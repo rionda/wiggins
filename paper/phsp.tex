@@ -1,143 +1,72 @@
-%  \documentclass{sig-alternate}
-% \documentclass[10pt]{article}
-\documentclass[runningheads,a4paper]{llncs}
-\usepackage{amssymb}
-\setcounter{tocdepth}{3}
-\usepackage{graphicx}
+\documentclass{sig-alternate-2013}
+\newif\ifacmstyle
+\acmstyletrue
 
-\usepackage{url}
-\urldef{\mailsa}\path|{ahmad, eli}@cs.brown.edu|    
-\newcommand{\keywords}[1]{\par\addvspace\baselineskip
-\noindent\keywordname\enspace\ignorespaces#1}
-% \newcommand*{\defeq}{\stackrel{\texttt{def}}{=}}
-\newcommand{\defeq}{\overset{\mathrm{def}}{=}}
-
-% \usepackage{amsmath, amssymb,amsthm}
-
-\usepackage{color}
-\usepackage[margin=1.5in]{geometry}
-\usepackage{soul}
-
-%\usepackage{fullpage}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{mathtools}
-
-\usepackage{caption}
-\usepackage{subcaption}
-
-%%%%%%%%%%%%%%%% Other packages %%%%%%%%%%%%%%%%%%
-% \usepackage{natbib}
-\usepackage[algoruled,vlined]{algorithm2e}
-% \usepackage{algorithmic}
-\usepackage{algpseudocode}
-\usepackage{nicefrac}
-
-\usepackage{floatrow}
-\DeclareFloatFont{tiny}{\tiny}% "scriptsize" is defined by floatrow, "tiny" not
-\floatsetup[table]{font=tiny}
- 
-
-%%%%%%%%%%%%% Commands and definitions %%%%%%%%%%%
-% \newtheorem{theorem}{Theorem}
-% \newtheorem{lemma}[theorem]{Lemma}
-% \newtheorem{corollary}[theorem]{Corollary}
-% \newtheorem{proposition}[theorem]{Proposition}
-% \newtheorem{remark}{Remark}
-% \newtheorem{definition}[theorem]{Definition}
-
-
-\DeclareMathOperator*{\argmax}{arg\,max}
-
-\newcommand{\paran}[1]{\left(#1\right)}
-\newcommand{\set}[1]{\left\{#1\right\}}
-\newcommand{\setof}[2]{\left\{#1 \vert #2\right\}}
-% \newcommand{\E}[1]{\mathbb{E}\left(#1\right)}
-
-\newcommand{\pr}[1]{\text{Pr}\left[#1\right]}
-\newcommand{\cost}[1]{\text{cost}\left( #1 \right)}
-
-\DeclareMathOperator*{\argmin}{argmin}
-
-\def\pr{\text{Pr}}
-\def\E{\mathbb{E}}
-\def\M{{\cal M}}
-\def\p{\mathbf{p}}
-\def\S{\mathcal{I}}
-\def\F{\mathcal{F}}
-% \def\I{\mathcal{I}}
-\def\T{\mathcal{T}}
-\def\P{\mathcal{P}}
-
-    
-\def\D{\mathcal{D}}
-\def\deg{\text{deg}}
-\def\optimizer{\texttt{optimizer}}
-\def\appoptimizer{\texttt{approx\_optimizer}}
-\def\sampler{\texttt{sampler}}
-\def\sys{\Gamma}
-\def\fr{\text{fr}}
-\def\ins{informed-set}
-
-
-
-\def\escos{\text{cost}}
-\def\mi{\text{mi}}
-
-\def\probname{Probabilistic Hitting Set Paradigm}
-\def\problem{Probabilistic Hitting Set Problem}
-
-% \newcommand{\ahmad}[1]{\textcolor{red}{#1}}
-% \newcommand{\eli}[1]{\textcolor{blue}{#1}}
-
-
-
-
-%%%%%%%%%%%%%%%%% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{./tex/macro.tex}
 
 \begin{document}
+\ifacmstyle
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
 
-\mainmatter
-
-\mainmatter  % start of an individual contribution
-
-% first the title is needed
-\title{The \probname: a General Framework for Search and Detection in Dynamic Social Networks\thanks{Work supported by NSF grant IIS-1247581 and NIH grant R01-CA180776.}}
-
-% a short form should be given in case it is too long for the running head
-\titlerunning{\probname}
-
-%
-\author{Ahmad Mahmoody%
-% \thanks{xx}%
-\and Eli Upfal}
-%
-% \authorrunning{Lecture Notes in Computer Science: Authors' Instructions}
-% (feature abused for this document to repeat the title also on left hand pages)
-
-% the affiliations are given next; don't give your e-mail address
-% unless you accept that it will be published
-\institute{Department of Computer Science, Brown University, Providence, RI\\
-\mailsa\\
-% \mailsb\\
-% \mailsc\\
-% \url{http://www.springer.com/lncs}
+\CopyrightYear{2016}
+\permission{Permission to make digital or hard copies of all or part of this
+work for personal or classroom use is granted without fee provided that copies
+are not made or distributed for profit or commercial advantage and that copies
+bear this notice and the full citation on the first page. Copyrights for
+components of this work owned by others than ACM must be honored. Abstracting
+with credit is permitted. To copy otherwise, or republish, to post on servers or
+to redistribute to lists, requires prior specific permission and/or a fee.
+Request permissions from Permissions@acm.org.}
+\conferenceinfo{WSDM'16,}{February 22--25, 2016, San Francisco, CA, USA}
+\copyrightetc{\copyright~2016 ACM. ISBN \the\acmcopyr}
+\crdata{XXX-X-XXXX-XXXX-X/16/02\ ...\$15.00.\\
+DOI: http://dx.doi.org/XX.XXXX/XXXXXXX.XXXXXXX
 }
 
-\toctitle{}
-\tocauthor{}
+\clubpenalty=10000
+\widowpenalty = 10000
+\fi
+
+\title{The \probname: a General Framework for Search and Detection in Dynamic
+Social Networks}
+
+\numberofauthors{3}
+\author{
+\alignauthor
+Ahmad Mahmoody\\
+\affaddr{Department of Computer Science}\\
+\affaddr{Brown University}\\
+\affaddr{Providence, RI, USA}\\
+\email{ahmad@cs.brown.edu}
+\alignauthor
+Matteo Riondato\\
+\affaddr{Department of Computer Science}\\
+\affaddr{Brown University}\\
+\affaddr{Providence, RI, USA}\\
+\email{matteo@cs.brown.edu}
+\alignauthor
+Eli Upfal\\
+\affaddr{Department of Computer Science}\\
+\affaddr{Brown University}\\
+\affaddr{Providence, RI, USA}\\
+\email{eli@cs.brown.edu}
+}
+
+\date{\today}
+
 \maketitle
-
-
-
-
-
-
 
 \begin{abstract}
 \input{./tex/abstract.tex}
 \end{abstract}
 
+\category{G.2.2}{Discrete Mathematics}{Graph Theory}[Graph algorithms]
+\category{H.2.8}{Database Management}{Database Applications}[Data mining]
+
+\keywords{ADD KEYWORDS SEPARATED BY SEMICOLONS}
 
 \input{./tex/introduction.tex}
 \input{./tex/relatedwork.tex}
@@ -147,10 +76,9 @@
 \input{./tex/experiment.tex}
 \input{./tex/conclusion.tex}
 
-% \section*{Acknowledgements}
+\section{Acknowledgements}
 
-% \bibliographystyle{abbrv}
-\bibliographystyle{splncs03}
+\bibliographystyle{abbrvnat}
 \bibliography{catchRef}
 
 % \appendix

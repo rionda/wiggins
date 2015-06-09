@@ -1,0 +1,80 @@
+\usepackage{lmodern} % More complete than the default CM font
+\usepackage[T1]{fontenc} % needed for lmodern
+\usepackage[utf8]{inputenc}
+%\usepackage{newtxtext} % use (similar to) Times font in text.
+%\usepackage{newtxmath} % use (similar to) Times font in math.
+\usepackage{hyperref} % Must be loaded before cleveref
+\usepackage{cleveref} % to have smart references using \cref.
+\crefname{section}{§}{§§}
+\Crefname{section}{§}{§§}
+\crefformat{section}{§#2#1#3}
+\crefname{theorem}{thm.}{thms.}
+\Crefname{theorem}{Thm.}{Thms.}
+\crefformat{theorem}{Thm.~#2#1#3}
+\usepackage{mdwlist} % compressed itemize, enumerate
+\usepackage[numbers,sort&compress,square]{natbib}
+\renewcommand{\refname}{REFERENCES}
+\renewcommand{\bibsection}{\section{REFERENCES}}
+\usepackage[ruled,linesnumbered]{algorithm2e} % must be loaded after natbib
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{mathtools}
+\newcommand*{\defeq}{\coloneqq}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{nicefrac}
+\usepackage{floatrow}
+
+\ifacmstyle
+\else
+\usepackage{amsthm}
+\fi
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{fact}{Fact}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\ifacmstyle
+\else
+\theoremstyle{definition}
+\fi
+\newtheorem{definition}{Definition}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\paran}[1]{\left(#1\right)}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\setof}[2]{\left\{#1 \vert #2\right\}}
+% \newcommand{\E}[1]{\mathbb{E}\left(#1\right)}
+
+\newcommand{\pr}[1]{\text{Pr}\left[#1\right]}
+\newcommand{\cost}[1]{\text{cost}\left( #1 \right)}
+\def\pr{\text{Pr}}
+\def\E{\mathbb{E}}
+\def\M{{\cal M}}
+\def\p{\mathbf{p}}
+\def\S{\mathcal{I}}
+\def\F{\mathcal{F}}
+% \def\I{\mathcal{I}}
+\def\T{\mathcal{T}}
+\def\P{\mathcal{P}}
+
+    
+\def\D{\mathcal{D}}
+\def\deg{\text{deg}}
+\def\optimizer{\texttt{optimizer}}
+\def\appoptimizer{\texttt{approx\_optimizer}}
+\def\sampler{\texttt{sampler}}
+\def\sys{\Gamma}
+\def\fr{\text{fr}}
+\def\ins{informed-set}
+\def\escos{\text{cost}}
+\def\mi{\text{mi}}
+\def\probname{Probabilistic Hitting Set Paradigm}
+\def\problem{Probabilistic Hitting Set Problem}
