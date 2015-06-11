@@ -40,7 +40,8 @@ void update(vector<double>& p, vector<double>& W) {
 	}
 }
 
-void solver(string sample_file, int number_of_nodes, double theta, int time_length, int num_iter, vector<double>& cost, vector<clock_t>& iter_time) {
+void solver(string sample_file, int number_of_nodes, double theta, int time_length, 
+	int num_iter, vector<double>& cost, vector<clock_t>& iter_time, const int cc) {
 	
 	vector<double> p(number_of_nodes, 1.0/number_of_nodes);	
 
@@ -75,11 +76,11 @@ void solver(string sample_file, int number_of_nodes, double theta, int time_leng
 				pS += p[u];
 				S.push_back(u);
 			}
-			tmp = 1.0/(1 - theta*(1-pS));
+			tmp = 1.0/(1 - theta*pow(1-pS,cc));
 			cost[r] += tmp;
 
 			// update W:
-			tmp = pow(tmp,2);
+			tmp = pow(tmp,2)*pow(1-pS,cc-1);
 			for (int v : S) {
 				W[v] += tmp;
 			}
@@ -101,29 +102,27 @@ int main(int argc, char *argv[]) {
 	int num_iter = 51;
 	int number_of_nodes;
 	int time_length;
-	// double theta = stod(argv[2]);
+	
+
 	double theta = 0.75;
-	// double theta = 0.0001;
+	
 
 	string input_graph = argv[1];
+	int cc = stoi(argv[2]);
 	string sample_file;
 
-	// vector<int> tries = {1,2,3,4,5,20};
+	
 	vector<int> tries = {1};
 
 	
 	ofstream fout_conv;
-	// fout_cost.open(input_graph + "_theta-" + to_string(theta)+ "_results.cost");
-	// fout_time.open(input_graph + "_theta-" + to_string(theta)+ "_results.time");
 	
-	fout_conv.open(my_get_dir_name(input_graph) +  "conv");
-	// fout_time.open(my_get_dir_name(input_graph) +  "conv.time");
+	fout_conv.open(my_get_dir_name(input_graph) + to_string(cc) + ".conv");
 
 	for (int i : tries) {
 		cout << "\n\nworking on i: " << i << endl; cout.flush();
 		cout << "\nrounds: \n";
-		// sample_file = input_graph+"eps-0.1_S-"+to_string(i);
-		// sample_file = input_graph+"_theta-"+to_string(theta)+"_S-"+to_string(i);
+
 		sample_file = my_get_dir_name(input_graph)+"S-"+to_string(i);
 
 		ifstream fin;
@@ -131,46 +130,17 @@ int main(int argc, char *argv[]) {
 		fin >> number_of_nodes >> time_length;
 		fin.close();		
 
+		solver(sample_file, number_of_nodes, theta, time_length, num_iter, cost, iter_time, cc);
 
-		solver(sample_file, number_of_nodes, theta, time_length, num_iter, cost, iter_time);
-		
-		// fout_cost << i << "\t";
 		for (double c : cost)
 			fout_conv << c << "\t";
 		fout_conv << endl;
 
-		// fout_time << i << "\t";
 		for (clock_t t : iter_time)
 			fout_conv << t << "\t";
 		fout_conv << endl;
 	}
 	fout_conv.close();
-	
-
 	cout << endl;
-
-
-
-
-	// cout << endl;
-	// cout << "costs: ";
-	// for (double c : cost)
-	// 	cout << c << " " ;
-	// cout << endl << endl;
-	// cout << "time: ";
-	// for (clock_t t : iter_time)
-	// 	cout << t << " ";
-	// cout << endl;
-
-	
-	
-	// cout << "costs:\n";
-	// for (double c : cost)
-	// 	cout << c << "\t" ;
-	// cout << endl << endl;
-	// cout << "time:\n";
-	// for (clock_t t : iter_time)
-	// 	cout << t << "\t";
-	// // cout << endl;
 	return 0;
 }

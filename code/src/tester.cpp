@@ -19,7 +19,7 @@ string my_get_dir_name(const string filename) {
 }
 
 
-vector<double> cost(vector<vector<double>>& pp, const string test_file, const double theta, const int time_length) {
+vector<double> cost(vector<vector<double>>& pp, const string test_file, const double theta, const int time_length, const int cc) {
 	ifstream fin;
 	fin.open(test_file);
 	if (! fin.is_open()) {
@@ -42,12 +42,12 @@ vector<double> cost(vector<vector<double>>& pp, const string test_file, const do
 			}			
 		}
 		for (int r=0; r<pp.size(); ++r) {
-			cost_val[r] += 1.0/(1 - theta*(1-pS[r]));
+			cost_val[r] += 1.0/(1 - theta*pow(1-pS[r],cc));
 		}
 	}
 
 	for (int r=0; r < pp.size(); ++r) {
-		cost_val[r] /= theta;
+		//cost_val[r] /= theta;
 		cost_val[r] /= time_length;	
 	}
 
@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 	double theta = 0.75;
 
 	string input_graph = argv[1];
+	int cc = stoi(argv[2]);
 	// string test_file = input_graph+"eps-0.1_S-20";
 	// string test_file = input_graph+"_theta-"+to_string(theta)+"_S-5";//+to_string(i);	
 
@@ -102,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 	ofstream fout_test_cost;
 
-	fout_test_cost.open(my_get_dir_name(input_graph) + "test");
+	fout_test_cost.open(my_get_dir_name(input_graph) + to_string(cc) +".test");
 	for (int i : tries) {
 		cout << "working on i: " << i << endl;
 		// string pp_file = input_graph+"_theta-"+to_string(theta)+"_S-"+to_string(i) +".p";
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
 
 		vector<vector<double>> pp = load_pp(pp_file, number_of_nodes, num_iter);
 		cout << "loaded" << endl; cout.flush();
-		vector<double> cost_val = cost(pp, test_file, theta, time_length);
+		vector<double> cost_val = cost(pp, test_file, theta, time_length, cc);
 		cout << "should be done" << endl;cout.flush();
 		for (double c : cost_val) {
 			cout << c << "\t";

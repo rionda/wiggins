@@ -1,7 +1,3 @@
-/*
-	The algorithms for betweenness are implemented similar to Networkx package
-*/
-
 #include <iostream>
 #include <vector>
 #include <deque>
@@ -15,6 +11,7 @@
 using namespace std;
 typedef vector<vector<deque<int>>> prev_t;
 typedef vector<vector<int>>	vvint_t;
+typedef vector<vector<double>>	vvdoub_t;
 typedef vector<deque<int>>	vdint_t;
 typedef vector<double>		vdoub_t;
 typedef deque<int>			deint_t;
