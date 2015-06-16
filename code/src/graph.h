@@ -7,10 +7,13 @@
 #include <algorithm>
 #include <tuple>
 #include <set>
+#include <numeric>
+#include <random>
 
 using namespace std;
 typedef vector<vector<deque<int>>> prev_t;
-typedef vector<vector<int>>	vvint_t;
+typedef vector<vector<int>>		vvint_t;
+typedef vector<int>				vint_t;
 typedef vector<vector<double>>	vvdoub_t;
 typedef vector<deque<int>>	vdint_t;
 typedef vector<double>		vdoub_t;
@@ -31,6 +34,9 @@ public:
 	int number_of_nodes;
 	int number_of_edges;	
 	double theta;
+	vint_t indeg;
+	vint_t outdeg;
+
 	Graph(const string input_file, const double theta);
 	// Graph(const string input_file);
 	/*

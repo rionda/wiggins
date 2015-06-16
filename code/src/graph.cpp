@@ -64,6 +64,8 @@ Graph::Graph(const string input_file, const double theta_input) {
 	nodes = vvint_t(number_of_nodes);
 	distr = uniform_int_distribution<>(0,number_of_nodes-1);
 	bern = vector<vector<bernoulli_distribution>>(number_of_nodes);
+	indeg = vint_t(number_of_nodes, 0);
+	outdeg = vint_t(number_of_nodes, 0);
 
 	// loading the edges:
 	number_of_edges = 0;
@@ -71,6 +73,8 @@ Graph::Graph(const string input_file, const double theta_input) {
 	while (fin >> u >> v >> p) {
 		++number_of_edges;		
 		nodes[u].push_back(v);
+		++outdeg[u];
+		++indeg[v];
 		bern[u].push_back(bernoulli_distribution(p));
 	}	
 	fin.close();
@@ -153,13 +157,11 @@ void Graph::gen_sample_with_time(const int time_interval, const string output_fi
 vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
 	int u;
 	vdoub_t p0, p1, p2;
-	// int R = ceil(log(g.number_of_nodes) * pow(theta,2) /(2*pow(eps,2)*pow(1-theta,2)));
+	
 	int R = ceil(3*(log(number_of_nodes)+log(2))/ ((1-theta)*pow(eps,2)));
-	// int R = 10;
 	int a = 10*R;
 	int b = 2*R;
-	// int a = 100*R;
-	// int b = 20*R;
+
 	cout << "R: " << R << ", a: " << a << ", b: " << b << endl;
 	
 	p0 = simul_with_file(R, graph_name+".tmp0"+idxstr, num_iter, 0);
@@ -170,7 +172,6 @@ vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
 	discrete_distribution<int> disc1(p1.begin(), p1.end());
 	discrete_distribution<int> disc2(p2.begin(), p2.end());
 
-	// vvint_t schedule(3*a + 2*b);
 	vvint_t schedule(number_of_nodes);
 	//
 	cout << "1" << endl; cout.flush();

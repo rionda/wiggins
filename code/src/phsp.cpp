@@ -1,6 +1,6 @@
 #include <cmath>
 #include "graph.h"
-// #include <direct.h>
+
 
 string my_get_dir_name(const string filename) {
 	string dir;
@@ -185,7 +185,134 @@ void tester(const string samp_file, const string test_file,
 
 
 // ************************************************
+// Functions for Simulator
 // ************************************************
+void simulator(const string filename, const int num_simuls, const int num_iter, const double theta, const double epsilon) {
+	/*
+		In PKDD submission, we let epsilon = 1, theta=0.75, and num_iter = 15;
+	*/
+
+	for (int idx=0; idx < num_simuls; ++idx) {
+		Graph g(filename, theta);
+		vdoub_t cost = g.simul_process(epsilon, num_iter,""+to_string(idx));
+		ofstream fout;
+		fout.open(my_get_dir_name(filename) + "simul-"+to_string(idx));
+		for (double c : cost)
+			fout << c << "\t";
+		fout << endl;
+		fout.close();
+	}
+}
+
+// ************************************************
+// Functions for Comparison
+// ************************************************
+
+vdoub_t load_p(const string pp_file, const int number_of_nodes, 
+							   const int num_iter) {
+	
+	ifstream fin;
+	fin.open(pp_file);
+	if (! fin.is_open()) {
+		cerr << "load_pp: file not found: " << pp_file << endl;
+	}
+	double p_val;
+	vdoub_t p(number_of_nodes);
+	for (int r=0; r < num_iter-1; ++r) {
+		for (int i=0; i<number_of_nodes; ++i) {
+			fin >> p_val;
+		}
+	}
+	for (int i=0; i<number_of_nodes; ++i) {
+		fin >> p_val;
+		p[i] = p_val;
+	}
+
+	return p;
+}
+
+
+
+void compare(const string filename, const string samp_file, const string test_file,
+			const int num_iter, const int probes,
+			const double theta) {
+
+	Graph g(filename, theta);
+
+	int number_of_nodes, len_samp;
+	ifstream fin(samp_file + ".stat");	
+	fin >> number_of_nodes >> len_samp;	
+	fin.close();
+
+	string pp_file = samp_file +".p";
+	
+	// getting p
+	vdoub_t p = load_p(pp_file, number_of_nodes, num_iter);
+
+	fin.open(test_file);
+	if (! fin.is_open()) {
+		cerr << "cost: file not found: " << test_file << endl;		
+	}
+
+	// getting uniform:
+	vdoub_t unif(number_of_nodes, 1.0/number_of_nodes);
+
+	// getting out_degree:
+	vdoub_t out_degree(number_of_nodes);
+	for (int u = 0; u<number_of_nodes; ++u) {
+		out_degree[u] = (double) g.outdeg[u]/(g.number_of_edges);
+	}
+	
+	// getting in_degree:
+	vdoub_t in_degree(number_of_nodes);
+	for (int u = 0; u<number_of_nodes; ++u) {
+		in_degree[u] = (double) g.indeg[u]/(g.number_of_edges);
+	}
+
+
+	vdoub_t cost_val(4,0);	
+	int k, u;
+	double pS_p, pS_unif, pS_out, pS_in;	
+	double cost_p = 0, cost_unif = 0, cost_out = 0, cost_in = 0;
+	while (fin >> k) {
+		// vector<double> pS(pp.size(), 0);
+		pS_p = 0;
+		pS_unif = 0;
+		pS_out = 0;
+		pS_in = 0;
+
+		for (int i=0; i<k; ++i) {			
+			fin >> u;
+			pS_p += p[u];
+			pS_unif += unif[u];
+			pS_out += out_degree[u];
+			pS_in  += in_degree[u];
+			
+		}
+
+		cost_p += 1.0/(1 - theta*pow(1-pS_p,probes));
+		cost_unif += 1.0/(1 - theta*pow(1-pS_unif,probes));
+		cost_out += 1.0/(1 - theta*pow(1-pS_out,probes));
+		cost_in += 1.0/(1 - theta*pow(1-pS_in,probes));
+
+	}
+	fin.close();
+
+	cost_p /= len_samp;
+	cost_unif /= len_samp;
+	cost_out /= len_samp;
+	cost_in /= len_samp;
+	
+	ofstream fout_comp(samp_file + ".compare");
+	fout_comp << "p\t" << cost_p << endl;
+	fout_comp << "unif\t" << cost_unif << endl;
+	fout_comp << "out_degree\t" << cost_out << endl;
+	fout_comp << "in_degree\t" << cost_in << endl;
+
+	fout_comp.close();
+}
+
+	
 
 
 
@@ -196,7 +323,7 @@ int main(int argc, char *argv[]) {
 	string TASK, filename;
 	uint64_t len_samp, len_test;
 
-	int num_iter = 51, probes; // arm counts the number of probes
+	int num_iter = 51, probes, num_simuls = 1; // arm counts the number of probes
 	double epsilon = 0.1, theta = 0.75;
 
 	for (int i=0; i<argc; ++i) {			
@@ -216,7 +343,10 @@ int main(int argc, char *argv[]) {
 			num_iter = stod(argv[i+1]);
 		} else if (! strcmp(argv[i],"-PROBES")) {
 			probes = stod(argv[i+1]);
+		} else if (! strcmp(argv[i],"-NUM_SIMULS")) {
+			num_simuls = stod(argv[i+1]);
 		}
+
 	}
 
 	/*
@@ -237,6 +367,12 @@ int main(int argc, char *argv[]) {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_test);
 		tester(samp_file, test_file, num_iter, probes, theta);
+	} else if (TASK == "simulator") {
+		simulator(filename, num_simuls, num_iter, theta, epsilon);
+	} else if (TASK == "compare") {
+		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
+		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_test);
+		compare(filename, samp_file, test_file, num_iter, probes, theta);
 	}
 	
 	return 0;
