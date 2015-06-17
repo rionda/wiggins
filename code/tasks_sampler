@@ -1,0 +1,12 @@
+./phsp -TASK sampler -DIR data/twitter/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/twitter/ -SAMPLE 10000
+./phsp -TASK sampler -DIR data/enronEmail/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/enronEmail/ -SAMPLE 10000
+./phsp -TASK sampler -DIR data/epinion/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/epinion/ -SAMPLE 10000
+./phsp -TASK sampler -DIR data/brightkite/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/brightkite/ -SAMPLE 10000
+./phsp -TASK sampler -DIR data/webgoogle/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/webgoogle/ -SAMPLE 10000
+./phsp -TASK sampler -DIR data/notredame/ -SAMPLE 2000
+./phsp -TASK sampler -DIR data/notredame/ -SAMPLE 10000
