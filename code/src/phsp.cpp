@@ -29,6 +29,18 @@ void sampler(Graph g, const string dir, const uint64_t len_samp) {
 	fout.close();		
 }
 
+void indexed_sampler(Graph g, const string dir, const uint64_t len_samp, const int ind) {
+	/*
+		len_samp: the lenght of the time interval of samples
+	*/
+	string samp_file = dir+"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
+	g.gen_sample(len_samp, samp_file);
+	
+	ofstream fout(samp_file + ".stat");	
+	fout << g.number_of_nodes << endl;
+	fout << len_samp;
+	fout.close();		
+}
 
 // ************************************************
 //	Functins for Solver task
@@ -106,7 +118,6 @@ void solver(const string samp_file,
 	fout_conv.close();
 
 }
-
 
 
 // ************************************************
@@ -243,7 +254,8 @@ void compare(const string filename, const string samp_file, const string test_fi
 	Graph g(filename, theta);
 
 	int number_of_nodes, len_samp;
-	ifstream fin(samp_file + ".stat");	
+	// ifstream fin(samp_file + ".stat");
+	ifstream fin(test_file + ".stat");	
 	fin >> number_of_nodes >> len_samp;	
 	fin.close();
 
@@ -326,7 +338,7 @@ int main(int argc, char *argv[]) {
 	string TASK, filename;
 	uint64_t len_samp, len_test;
 
-	int num_iter = 51, probes, num_simuls = 1; 
+	int num_iter = 51, probes, num_simuls = 1, ind; 
 	double epsilon = 0.1, theta = 0.75;
 
 	for (int i=0; i<argc; ++i) {			
@@ -349,6 +361,8 @@ int main(int argc, char *argv[]) {
 			probes = stod(argv[i+1]);
 		} else if (! strcmp(argv[i],"-NUM_SIMULS")) {
 			num_simuls = stod(argv[i+1]);
+		} else if (! strcmp(argv[i],"-IND")) {
+			ind = stod(argv[i+1]);
 		}
 
 	}
@@ -362,20 +376,37 @@ int main(int argc, char *argv[]) {
 	if (TASK == "sampler") {
 		Graph g(filename, theta);
 		sampler(g, my_get_dir_name(filename), len_samp);
+	} else if (TASK == "indexed_sampler") {
+		Graph g(filename, theta);
+		indexed_sampler(g, my_get_dir_name(filename), len_samp, ind);
 
 	} else if (TASK == "solver") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		solver(samp_file, theta, num_iter, probes);		
+	} else if (TASK == "indexed_solver") {
+		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
+		solver(samp_file, theta, num_iter, probes);	
 
 	} else if (TASK == "tester") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_test);
 		tester(samp_file, test_file, num_iter, probes, theta);
+
+	} else if (TASK == "indexed_tester") {
+		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
+		string test_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_test)+"-"+to_string(ind);
+		tester(samp_file, test_file, num_iter, probes, theta);
+		
 	} else if (TASK == "simulator") {
 		simulator(filename, num_simuls, num_iter, theta, epsilon);
 	} else if (TASK == "compare") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_test);
+		compare(filename, samp_file, test_file, num_iter, probes, theta);
+	
+	} else if (TASK == "indexed_compare") {
+		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
+		string test_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_test)+"-"+to_string(ind);
 		compare(filename, samp_file, test_file, num_iter, probes, theta);
 	}
 	

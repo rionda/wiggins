@@ -1,0 +1,6 @@
+./phsp -TASK indexed_solver -DIR data/twitter/ -PROBES 1
+./phsp -TASK indexed_solver -DIR data/enronEmail/ -PROBES 1
+./phsp -TASK indexed_solver -DIR data/epinion/ -PROBES 1
+./phsp -TASK indexed_solver -DIR data/brightkite/ -PROBES 1
+./phsp -TASK indexed_solver -DIR data/webgoogle/ -PROBES 1
+./phsp -TASK indexed_solver -DIR data/notredame/ -PROBES 1

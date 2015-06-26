@@ -1,0 +1,6 @@
+./phsp -TASK indexed_compare -DIR data/twitter/ -PROBES 1 -TEST 10000
+./phsp -TASK indexed_compare -DIR data/enronEmail/ -PROBES 1 -TEST 10000
+./phsp -TASK indexed_compare -DIR data/epinion/ -PROBES 1 -TEST 10000
+./phsp -TASK indexed_compare -DIR data/brightkite/ -PROBES 1 -TEST 10000
+./phsp -TASK indexed_compare -DIR data/webgoogle/ -PROBES 1 -TEST 10000
+./phsp -TASK indexed_compare -DIR data/notredame/ -PROBES 1 -TEST 10000

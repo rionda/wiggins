@@ -1,0 +1,6 @@
+./phsp -TASK indexed_sampler -DIR data/twitter/
+./phsp -TASK indexed_sampler -DIR data/enronEmail/
+./phsp -TASK indexed_sampler -DIR data/epinion/
+./phsp -TASK indexed_sampler -DIR data/brightkite/
+./phsp -TASK indexed_sampler -DIR data/webgoogle/
+./phsp -TASK indexed_sampler -DIR data/notredame/
