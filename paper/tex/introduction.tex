@@ -21,12 +21,13 @@ contributions are the following
 
 \para{Paper Structure} In Sect.~\ref{sec:prelims} we give introductory
 definitions and formulate the \probname, showing how it is related to
-information-diffusion processes in a graph. In Sect.~\ref{sec:method} we
-describe our algorithms for computing an optimal schedule and its cost
-\itodo{verify that we define what a schedule is before this}, and then show
-(Sect.~\refmissing) how to adapt the algorithm to the realistic case when the
-parameters of the problem needs to be learned from a collection of observations
-and the cost can only be estimated. Then, in Sect.~\refmissing we show a
+information-diffusion processes in a graph. We discuss related works in
+Sect.~\ref{sec:related_work}. In Sect.~\ref{sec:method} we describe our
+algorithms for computing an optimal schedule and its cost \itodo{verify that we
+define what a schedule is before this}, and then show how to adapt the algorithm
+to the realistic case when the parameters of the problem needs to be learned
+from a collection of observations, the cost can only be estimated, and the
+parameters change in time. Then, in Sect.~\ref{sec:mapreduce} we show a
 MapReduce algorithm for the same problem which greatly speeds up the computation
 and allows to scale up to large networks. The result of our experimental
 evaluation are presented in Sect.~\ref{sec:exp}. We draw our conclusions and
