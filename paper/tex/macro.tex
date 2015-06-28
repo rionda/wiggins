@@ -4,13 +4,6 @@
 %\usepackage{newtxtext} % use (similar to) Times font in text.
 %\usepackage{newtxmath} % use (similar to) Times font in math.
 \usepackage{hyperref} % Must be loaded before cleveref
-\usepackage{cleveref} % to have smart references using \cref.
-\crefname{section}{§}{§§}
-\Crefname{section}{§}{§§}
-\crefformat{section}{§#2#1#3}
-\crefname{theorem}{thm.}{thms.}
-\Crefname{theorem}{Thm.}{Thms.}
-\crefformat{theorem}{Thm.~#2#1#3}
 \usepackage{mdwlist} % compressed itemize, enumerate
 \usepackage[numbers,sort&compress,square]{natbib}
 \renewcommand{\refname}{REFERENCES}
@@ -78,5 +71,8 @@
 \def\mi{\text{mi}}
 \def\probname{Probabilistic Hitting Set Paradigm}
 \def\problem{Probabilistic Hitting Set Problem}
+
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1.}}
+\newcommand{\para}[1]{\noindent{\bf #1.}}
 
 \usepackage[show]{notes-alt}
