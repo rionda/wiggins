@@ -7,10 +7,10 @@ UPLOADURI = public_html/MahmoodyRiondatoUpfal-PHSP-extended.pdf
 
 all : archive
 
-$(MAINFILE).aux: *.tex $(wildcard *.eps)
+$(MAINFILE).aux: phsp.tex tex/*.tex $(wildcard *.eps) Makefile
 	$(LATEX) $(MAINFILE).tex
 
-$(MAINFILE).bbl: *.tex  *.bib
+$(MAINFILE).bbl: phsp.tex tex/*.tex *.bib Makefile
 	-bibtex --min-crossrefs=20 $(MAINFILE)
 
 $(MAINFILE).pdf: $(MAINFILE).aux $(MAINFILE).bbl
@@ -18,7 +18,7 @@ $(MAINFILE).pdf: $(MAINFILE).aux $(MAINFILE).bbl
 	$(LATEX) $(MAINFILE).tex
 
 $(MAINFILE).tar.bz2: $(MAINFILE).pdf
-	env COPYFILE_DISABLE=1 tar cjvfh $(MAINFILE).tar.bz2 *.tex *.bib *.pdf $(wildcard figures/*.pdf) $(wildcard *.bst) $(wildcard *.cls) $(wildcard *.clo) $(wildcard *.eps) $(wildcard *.svg) Makefile
+	env COPYFILE_DISABLE=1 tar cjvfh $(MAINFILE).tar.bz2 *.tex tex/*.tex *.bib *.pdf $(wildcard figures/*.pdf) $(wildcard *.bst) $(wildcard *.cls) $(wildcard *.clo) $(wildcard *.eps) $(wildcard *.svg) Makefile
 
 archive: $(MAINFILE).tar.bz2
 
