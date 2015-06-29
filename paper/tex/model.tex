@@ -125,11 +125,11 @@ step $t$ (i.e., after the agent has probed the nodes in the set $P_t$ generated
 by a $c$-schedule.
 
 \begin{definition}[$\theta$-cost]
-	Given a $(\theta,c)$-PHSP on $\sys$, the $\theta$-\emph{cost} $\cost{c,p}$
+	Given a $(\theta,c)$-PHSP on $\sys$, the $\theta$-\emph{cost} $\cost{c,\p}$
 	of a $c$-schedule $(c,\p)$ is the limit of the average expected
 	$\theta$-load of $\sys$:
 	\[
-		\cost{c,p}=\lim\limits_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\E(L_\sys(\theta,t'))\enspace.
+		\cost{c,\p}=\lim\limits_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\E(L_\sys(\theta,t'))\enspace.
 	\]
 \end{definition}
 The limit above always exists as proven in Lemma~\ref{lem:explicit}.
