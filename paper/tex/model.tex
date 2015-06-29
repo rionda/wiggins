@@ -45,14 +45,14 @@ We now move to introduce the \probname and its components more formally.
 	Let $G=(V,E)$ be a graph, $\F$ be a family of subsets of $V$, and $\pi$ a
 	function from $\F$ to $[0,1]$. A \emph{generating process} $\sys =
 	(V,\F,\pi)$ is an \emph{infinite time process} that at each time $t$,
-	generates a collection $\S_t\subseteq\F$ of subsets of $V$ such that $S\in
-	\F$ is included in $\S_t$ with probability $\pi(S)$, independent of other
+	generates a collection $\Sample_t\subseteq\F$ of subsets of $V$ such that $S\in
+	\F$ is included in $\Sample_t$ with probability $\pi(S)$, independent of other
 	sets generated at $t$ and at time $t'<t$.
 \end{definition}
 
 For example, let $\sys$ represents the process of generation and diffusion of
 rumors in the graph $G$. At each time $t$, a set of rumors is generated, one
-rumor for each set $S\in\S_t$ and it \emph{instantaneously} spreads to all
+rumor for each set $S\in\Sample_t$ and it \emph{instantaneously} spreads to all
 nodes in $S$, and then \emph{stops spreading}. This is a natural model of rumor
 spreading as observed by the \emph{resource-limited} agent that can not monitor
 all the network continuously at all times: the diffusion of a rumor happens too
@@ -63,7 +63,7 @@ As we mentioned, the agent can actually observe new rumors only by
 \emph{probing} up to $c$ nodes at each time $t$, checking whether any new
 rumor reached them. We can formalize this idea as follows.
 
-An \emph{item} is a pair $(t,S)$, for any $t$ and any $S\in\S_t$. For any
+An \emph{item} is a pair $(t,S)$, for any $t$ and any $S\in\Sample_t$. For any
 node $v\in V$, let $I_{t,v}$ be the set of items $(t',S)$ such that ``reached''
 $v$ up to and including time $t$:
 \[
@@ -129,7 +129,7 @@ by a $c$-schedule.
 	of a $c$-schedule $(c,\p)$ is the limit of the average expected
 	$\theta$-load of $\sys$:
 	\[
-		\cost{c,\p}=\lim\limits_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\E(L_\sys(\theta,t'))\enspace.
+		\cost{c,\p}=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\expect(L_\sys(\theta,t'))\enspace.
 	\]
 \end{definition}
 The limit above always exists as proven in Lemma~\ref{lem:explicit}.

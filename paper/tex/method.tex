@@ -1,255 +1,314 @@
-\section{Computing A Schedule}\label{sec:method}
-In this section, we first study the general problem of finding an optimal schedule in a  $(\theta,c)$-PHSP for a generating process $\sys = (U, \F, \pi)$. We provide two different approaches assuming we know $\F$ and $\pi$ in prior.  Then, we show how we still can apply our methods if we observe a sample $\S$ of $\F$ generated according to $\pi$ during a time interval of length $\tilde O(\log(n))$, i.e., $\S = \S_1\cup\S_2\cup\ldots\cup\S_{\tilde O(\log(n))}$ (see Section~\ref{sec:introduction}). Next, we present our method in the MapReduce framework to show the scalability of our method. Finally, we conclude the section by studying the case when the parameters of the network (topology, probabilities, etc) change and show how our method can adapts itself in dynamic networks.
+\section{Computing a Schedule}\label{sec:method}
+In this section, we study the problem of finding an optimal schedule in a
+$(\theta,c)$-PHSP for a generating process $\sys = (V, \F, \pi)$ on a graph
+$G=(V,E)$.
 
+We start we start by assuming that we have complete knowledge of $\F$ and $\pi$.
+This strong assumption allows us to study the theoretical properties of the
+problem and motivates the design of our algorithm to compute an optimal
+schedule. We then remove the assumption and show how we can extend our method
+to only use a collection of observations from $\sys$ collected over a time
+interval of length $O(\log n)$. Then we discuss how to recalibrate our
+algorithms when the parameters of the process (e.g., $\pi$ or $\F$) change.
+Finally, we show an algorithm for the MapReduce framework that allows us to
+scale to large networks.
 
-% In this section we first introduce our man approach for solving the 1-PHSP, and we show how the algorithm is scalable to larger datasets (large size $\F$) in MapReduce. Next, we study the sample complexity of the $\F$ and show that a  family of  sets $\F'$ gathered by sampling the sets of $\F$ during a time interval of length $\sim O(\log(n))$ is enough to estimate the cost and \ahmad{Lagrangian} functions of any schedule efficiently and accurately, using Chernoff bound techniques. 
-% 
-
-
-
-\subsection{Computing the Cost of a Schedule}\label{sec:optimize}
-As explained in the previous section, we study the $(\theta,c)$-PHSP for a generating process $\sys=(U, \F, \pi)$. Now, using the fact that $\theta \in (0,1]$, we can give an explicit formula for computing the cost of a $c$-schedule, which is useful in our optimization problem.
+\subsection{Computing a Schedule}\label{sec:optimize}
+Let $G=(V,E)$ be a graph. We study the $(\theta,c)$-PHSP for a generating
+process $\sys=(V, \F, \pi)$. Assume for now that we know $\F$, and $\pi$. With
+this assumption, we can exactly compute the $\theta$-cost of a $c$-schedule.
 
 \begin{lemma}\label{lem:explicit}
 For a schedule $\p$ we have
-$$\cost{\p} \defeq \lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\E(L_{\sys}(t')) = \sum_{S\in \F} \frac{\pi(S)}{1- \theta(1-\p(S))^c},$$
-where $\p(S) = \sum_{i\in S} p_i$.
+\begin{equation}\label{eq:explicit}
+\cost{\p} \defeq
+\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_{\sys}(t')] = \sum_{S\in \F} \frac{\pi(S)}{1- \theta(1-\p(S))^c},
+\end{equation}
+where $\p(S) = \sum_{v\in S} \p(v)$.
 \end{lemma}
-% See Appendix~\ref{app:proof} for the proof of Lemma~\ref{lem:explicit}.
+
 \begin{proof}
-Let $i=i_{t, S}$ be an item. The probability that $i$ is still uncaught at time $t'$ is $(1-\p(S))^{c(t'-t)}$, and its freshness at $t'$ is $\theta^{t' - t}$. Therefore, $i$ imposes the load $\theta^{t'-t}$ to the system at time $t'$, with probability $(1-\p(S))^{c(t'-t)}$, and zero otherwise. Since the probability of $i_{t,S}$ being generated is $\pi(S)$ we have
-\begin{align*}
- \cost{\p} &= \lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\E(L_{\sys}(t')) = \lim_{t\rightarrow \infty} \E\paran{L_{\sys}(t)} \\
- &=\lim_{t\rightarrow \infty} \sum_{S\in \F} \pi(S) \paran{1 + \theta\cdot(1-\p(S))^c + \ldots + \theta^t\cdot(1-\p(S))^{ct}} \\ 
- &=
- \sum_{S\in \F} \frac{\pi(S)}{1-\theta(1-\p(S))^c},
-\end{align*}
-where we used the fact that for any convergent sequence $\set{a_i}_{i\in\mathbb{N}}$ we have $\lim\limits_{t\rightarrow\infty}\frac{\sum_{i=1}^t a_i}{t} = \lim\limits_{i\rightarrow\infty}a_i$ (Cesaro means~\cite{hardy1991divergent}).\qed
+	Let $i=(t, S)$ be an item. The probability that $i$ is still uncaught at
+	time $t'$ is $(1-\p(S))^{c(t'-t)}$, and its freshness at $t'$ is $\theta^{t'
+	- t}$.  Therefore, $i$ imposes the load $\theta^{t'-t}$ to the system at
+	time $t'$, with probability $(1-\p(S))^{c(t'-t)}$, and zero otherwise. Since
+	the probability of $i_{t,S}$ being generated is $\pi(S)$ we have 
+	\mynote{In my opinion, we need more passages in the following proof. E.g.,
+		decomposing the expectation into a sum over all the timesteps $t\le t'$
+		of sum over all sets $S$ in $\F$ of the probability of being generated
+		at time $t$ and uncaught at time $t'$.}
+	\begin{align*}
+		\cost{\p} &=
+		\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_{\sys}(t')] =
+		\lim_{t\rightarrow \infty} \expect[L_{\sys}(t)] \\
+		&=\lim_{t\rightarrow \infty} \sum_{S\in \F} \pi(S) (1 +
+		\theta\cdot(1-\p(S))^c + \ldots + \theta^t\cdot(1-\p(S))^{ct}) \\ 
+		&=
+		\sum_{S\in \F} \frac{\pi(S)}{1-\theta(1-\p(S))^c},
+		\end{align*}
+		where we used the fact that for any convergent sequence
+		$\set{a_i}_{i\in\mathbb{N}}$ we have
+		$\lim\limits_{t\rightarrow\infty}\frac{\sum_{i=1}^t a_i}{t} =
+		\lim\limits_{i\rightarrow\infty}a_i$ (Cesaro
+		means~\cite{hardy1991divergent} \itodo{Is there a specific theorem we can
+		cite?}).
 \end{proof}
 
-Now, having the explicit formula for the cost function, we show that it is a convex function over its domain:
+We now show that $\cost{\p}$, as expressed by the r.h.s.~of~\eqref{eq:explicit}
+is a convex function over its domain, i.e., over the set of all possible
+probability distribution over the set $V$ of nodes. We then use this result to
+show how to compute an optimal schedule.
+
 \begin{theorem}\label{thm:convexity}
- The cost function, $\cost{\p}$, is a convex function over its domain.
+	The cost function $\cost{\p}$ is a convex function over its domain.
 \end{theorem}
 \begin{proof}
- Fix a subset $S\subseteq V$. Note that it suffices to show that the function $f_S(\p) = \frac{1}{1 - \theta(1-\p(S))^c}$ is a convex function, as $\cost{\p}$ is a linear combination of $f_S(\p)$'s with positive coefficients. 
- 
- Let $g_S(\p) = \theta(1-\p(S))^c$. We claim that $g_S$ is a convex function. This is because the Hessian matrix of $g_S$ is positive semidefinite:
- $$
-    \frac{\partial}{\partial p_i \partial p_j} g_S(\p) = \left\{
-     \begin{array}{lr}
-       \theta c(c-1) (1-\p(S))^{c-2} &  i,j \in S\\
-       0 &  \text{otherwise}
-     \end{array}
-   \right.
- $$
- Suppose $V_S$ is a $n\times 1$ vector in $\mathbb{R}^n$ such that its $i$-th coordinate is $\left[c(c-1) (1-\p(S))^{c-2} \right]^{1/2}$ if $i\in S$, and 0 otherwise. Therefore, we can write the Hessian matrix of $g_S$ as
- $$\nabla^2 g_S = V_S * V_S^T,$$ 
- and thus, $\nabla^2 g_S$ is positive semidefinite matrix and $g$ is convex. So, $1-g_S$ is a \emph{concave} function. Finally, since $f_S(\p)=\frac{1}{1-g_S(\p)}$ and the function $h(x)=\frac{1}{x}$ is convex and non-increasing, $f_S$ is a convex function.\qed
-%  
-%  . We denote the set of all possible schedules by $\triangle^{n-1}$ which is the $n$-dimensional simplex. Now, define $h:\mathbb{}$
-%  
-%  
-%  
-%  To do so, we need to show the Hessian matrix of $f_S$, $\nabla^2 f_S$, is positive semidefinite. Note that 
-%  $$
-%     \frac{\partial}{\partial p_i \partial p_j} f_S(\p) = \left\{
-%      \begin{array}{lr}
-%        \frac{2\theta^2}{\paran{1-\theta(1-\p(S))}^3} &  i,j \in S\\
-%        0 &  \text{otherwise}
-%      \end{array}
-%    \right.
-%  $$
-%  Now let $V_S$ be a $n\times 1$ vector in $\mathbb{R}^n$ such that its $i$-th coordinate is $\frac{\sqrt{2}\theta}{\paran{1-\theta(1-p(S))}^{1.5}}$ if $i\in S$, and 0 otherwise. Therefore, we can write the Hessian matrix of $f_S$ as
-%  $$\nabla^2 f_S = V_S * V_S^T.$$
-%  So, $\nabla^2 f_S$ is a positive semidefinite matrix, and $f_S$ is a convex function. Hence, the cost function is a linear combination of convex functions with positive terms, it is a convex function. Note that if for every  $i\in [n]$, $\set{i}\in \F$, the cost function is \textbf{strictly} convex.
-\end{proof}
-Note that in the proof of Theorem~\ref{thm:convexity}, if for every $i\in U$, $S=\set{i}\in \F$, the function $g_S$, and therefore $f_S$, are \emph{strictly} convex.
+	For any $S\in\F$, let $f_S(\p) = \frac{1}{1 - \theta(1-\p(S))^c}$. The
+	function $\cost{\p}$ is a linear combination of $f_S(\p)$'s with positive
+	coefficients. Hence to show that $\cost{\p}$ is convex it is sufficient to
+	show that, for any $S\in\F$, $f_S(\p)$ is convex.
 
+	We start by showing that $g_S(\p) = \theta(1-\p(S))^c$ is convex, because
+	its Hessian matrix is positive semidefinite. Indeed we have:
+	\[
+		\frac{\partial}{\partial p_i \partial p_j} g_S(\p) = \left\{
+		\begin{array}{lr}
+		\theta c(c-1) (1-\p(S))^{c-2} &  i,j \in S\\
+		0 &  \text{otherwise}
+		\end{array}
+		\right.
+	\]
+	Let $\mathbf{v}_S$ be a $n\times 1$ vector in $\mathbb{R}^n$ such that its
+	$i$-th coordinate is $\left[c(c-1) (1-\p(S))^{c-2} \right]^{1/2}$ if $i\in
+	S$, and $0$ otherwise. We can write the Hessian matrix of $g_S$ as
+	\[
+		\nabla^2 g_S = V_S * V_S^\mathsf{T},
+	\]
+	and thus, $\nabla^2 g_S$ is positive semidefinite matrix and $g$ is convex.
+	From here, we have that $1-g_S$ is a \emph{concave} function. Since
+	$f_S(\p)=\frac{1}{1-g_S(\p)}$ and the function $h(x)=\frac{1}{x}$ is convex
+	and non-increasing, then $f_S$ is a convex function.
+	\end{proof}
+In the above proof, if for every $v\in V$, $S=\set{v}$ belongs to $\F$, then the
+function $g_S$ is \emph{strictly} convex, and so is $f_S$. We then have the
+following corollary of Thm.~\ref{thm:convexity}.
 
-Theorem~\ref{thm:convexity} has the following immediate corollary:
 \begin{corollary}
- A schedule $\p$ with locally minimum cost, has also a global minimum cost and is an optimal schedule. Furthermore, if for every $i\in U$, $\set{i}\in \S$ the optimal schedule is \emph{unique}.
+	A schedule $\p$ with locally minimum cost, has also a global minimum cost
+	and is an optimal schedule. Furthermore, if for every $v\in V$, $\set{v}$
+	belongs to $\F$, the optimal schedule is \emph{unique}.
 \end{corollary}
 
-Our goal to find an optimal schedule is indeed to solve the following optimization problem:
-
+Finding the optimal schedule is then equivalent to solve the following
+constrained convex optimization problem:
 \begin{equation}\label{eq:optimization}
-\boxed{
-\begin{array}{rrclcl}
-\displaystyle \min_{\p} & \multicolumn{3}{l}{\cost{\p}} \\
-&\displaystyle \sum_{i=1}^{n} p_i & = & 1 \\
-&p_i & \geq & 0 & & \forall i \in \set{1,\ldots,n} \\
-\end{array} }
+	\boxed{
+	\begin{array}{rrclcl}
+	\displaystyle \min_{\p} & \multicolumn{3}{l}{\cost{\p}} \\
+	&\displaystyle \sum_{i=1}^{n} p_i & = & 1 \\
+	&p_i & \geq & 0 & & \forall i \in \set{1,\ldots,n} \\
+	\end{array} }
 \end{equation}
-Here, we present two approaches for solving this optimization problem: one by using \emph{gradient descent} and one based on \emph{Lagrange multipliers}. Using gradient descent, provides theoretical guarantee for converging to the optimal schedule but is slow in practice for large networks. The other method is fast but does not give a theoretical guarantee, though if it converges in finite time to the final schedule, that schedule is provably optimal (see below).
 
+Here, we present two approaches for solving this optimization problem: one by
+using \emph{gradient descent} and one based on \emph{Lagrange multipliers}.
+Using gradient descent, provides theoretical guarantee for converging to the
+optimal schedule but is slow in practice for large networks. The other method is
+fast but does not give a theoretical guarantee, though if it converges in finite
+time to the final schedule, that schedule is provably optimal (see below).
 
-% Two of the methods provide theoretical guarantee for finding the optimal schedule, but are slow in practice. The third method (using non-linear iterative method) is fast but does not give a theoretical guarantee, though if it converges in finite time the final schedule is provably optimal (see below).
+\mynote{How is gradient descent handling the constraints? Also, the function has
+	also a Hessian, so we could use Newton's method, which is even faster than
+gradient descent}
 
+\mynote{What is the real issue with gradient descent? Is it that we have to
+	evaluate the cost function multiple times and this is computationally too
+expensive. Is there a way to formalize this cost?}
 
+\mynote{There are tons of methods for convex optimization. Why don't we care
+about them?} 
 
-\paragraph{\bf Gradient Descent.} As we showed in Theorem~\ref{thm:convexity} the cost function is  (smoothly) convex. Thus, we can apply the gradient descent method for the optimization in (\ref{eq:optimization}), as converging to any local minimum is guaranteed to give a global minimum.
-% Therefore,
-% the gradient of the cost function is
-% \begin{align*}
-% \nabla \cost{\p} &= \paran{\frac{\partial}{\partial p_1} \cost{\p}, \ldots, \frac{\partial}{\partial p_n} \cost{\p}} \\
-% &= \theta \cdot
-% \paran{\sum_{S: 1\in S} \frac{-\pi(S)}{(1-\theta(1-\p(S)))^2}, \ldots, \sum_{S: n\in S} \frac{-\pi(S)}{(1-\theta(1-\p(S)))^2}}.
-% \end{align*}
+\paragraph{Gradient Descent} As we showed in Theorem~\ref{thm:convexity}
+the cost function is  (smoothly) convex. Thus, we can apply the gradient descent
+method for the optimization in~\eqref{eq:optimization}, as converging to any
+local minimum is guaranteed to give a global minimum.
 
-% \paragraph{\bf Lagrange Multipliers (I): system of linear equations.}
-% In Lagrange Multipliers method, we have to solve the system of equations induced by $\nabla [\cost{\p} - \lambda (p_1+\ldots+p_n)] = 0$, for variables $p_1, \ldots, p_n$, and $\lambda$. By computing the partial derivatives we have
-% $$\nabla \cost{\p} = \paran{\sum_{S: 1\in S} \frac{-\theta\pi(S)}{(1-\theta(1-\p(S)))^2}, \ldots, \sum_{S: n\in S} \frac{-\theta\pi(S)}{(1-\theta(1-\p(S)))^2}}.$$
-% In order to convert the $n$ equations in $\nabla [\cost{\p} - \lambda (p_1+\ldots+p_n)] = 0$ into linear equations, we introduce new variables: For each set $S$, define a new variable $p_S$ and a new constraint $p_S = \p(S) = \sum_{i\in S} p_i$. So we can rewrite the gradient vector as 
-% $$\nabla \cost{\p} = \paran{\sum_{S: 1\in S} \frac{-\theta\pi(S)}{(1-\theta(1-p_S))^2}, \ldots, \sum_{S: n\in S} \frac{-\theta\pi(S)}{(1-\theta(1-p_S))^2}}.$$
-% Let $\lambda$ be a variable assigned to the constraint $\sum_{i}p_i = 1$, and $\mu_S$ be the constraint assigned to the constraint $p_S = \sum_{i\in S}p_i$, for each $S$.
-% So, for each $i\in [n]$ we have
-% $$\sum_{S: i\in S} \frac{-\theta\pi(S)}{(1-\theta(1-p_S))^2} + \sum_{S: i\in S} \mu_S - \lambda = 0.$$ Finally by defining $X_S = \frac{1}{(1-\theta(1-p_S))^2}$, we have $|\F| +n + 1$ variables and $|\F| +n + 1$ linear equations, and have to find a solution with nonnegative $p_i$ values. 
+\paragraph{Lagrange Multipliers: nonlinear iterative method} Generally, to use
+the nonlinear iterative method, we need a function $Q:\triangle^{n-1}\rightarrow
+\triangle^{n-1}$ such that $Q(\p^*) = \p^*$ for any optimal schedule $\p^*$.
 
+\mynote{What is $\triangle^{n-1}$ ?}
 
-\paragraph{\bf Lagrange Multipliers: nonlinear iterative method.}
-Generally, to use the nonlinear iterative method, we need a function 
-$Q:\triangle^{n-1}\rightarrow \triangle^{n-1}$
-%where 
-%$$\triangle^{n-1} = \setof{(p_1,\ldots,p_n)}{\forall p_i \geq 0, \sum_i p_i = 1},$$
-such that $Q(\p^*) = \p^*$ for any optimal schedule $\p^*$.
-Note that if $\p^*$ is an optimal schedule, by Lagrange multipliers, it is a solution to the following equality:
+\mynote{Is the following correct?}
+From the method of Lagrance multipliers, we have that,
+if a schedule $\p^*$ is optimal, then $p^*$ is a solution to following system of
+$n$ equations:
 \begin{equation}\label{eq:lagrange}
-\nabla [\cost{\p} + \lambda (p_1+\ldots+p_n)] = 0. 
+	\nabla [\cost{\p} + \lambda (p_1+\ldots+p_n)] = 0,
 \end{equation}
-The $i$-th equation induced by (\ref{eq:lagrange}) is $\frac{\partial}{\partial p_i} \cost{\p} + \lambda = 0$, which is
-$$\sum_{S:i\in S} \frac{\theta c \pi(S) (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2} = \lambda.$$
-% 
-% 
-% 
-% 
-% 
-% To find such function, we use the Lagrange Multipliers. Note that the $i$-th equation induced by 
-% $\nabla [\cost{\p} - \lambda (p_1+\ldots+p_n)] = 0$ for any optimal schedule $\p^*$ gives
-% $$\sum_{S: i\in S} \frac{-\theta\pi(S)}{(1-\theta(1-\p^*(S)))^2} = \lambda.$$
-For notational convenience let $W_i(\p) = \frac{\theta c \pi(S) (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$.
-Suppose $f: \mathbb{R} \rightarrow \mathbb{R}$ is an invertible function, and define $Q(\p) = (Q_1(\p), \ldots, Q_n(\p))$ where 
-$$Q_i(\p) = \frac{p_i f(W_i(\p))}{\sum_{j} p_j f(W_j(\p))}.$$
-Note that $Q_i(\p^*) = \frac{p^*_i\cdot \lambda}{\sum_j p^*_j\cdot \lambda} = p^*_i$, and thus $Q(\p^*) = \p^*$. Although we do not provide any guarantee on convergence of this method,  the following theorem states that $Q(\p) = \p$ if and only if $\p$ is optimal, and later in experiments, we illustrate the convergence of this method in different cases.
+\mynote{Shouldn't it be $p_1\ldots+p_n-1$ ?}
+where the gradient on the l.h.s.~(which has $n+1$ components) is taken with
+respect to (the components of) $\p$ and to $\lambda$.
+
+For $1\le i\le n$, the $i$-th equation induced by~\eqref{eq:lagrange} is 
+\[
+	\frac{\partial}{\partial p_i} \cost{\p} + \lambda = 0,
+\]
+or, equivalently,
+\[
+	\sum_{S:i\in S} \frac{\theta c \pi(S)
+		(1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2} = \lambda\enspace.
+\]
+For notational convenience let 
+\[
+	W_i(\p) = \frac{\theta c \pi(S)
+		(1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}
+\]
+\mynote{Is there supposed to be a sum in front above?}
+
+and let $f: \mathbb{R} \rightarrow \mathbb{R}$ be an \emph{invertible} function.
+We define $Q(\p) = (Q_1(\p), \ldots, Q_n(\p))$ as the vector whose $i$-th
+component $Q_i(\p)$ is
+\[
+	Q_i(\p) = \frac{p_i f(W_i(\p))}{\sum_{j} p_j f(W_j(\p))}\enspace.
+\]
+We have
+\[
+	Q_i(\p^*) = \frac{p^*_i\cdot \lambda}{\sum_j p^*_j\cdot \lambda} =
+p^*_i,\]
+\mynote{I don't understand the above. Should it be $f(\lambda)$?}
+
+and thus $Q(\p^*) = \p^*$. 
+
+There is no guarantee that the method converges,  
+\mynote{Which method? There has been no mention or description of an iterative
+method yet.}
+
+but we have that $Q(\p) = \p$ if and only if $\p$ is optimal, as shown by
+Thm.~\ref{thm:iff}. In Sect.~\ref{sec:experiments} we show our experimental
+results illustrating the convergence of this method in different cases.
+\mynote{Do we actually have these?}
+
 \begin{theorem}\label{thm:iff}
- If $\p$ is a schedule, then $Q(\p) = \p$ if and only if $\p$ is an optimal schedule.
+	If $\p$ is a schedule, then $Q(\p) = \p$ if and only if $\p$ is an optimal
+	schedule.
 \end{theorem}
+
 \begin{proof}
- As shown above, if $\p$ is an optimal schedule $Q(\p)=\p$ holds. Now assume that $Q(\p)=\p$. Therefore $p_i = Q_i(\p)$ for $1\leq i \leq n$, and we have
- \begin{align*}
-  Q_i(\p) = p_i = \frac{p_i f(W_i(\p))}{\sum_{j} p_j f(W_j(\p))} 
-  \Rightarrow
-  W_i(\p) = f^{-1}\paran{\sum_{j} p_j f(W_j(\p))}.
- \end{align*}
- Hence, $W_i(p)$ is a constant (independent of $i$) and we have $W_1(\p)=\ldots=W_n(\p)$. Now, by letting $\lambda = W_i(\p)$, we obtain a solution for the system of equations in Lagrange multipliers method, and thus, $\p$ is an optimal schedule.\qed
+	As shown above, if $\p$ is an optimal schedule $Q(\p)=\p$ holds.
+	\mynote{Wouldn't it be better to have the proof here and only the
+		description of the method (currently missing, in my opinion) outside the
+	theorem?}
+	
+	Now assume that $Q(\p)=\p$. Therefore $p_i = Q_i(\p)$ for $1\leq i \leq n$,
+	and we have
+	\begin{align*}
+	Q_i(\p) = p_i = \frac{p_i f(W_i(\p))}{\sum_{j} p_j f(W_j(\p))} 
+	\Rightarrow
+	W_i(\p) = f^{-1}\left(\sum_{j} p_j f(W_j(\p))\right).
+	\end{align*}
+	Hence, $W_i(p)$ is a constant (independent of $i$) 
+
+	\mynote{I don't see the above.}
+	
+	and we have
+	$W_1(\p)=\ldots=W_n(\p)$. Now, by letting $\lambda = W_i(\p)$, we obtain a
+	solution for the system of equations in Lagrange multipliers method, and
+	thus, $\p$ is an optimal schedule.
 \end{proof}
 
+In this work, we apply the second method as it is very fast on large datasets
+that we use in our experiments. Also, although the convergence of this method is
+not guaranteed, we show that in practice it converges quickly. For sake of
+simplicity we took the identity function for $f$, and our method for the
+optimization problem in~\eqref{eq:optimization} is given in
+Algorithm~\ref{alg:iterative}.
 
-In this work, we apply the second method as it is very fast on large datasets that we use in our experiments. Also, although the convergence of this method is not guaranteed, we show that in practice it converges quickly. For sake of simplicity we took the identity function for $f$, and our method for the optimization problem in~(\ref{eq:optimization}) is given in Algorithm~\ref{alg:iterative}.
 
-
-% Therefore, a schedule $\p$ is optimal if an only if $F(\p) = \p$. An iterative method is then, to start from an initial schedule $\p^0$, and obtain $\p^t = F(\p^{t-1})$ for $t > 0$. We later show that this is an effective method for solving our optimization problem (1-PHSP) that can be easily scaled to large generating processs (i.e., the size $\F$ can be large), using MapReduce techniques. This method is given in Algorithm~\ref{alg:iterative}. Also, in Section~\ref{sec:experiment} we show that in practice this method converges very fast and uses a very little memory.
-
-
-
-% we create a function $$, such that for an optimal schedule $\p^*$ we have $F$
-
-% Again by the Lagrange multipliers method, at an optimal schedule $\p*$, for each $i\in[n]$ we have
-% $$\sum_{S: i\in S} \frac{\pi(S)}{(1-\theta(1-p^*(S)))^2} = \lambda.$$
-% For notational convenience let $W_i(\p) = \sum_{S: i\in S} \frac{\pi(S)}{(1-\theta(1-p(S)))^2}$.
-% Suppose $f: \mathbb{R} \rightarrow \mathbb{R}$ is a invertible function, and define $F(\p) = (F_1(\p), \ldots, F_n(\p))$ where 
-% $$F_i(\p) = \frac{p_i f(W_i(\p))}{ \paran{\sum_{j} p_j f(W_j(\p))}}.$$
-% Therefore, a schedule $\p$ is optimal if an only if $F(\p) = \p$. An iterative method is then, to start from an initial schedule $\p^0$, and obtain $\p^t = F(\p^{t-1})$ for $t > 0$. We later show that this is an effective method for solving our optimization problem (1-PHSP) that can be easily scaled to large generating processs (i.e., the size $\F$ can be large), using MapReduce techniques. This method is given in Algorithm~\ref{alg:iterative}. Also, in Section~\ref{sec:experiment} we show that in practice this method converges very fast and uses a very little memory.
-
-\begin{algorithm}[!h]
-\BlankLine
-{\bf Inputs:} The number of  $\texttt{iterations}$.
-
-\Begin{
-$\p \leftarrow \paran{1/n, \ldots, 1/n}$\;
-\For{$i\in\set{1,\ldots, \texttt{iterations}}$}{
-	$W \leftarrow (0,\ldots, 0)$\;
-	\For{$S\in \F$} {
-		\For{$u \in S$} {
-			$W_i \leftarrow W_i - \frac{\theta c \pi(S) (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$\;%\frac{-\theta\pi(S)}{(1-\theta(1-p(S)))^2}$\;
+\begin{algorithm}[ht]
+	\DontPrintSemicolon
+	\SetKwInOut{Input}{input}
+	\SetKwInOut{Output}{output}
+	\SetKwComment{tcp}{//}{}
+	\Input{Number $iter$ of iterations. XXX what about other?}
+	\Output{XXX}
+	$\p \leftarrow (1/n, \ldots, 1/n)$\;
+	\For{$i\in\set{1,\ldots, \texttt{iterations}}$}{
+		$W \leftarrow (0,\ldots, 0)$\;
+		\For{$S\in \F$} {
+			\For{$u \in S$} {
+				$W_i \leftarrow W_i - \frac{\theta c \pi(S) (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$\;%\frac{-\theta\pi(S)}{(1-\theta(1-p(S)))^2}$\;
+			}
 		}
+		$\p \leftarrow \frac{1}{\sum_{i} p_iW_i} (p_1W_1, \ldots, p_nW_n)$\;
 	}
-	$\p \leftarrow \frac{1}{\sum_{i} p_iW_i} (p_1W_1, \ldots, p_nW_n)$\;
-}
-  return $\p$\;
-}
-\caption{$\optimizer(\texttt{iterations})$}\label{alg:iterative}
+	\Return{$\p$}\;
+	\caption{$\optimizer(\texttt{iterations})$}
+	\label{alg:iterative}
 \end{algorithm}  
+	%However, this iterative method is convergent if the Jacobian norm of $F$ is less than 1, i.e., $\|DF\| < 1$. 
 
-
-
-%However, this iterative method is convergent if the Jacobian norm of $F$ is less than 1, i.e., $\|DF\| < 1$. 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cost Approximation through Sampling}\label{sec:sampcomp}
-In a generating process $\sys = (U, \F, \pi)$, computing the cost of a schedule can be very challenging due to the parameters $\F$ and $\pi$ as they might not be known to us.
-Instead we have access to sampled {\ins} from $\F$ during the time. In particular, at any time step an {\ins} $S\in\F$ may be generated, and observed or sampled, with probability $\pi(S)$. A sample $\S$ of {\ins} during a time interval $[t_1, t_2]$ is $\S=\S_{t_1}\cup\ldots\cup\S_{t_2}$ where each $\S_t$ is the set of all observed {\ins} at time $t$.
+	In a generating process $\sys = (U, \F, \pi)$, computing the cost of a schedule can be very challenging due to the parameters $\F$ and $\pi$ as they might not be known to us.
+	Instead we have access to sampled {\ins} from $\F$ during the time. In particular, at any time step an {\ins} $S\in\F$ may be generated, and observed or sampled, with probability $\pi(S)$. A sample $\Sample$ of {\ins} during a time interval $[t_1, t_2]$ is $\Sample=\Sample_{t_1}\cup\ldots\cup\Sample_{t_2}$ where each $\Sample_t$ is the set of all observed {\ins} at time $t$.
 
-In this section, we study the optimization problem~(\ref{eq:optimization}) in generating processes for which we only have access to samples of $\F$. Specifically, we show that a sample $\S$ gathered during a time interval of length $\tilde O(\log(n))$ suffices to estimate and optimize the cost function.
+	In this section, we study the optimization problem~(\ref{eq:optimization}) in generating processes for which we only have access to samples of $\F$. Specifically, we show that a sample $\Sample$ gathered during a time interval of length $\tilde O(\log(n))$ suffices to estimate and optimize the cost function.
 
-% In this section, we show how using a sample of sets in $\F$, formed during a short time interval of length $\tilde O(\log(n))$ we can estimate the $\cost{\p}$, $\nabla\cost{\p}$, and $W(\p)$ for any schedule $\p$ (during the optimization) accurately.  This shows the feasibility and accuracy of the Gradient Descent and the iterative methods when we have access to a sample of $\F$.
+	% In this section, we show how using a sample of sets in $\F$, formed during a short time interval of length $\tilde O(\log(n))$ we can estimate the $\cost{\p}$, $\nabla\cost{\p}$, and $W(\p)$ for any schedule $\p$ (during the optimization) accurately.  This shows the feasibility and accuracy of the Gradient Descent and the iterative methods when we have access to a sample of $\F$.
 
-We start by defining the cost of a schedule according to a sample:
-\begin{definition}[Cost according to a sample]
- Suppose $\p$ is a $c$-schedule and $\S$ is a sample of {\ins}s gathered during a time interval of length $\ell$. The cost of $\p$ according to $\S$, denoted by $\cost{\p,\S}$, is
- $\frac{1}{\ell}\sum_{S\in \S} \frac{1}{1-\theta(1-\p(S))^c}$.
-\end{definition}
-For a sample $\S$, $\cost{\p,\S}$ is an approximation of $\cost{\p}$, and the larger the size of $\S$ is, by the Law of Large Numbers we get better approximation. Lets denote the length of the time interval from which the sample $\S$ is obtained by $\ell(\S)$. The question we want to answer in this section is ``How large should $\ell(\S)$ be, so that for every schedule $\p$ we have $|\cost{\p,\S} - \cost{\p}| < \epsilon\cdot\cost{\p}$ w.h.p for $\epsilon > 0$?''
+	We start by defining the cost of a schedule according to a sample:
+	\begin{definition}[Cost according to a sample]
+	Suppose $\p$ is a $c$-schedule and $\Sample$ is a sample of {\ins}s gathered during a time interval of length $\ell$. The cost of $\p$ according to $\Sample$, denoted by $\cost{\p,\Sample}$, is
+	$\frac{1}{\ell}\sum_{S\in \Sample} \frac{1}{1-\theta(1-\p(S))^c}$.
+	\end{definition}
+	For a sample $\Sample$, $\cost{\p,\Sample}$ is an approximation of $\cost{\p}$, and the larger the size of $\Sample$ is, by the Law of Large Numbers we get better approximation. Lets denote the length of the time interval from which the sample $\Sample$ is obtained by $\ell(\Sample)$. The question we want to answer in this section is ``How large should $\ell(\Sample)$ be, so that for every schedule $\p$ we have $|\cost{\p,\Sample} - \cost{\p}| < \epsilon\cdot\cost{\p}$ w.h.p for $\epsilon > 0$?''
 
-We have the following theorem.
-\begin{theorem}\label{thm:chernoffcost}
- Suppose $\S$ is a sample gathered during a time interval of length $\ell(\S) \geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\frac{\log(n)}{\epsilon^2}}$. Then, for every schedule $\p$ we have
- $$\pr(|\cost{\p,\S} - \cost{\p}|\geq \epsilon\cdot\cost{\p}) < \frac{1}{n^r}.$$
-\end{theorem}
-\begin{proof}
-Let $X_S$ be a random variable which is $\frac{1}{1-\theta(1-\p(S))^c}$ with probability $\pi(S)$, and zero otherwise. So, $1\leq X_S \leq \frac{1}{1-\theta}$. Also let  $X = \sum_{S\in \F} X_S$, and thus, 
-\begin{equation}\label{eq:boundcost}
-\cost{\p} = \E(X) = \sum_{S\in\F} \E(X_{S}) \geq |\F|, 
+	We have the following theorem.
+	\begin{theorem}\label{thm:chernoffcost}
+	Suppose $\Sample$ is a sample gathered during a time interval of length $\ell(\Sample)
+	\geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} =
+	O\left(\frac{\log(n)}{\epsilon^2}\right)$. Then, for every schedule $\p$ we have
+	$$\Pr(|\cost{\p,\Sample} - \cost{\p}|\geq \epsilon\cdot\cost{\p}) < \frac{1}{n^r}.$$
+	\end{theorem}
+	\begin{proof}
+	Let $X_S$ be a random variable which is $\frac{1}{1-\theta(1-\p(S))^c}$ with probability $\pi(S)$, and zero otherwise. So, $1\leq X_S \leq \frac{1}{1-\theta}$. Also let  $X = \sum_{S\in \F} X_S$, and thus, 
+	\begin{equation}\label{eq:boundcost}
+		\cost{\p} = \expect[X] = \sum_{S\in\F} \expect[X_{S}] \geq |\F|, 
 \end{equation}
-and $|\F| \leq X \leq \frac{|\F|}{1-\theta}$. Let $X^i_S$ be the $i$-th draw of $X_S$ during the time interval $\S$ was sampled from and define $X^i = \sum_{S\in\F}X_S^i$. Note that 
-$\cost{\p,\S} = \frac{1}{\ell(\S)}\sum_{i}X^i$. Now, denote $\mu=\frac{\ell(\S)(1-\theta)}{|\F|}\cost{\p}$. Using the fact that $\frac{1-\theta}{|\F|}X \in [0,1]$ and the Chernoff bound we have
+and $|\F| \leq X \leq \frac{|\F|}{1-\theta}$. Let $X^i_S$ be the $i$-th draw of $X_S$ during the time interval $\Sample$ was sampled from and define $X^i = \sum_{S\in\F}X_S^i$. Note that 
+$\cost{\p,\Sample} = \frac{1}{\ell(\Sample)}\sum_{i}X^i$. Now, denote $\mu=\frac{\ell(\Sample)(1-\theta)}{|\F|}\cost{\p}$. Using the fact that $\frac{1-\theta}{|\F|}X \in [0,1]$ and the Chernoff bound we have
 \begin{align*}
-\pr\paran{\left|\cost{\p,\S} - \cost{\p}\right| \geq \epsilon \cdot \cost{\p}} 
+\Pr\paran{\left|\cost{\p,\Sample} - \cost{\p}\right| \geq \epsilon \cdot \cost{\p}} 
 &= 
-\pr\paran{\left|\sum_i X^i - \ell(\S)\cost{\p}\right| \geq \epsilon \ell(\S) \cost{\p}} \\
+\Pr\paran{\left|\sum_i X^i - \ell(\Sample)\cost{\p}\right| \geq \epsilon \ell(\Sample) \cost{\p}} \\
 &=
-\pr\paran{\left|\frac{1-\theta}{|\F|}\sum_i X^i - \mu\right| \geq \epsilon \mu} \\
+\Pr\paran{\left|\frac{1-\theta}{|\F|}\sum_i X^i - \mu\right| \geq \epsilon \mu} \\
 &\leq 2\exp\paran{-\frac{\epsilon^2\mu}{3}}\\
-% \pr\paran{\left|\frac{1-\theta}{|\F|}\sum_i X^i - \frac{\ell(\S)(1-\theta)}{|\F|}\cost{\p}\right| \geq \epsilon \frac{\ell(\S)(1-\theta)}{|\F|}\cost{\p}} \\
+% \Pr\paran{\left|\frac{1-\theta}{|\F|}\sum_i X^i - \frac{\ell(\Sample)(1-\theta)}{|\F|}\cost{\p}\right| \geq \epsilon \frac{\ell(\Sample)(1-\theta)}{|\F|}\cost{\p}} \\
 &=
-2\exp\paran{-\frac{\epsilon^2 \ell(\S) (1-\theta) \cost{\p}}{3|\F|}} \\
+2\exp\paran{-\frac{\epsilon^2 \ell(\Sample) (1-\theta) \cost{\p}}{3|\F|}} \\
 &\leq 
-2\exp\paran{-\frac{\epsilon^2 \ell(\S) (1-\theta)}{3}},
+2\exp\paran{-\frac{\epsilon^2 \ell(\Sample) (1-\theta)}{3}},
 \end{align*}
 where the last inequality holds since $\cost{\p}\geq |\F|$, as shown in Inequality (\ref{eq:boundcost}).
-So, if $\ell(\S) \geq \frac{3 (\ell \log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\log(n)/\epsilon^2}$, for every schedule $\p$, $\left|\cost{\p,\S} - \cost{\p}\right| < \epsilon \cdot \cost{\p}$ with probability at least $1-1/n^r$.
+So, if $\ell(\Sample) \geq \frac{3 (\ell \log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\log(n)/\epsilon^2}$, for every schedule $\p$, $\left|\cost{\p,\Sample} - \cost{\p}\right| < \epsilon \cdot \cost{\p}$ with probability at least $1-1/n^r$.
 \qed
 \end{proof}
 
 In the previous section we defined the $W_i(\p)$ functions on schedules for a given generating process $\sys=(U,\F,\pi)$, assuming we know $\pi$. However, similar to the cost function, we can define these functions according to a sample, namely, 
-$W_i(\p,\S) = \frac{1}{\ell(\S)}\sum_{S\in \S: i\in S} \frac{\theta c (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$.
+$W_i(\p,\Sample) = \frac{1}{\ell(\Sample)}\sum_{S\in \Sample: i\in S} \frac{\theta c (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$.
 % $W_i\frac{\theta c \pi(S) (1-\p(S))^{c-1}}{(1-\theta(1-\p(S))^c)^2}$. 
 Using a very similar argument we have the following theorem:
 \begin{theorem}\label{thm:chernoffW}
- Suppose $\S$ is a sample gathered during a time interval of length $\ell(\S) \geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\frac{\log(n)}{\epsilon^2}}$. Then, for every schedule $\p$ and $i\in\set{1,\dots,n}$ we have
- $$\pr(|W_i(\p,\S) - W_i(\p)|\geq \epsilon\cdot W_i(\p)) < \frac{1}{n^r}.$$
+ Suppose $\Sample$ is a sample gathered during a time interval of length $\ell(\Sample) \geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\frac{\log(n)}{\epsilon^2}}$. Then, for every schedule $\p$ and $i\in\set{1,\dots,n}$ we have
+ $$\Pr(|W_i(\p,\Sample) - W_i(\p)|\geq \epsilon\cdot W_i(\p)) < \frac{1}{n^r}.$$
 \end{theorem}
 
 We conclude this section by providing an algorithm, Algorithm~\ref{alg:iterative_with_sample}, for the optimization problem (\ref{eq:optimization}) in the case that we only have access to a sample of $\F$. Note that by Theorems~\ref{thm:chernoffcost} and~\ref{thm:chernoffW}, in the iterative process of Algorithm~\ref{alg:iterative_with_sample}, our estimates of the cost and $W_i$'s function are within an $\epsilon$ factor of their true value, with high probability (using an appropriate $r$).
 
 \begin{algorithm}[!h]
 \BlankLine
-{\bf Inputs:} The number of  $\texttt{iterations}$, and a sample of {\ins}s $\S$.
+{\bf Inputs:} The number of  $\texttt{iterations}$, and a sample of {\ins}s $\Sample$.
 
 \Begin{
 $\p \leftarrow \paran{1/n, \ldots, 1/n}$\;
@@ -257,14 +316,14 @@ $\p \leftarrow \paran{1/n, \ldots, 1/n}$\;
 	$W \leftarrow (0,\ldots, 0)$\;
 	\For{$S\in \F$} {
 		\For{$u \in S$} {
-			$W_i \leftarrow W_i - \frac{\theta c (1-\p(S))^{c-1}}{\ell(\S)(1-\theta(1-\p(S))^c)^2}$\;%\frac{1}{\ell(S)\cdot(1-\theta(1-p(S)))^2}$\;
+			$W_i \leftarrow W_i - \frac{\theta c (1-\p(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\p(S))^c)^2}$\;%\frac{1}{\ell(S)\cdot(1-\theta(1-p(S)))^2}$\;
 		}
 	}
 	$\p \leftarrow \frac{1}{\sum_{i} p_iW_i} (p_1W_1, \ldots, p_nW_n)$\;
 }
   return $\p$\;
 }
-\caption{$\appoptimizer(\texttt{iterations},\S)$}\label{alg:iterative_with_sample}
+\caption{$\appoptimizer(\texttt{iterations},\Sample)$}\label{alg:iterative_with_sample}
 \end{algorithm}  
 
 
@@ -305,16 +364,16 @@ $\D_2 \leftarrow \emptyset$\;
     }
     
   
-$\S \leftarrow \emptyset$\;
+$\Sample \leftarrow \emptyset$\;
 \For{$i \in D_1$}{
   $S \leftarrow \emptyset$\;
   \For{$(i, u) \in D_2$}{
   $S \leftarrow S \cup \set{u}$\;
   }
-  $\S \leftarrow \S \cup \set{S}$\;
+  $\Sample \leftarrow \Sample \cup \set{S}$\;
   }
   
-  return $\S$\;
+  return $\Sample$\;
 
 }
 
@@ -334,7 +393,7 @@ $\S \leftarrow \emptyset$\;
 %  \For{$t\in\set{1,\ldots,\texttt{iter}}$}{
 %   $c\leftarrow (0,\ldots,0)$\;
 %    \For{$S \in \M$}{
-%      \For{$i \in \S$}{
+%      \For{$i \in \Sample$}{
 %       $c_i \leftarrow c_i + \paran{\frac{p_i}{\sum_{j\in S p_j}}}^2$ \;
 %       }
 %     }
@@ -426,43 +485,35 @@ $\S \leftarrow \emptyset$\;
 \subsection{Scaling up: MapReduce Algorithm}\label{sec:mapreduce}
 In this section, we show the scalability of {\optimizer} and {\appoptimizer} (see Algorithms~\ref{alg:iterative} and \ref{alg:iterative_with_sample}) in MapReduce framework \cite{dean2008mapreduce}. A MapReduce model consists of two parts: mapping by \texttt{mappers}, and reducing by \texttt{reducers}. At each round of MapReduce the input dataset is partitioned into independent chunks and each chunk is sent to a \texttt{mapper}. Each mapper will process the received chunk and outputs pairs of key-values, $\langle k, v \rangle$. Then, the  platform shuffles the key-value pairs and aggregate the values of a same key and sends them to \texttt{reducers}. Therefore, each \texttt{reducer} receives inputs of form $\langle k, (v_1, \ldots, v_r) \rangle$, where $v_1, \ldots, v_r$ are all the values with the key $k$ generated by \texttt{mappers}. Finally, \texttt{reducers} process their inputs and return the final outputs.
 
-In following, we show how computing the cost and $W_i$ functions (and consequently $Q$)  can be done in a MapReduce given a sample $\S$ for a generating process $\sys=(U,\F,\pi)$. Therefore, {\appoptimizer} can be easily scaled to larger dataset.
-%for a generating process $\sys=(U,\F,\pi)$, with  full access to $\F$ and $\pi$. In a very similar argument, the method extends to the case when we only have access to a sample  $\S$ of $\F$ and we have to compute the cost and $W_i$ functions according to the sample $\S$. 
-So, lets assume the input dataset is $\S$, and the {\ins} in $\S$ are partitioned and sent to \texttt{mappers}. We also assume that \texttt{mappers} have a copy of $\p$. 
+In following, we show how computing the cost and $W_i$ functions (and consequently $Q$)  can be done in a MapReduce given a sample $\Sample$ for a generating process $\sys=(U,\F,\pi)$. Therefore, {\appoptimizer} can be easily scaled to larger dataset.
+%for a generating process $\sys=(U,\F,\pi)$, with  full access to $\F$ and $\pi$. In a very similar argument, the method extends to the case when we only have access to a sample  $\Sample$ of $\F$ and we have to compute the cost and $W_i$ functions according to the sample $\Sample$. 
+So, lets assume the input dataset is $\Sample$, and the {\ins} in $\Sample$ are partitioned and sent to \texttt{mappers}. We also assume that \texttt{mappers} have a copy of $\p$. 
 
 
 \paragraph{\bf Computing the cost function.}
-Each \texttt{mappers}, for every $S\in \S$ that it receives, outputs the following key-value pair:
-$\left\langle 0,  \frac{1}{\ell(\S)}f(S) \right\rangle,$
+Each \texttt{mappers}, for every $S\in \Sample$ that it receives, outputs the following key-value pair:
+$\left\langle 0,  \frac{1}{\ell(\Sample)}f(S) \right\rangle,$
 where $f(S) = \frac{1}{1- \theta(1-p(S))^c}$.
 Next, a \texttt{reducer} receives an input of the form 
-$\left\langle 0,  \left[\frac{1}{\ell(\S)}f(S)\right]_{S\in \S}  \right\rangle,$
-and outputs $\frac{\sum_{S\in \S}f(S)}{\ell(\S)}$.
+$\left\langle 0,  \left[\frac{1}{\ell(\Sample)}f(S)\right]_{S\in \Sample}  \right\rangle,$
+and outputs $\frac{\sum_{S\in \Sample}f(S)}{\ell(\Sample)}$.
 
 \paragraph{\bf Computing  the $W_i$'s functions.}
-Each \texttt{mappers}, for every $S\in \S$ that it receives, outputs all the following key-value pairs:
-$$\left\langle i,  \frac{-\theta c (1-\p(S))^{c-1}}{\ell(\S)(1-\theta(1-\p(S))^c)^2} \right\rangle, \forall i \in S.$$
+Each \texttt{mappers}, for every $S\in \Sample$ that it receives, outputs all the following key-value pairs:
+$$\left\langle i,  \frac{-\theta c (1-\p(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\p(S))^c)^2} \right\rangle, \forall i \in S.$$
 Next, each \texttt{reducer} receives an input of the form
-$$\left\langle i,  \left[\frac{-\theta c (1-\p(S))^{c-1}}{\ell(\S)(1-\theta(1-\p(S))^c)^2}\right]_{S\in \S: i\in S} \right\rangle,$$
-and would be able to compute $p_iW_i(\p, \S)$, by adding the ``values'' and multiply by $p_i$.
-% $$p_iW_i(\p) = \sum_{S: i\in S}\frac{-\theta}{\ell(\S)\paran{1-\theta(1-\p(S))}^2}.$$ 
+$$\left\langle i,  \left[\frac{-\theta c (1-\p(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\p(S))^c)^2}\right]_{S\in \Sample: i\in S} \right\rangle,$$
+and would be able to compute $p_iW_i(\p, \Sample)$, by adding the ``values'' and multiply by $p_i$.
+% $$p_iW_i(\p) = \sum_{S: i\in S}\frac{-\theta}{\ell(\Sample)\paran{1-\theta(1-\p(S))}^2}.$$ 
 Finally, the aggregator (or the central processing unit) can normalize the vector $(p_1W_1(\p), \ldots, p_nW_n(\p))$, and compute $Q(\p)$.
 
 Using a very similar technique, one can compute the cost and $W_i$'s functions in MapReduce framework when having full access to $\F$ and $\pi$ parameters of the generating process $\sys=(U,\F,\pi)$. This shows the scalability of {\optimizer}.
-%Each \texttt{mappers}, for every $S\in \S'$ that it receives, outputs all the following key-value pairs:
-%$$\left\langle i,  \frac{\theta^2 f(S)^2}{|\S'|} \right\rangle, \forall i \in S.$$
+%Each \texttt{mappers}, for every $S\in \Sample'$ that it receives, outputs all the following key-value pairs:
+%$$\left\langle i,  \frac{\theta^2 f(S)^2}{|\Sample'|} \right\rangle, \forall i \in S.$$
 %Next, each \texttt{reducer} receives an input of the form
-%$$\left\langle i,  \left[\frac{\theta^2 f(S)^2}{|\S'|}\right]_{S\in \S': i\in S} \right\rangle,$$
+%$$\left\langle i,  \left[\frac{\theta^2 f(S)^2}{|\Sample'|}\right]_{S\in \Sample': i\in S} \right\rangle,$$
 %and would be able to compute the $i$-th coordinate of the gradient:
-%$$\frac{\partial}{\partial p_i} \cost{\p} = - \frac{\theta^2}{|\S'|}\sum_{S\in \S': i\in S} f(S)^2.$$
-
-
-
-
-
-
-
-
+%$$\frac{\partial}{\partial p_i} \cost{\p} = - \frac{\theta^2}{|\Sample'|}\sum_{S\in \Sample': i\in S} f(S)^2.$$
 
 % Now, we show how each round of iteration in Algorithm~\ref{alg:optimizer} can be implemented in a MapReduce model: Note that the goal in each iteration is to compute 
 % $$c_i = \sum_{S\in \M: i\in S} \paran{\frac{p_i}{\sum_{j\in S}p_j}}^2,$$
@@ -491,9 +542,3 @@ Using a very similar technique, one can compute the cost and $W_i$'s functions i
 % \\ &=&
 %  \sum_{i\in V} \frac{1} {p_i}\sum_{S:i\in S} \pi(S) \left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2 
 %  \end{eqnarray}
-
-
-
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
