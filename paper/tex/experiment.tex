@@ -24,12 +24,12 @@ Our experiments were run on a Opteron 6282 SE CPU (2.6 GHz) using 12G memory. We
 
 
 \paragraph{\bf Parameters and model of propagation.}
-Throughout our experiments, for sake of simplicity we consider $c=1,3$ or 5 for our $(\theta,c)$-PHSP, and we always assume the graphs are directed by replacing undirected edges with two directed ones. We also let the decaying factor $\theta = 0.75$. By $\deg^+(i)$ (resp. $\deg^-(i)$) we mean the out-degree (resp. in-degree) of the node $i$. In each network $G=(V,E)$ we group the nodes into four groups (see Table~\ref{table:datasets}):
+Throughout our experiments, for sake of simplicity we consider $c=1,3$ or 5 for our $(\theta,c)$-PHSP, and we always assume the graphs are directed by replacing undirected edges with two directed ones. We also let the decaying factor $\theta = 0.75$. By $\degree^+(i)$ (resp. $\degree^-(i)$) we mean the out-degree (resp. in-degree) of the node $i$. In each network $G=(V,E)$ we group the nodes into four groups (see Table~\ref{table:datasets}):
 \begin{itemize}
- \item $V_{1000} = \setof{i\in V}{\deg^+(i) \geq 1000}$,
- \item $V_{500}  = \setof{i\in V}{500\leq \deg^+(i) < 1000}$,
- \item $V_{100}  = \setof{i\in V}{100\leq \deg^+(i) < 500}$, and
- \item $V_{0}    = \setof{i\in V}{\deg^+(i) < 100}$.
+ \item $V_{1000} = \setof{i\in V}{\degree^+(i) \geq 1000}$,
+ \item $V_{500}  = \setof{i\in V}{500\leq \degree^+(i) < 1000}$,
+ \item $V_{100}  = \setof{i\in V}{100\leq \degree^+(i) < 500}$, and
+ \item $V_{0}    = \setof{i\in V}{\degree^+(i) < 100}$.
 \end{itemize}
 We assume each node may generate a new item, that will be propagated, at each time based on the group the node is assigned to. In particular, the probability that the node $i$ generates a new item, $\pi_i$, is as follows:
 %  $\pi=(\pi_1, \ldots, \pi_n)$, where
@@ -48,8 +48,8 @@ based on the intuition that active individuals are  likely to have more follower
 
 
 
-As the model of propagation, we consider the Independent-Cascade model\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability $p_e$ that a new item at node $v$ is propagated through this edge to node $w$, and events for different items are independent. Following the parameters reported in the literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we set $p_{v\rightarrow w} = \frac{1}{\deg^-(w)}$.
-%For every edge $e=(a,b)$ we let the activation probability $p_e$ to be $\frac{1}{\deg^-(b)}$ which is a commonly used parameter~.
+As the model of propagation, we consider the Independent-Cascade model\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability $p_e$ that a new item at node $v$ is propagated through this edge to node $w$, and events for different items are independent. Following the parameters reported in the literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
+%For every edge $e=(a,b)$ we let the activation probability $p_e$ to be $\frac{1}{\degree^-(b)}$ which is a commonly used parameter~.
 
 
 
