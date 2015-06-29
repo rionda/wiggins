@@ -1,42 +1,27 @@
-We formulate and study the {\probname} (PHSP), a general framework for design and analysis of search and detection algorithms in large scale dynamic networks.
-The PHSP  captures applications ranging from monitoring new contents on the web,  blogosphere, and Twitterverse, to analyzing influence properties in social networks, and
-detecting failure propagation on large electronic circuits.
+\begin{abstract}
+	%\todo[Matteo]{Shorten to fit in single column, with Categories and
+	%Keywords.}
+	Detecting information spreading across a network can be done by monitoring
+	its nodes and has many practical applications: discovering new webpages,
+	analyzing influence properties in network, and detecting failure propagation
+	in electronic circuits or infections in public drinkable water systems. In
+	practice, it is infeasible for anyone but the owner of the network (if
+	existent) and government agencies to monitor all nodes at all times. In this
+	work we study the constrained setting when the observer can only probe a
+	small set of nodes at each time step to check whether new pieces of
+	information (items) have reached those nodes.
 
-The {\probname} (PHSP) defines an infinite time generating process that places new items in subsets of nodes, according to an unknown probability distribution that may change in time. The \emph{freshness} or \emph{relevance} of the items decay exponentially in time, and the goal is to compute a dynamic probing schedule that probes one or a few nodes per step and maximizes the expected sum of the relevance of the items that are discovered at each step.
-
- We develop an efficient sampling method for estimating the network parameters and an efficient optimization algorithm for obtaining an optimal probing schedule. We also present a scalable solution on the MapReduce platform. Finally we apply our method to real social networks, demonstrating the practicality and optimality of our solution. 
-
-%Let $\F$ of a family of subsets of a universal set $U$, and let $\pi$ be a distribution function on $\F$, $\pi: \F \rightarrow [0,1]$. At time $t$ the process generates a new item $i_{t,S}$ and placed copied of it in the nodes of a set $S$ chosen according to the distribution $\pi$.
-%
-%
-%We consider networks in which each item is generated at a node and propagated to others. We consider \emph{probing schedules} defined by a probability distribution over the nodes, specifying which node to probe next, and our goal is to compute a probing schedule that minimizes  the expected time to discover at least one copy of any item propagated in the network. 
-%%
-%Our model can be viewed as an Internet variation of the \emph{outbreak detection} problem.  We can probe any node in the network (not just by a set of fixed sensors), but only a few nodes can be probed at each step, and all items (outbreaks) in the network must be detected. 
-%
-%We develop an efficient method for obtaining an optimal probing schedule, and apply our method to real social networks, demonstrating the practicality and optimality of our solution.
-%
-%
-%that at any time $t$ places a new item $ i_{t,S}$
-%in a subset $S$ of the universe of  nodes $U$. .
-%(characterized by the following 4 properties:  (i) a family $\F$ of subsets of a universal set $U$, (ii) a probability function $\pi: \F \rightarrow [0,1]$, (iii) a decaying factor $\theta$, and (iv) a positive integer $c$. In an infinite time process, at any time step $t$ and for any subset $S\in \F$ and item $i_{t,S}$ will be generated with probability $\pi(S)$. The \emph{freshness} of the an item $i_{t,S}$ at time $t' \geq t$ is given by $\theta^{t'-t}$. 	
-%
-%A probing schedule is a probability distribution over the elements of $U^c$ that specifies at most $c$ elements to probe at any time step. The prober catch an item $i_{t,S}$ at time $t'\geq t$ if 
-%$t'$ is the smallest time step in which prober probes an element in $S$.
-%The  \emph{cost} of a probing schedule is the expected (total) freshness of the items that are not caught at a random time. The goal is to find a schedule with minimum cost.
-%
-%PHSP can be views as a  search and detection problem in dynamic environments, with applications ranging from monitoring new contents on the web, social networks, blogosphere, and Twitterverse, to detecting failure propagation on large electronic circuits. This is a very general framework, such that  some of the important social network problems (e.g., centrality and influence maximization) can be represented and asked as an instance of PHSP.
-
-%We then focus on PHSP where $c=1$.  We develop efficient methods for obtaining an optimal probing schedule. We also study the problem when we have a sample of $\F$, and provide a scalable algorithm using MapReduce techniques.
-%Finally we apply our method to real social networks, demonstrating the practicality and optimality of our solution. 
-
-
-
-
-
-
-% Our model can be viewed as an Internet variation of the \emph{outbreak detection} problem.  We can probe any node in the network (not just by a set of fixed sensors), but only a few nodes can be probed at each step, and \ahmad{our interest in generated and yet undiscovered items changes over the time.}
-
-
-% \terms{Anomaly/novelty detection, Graph mining, Sampling, Scalable methods, Social and information networks.}
-
-% \keywords{Randomized Algorithm, Approximation Algorithm, Scalable Algorithm.}
+	We formally define the problem through an infinite time generating process
+	that places new items in subsets of nodes according to an unknown
+	probability distribution. Items have an exponentially decaying
+	\emph{freshness}, modeling their decreasing value. The observer uses a
+	\emph{probing schedule} (i.e., a probability distribution over the set of
+	nodes) to choose, at each time step, a small set of nodes to check for new
+	items. The goal is to compute a schedule that minimizes the average
+	freshness of undetected items. We present an algorithm, \algoname, to
+	compute the optimal schedule through convex optimization, and then show how
+	it can be adapted when the parameters of the problem must be learned or
+	change over time. We also present a scalable variant of \algoname for the
+	MapReduce framework. The results of our experimental evaluation on real
+	social networks demonstrate the practicality of our approach.
+\end{abstract}
