@@ -1,16 +1,16 @@
 LATEX = pdflatex
-MAINFILE = phsp
+MAINFILE = wiggins
 UPLOADHOST = ssh.cs.brown.edu
-UPLOADURI = public_html/MahmoodyRiondatoUpfal-PHSP-extended.pdf
+UPLOADURI = public_html/MahmoodyRiondatoUpfal-Wiggins-extended.pdf
 
 .PHONY: all archive check clean osx pdf upload view
 
 all : archive
 
-$(MAINFILE).aux: phsp.tex tex/*.tex $(wildcard *.eps) Makefile
+$(MAINFILE).aux: $(MAINFILE).tex tex/*.tex $(wildcard *.eps) Makefile
 	$(LATEX) $(MAINFILE).tex
 
-$(MAINFILE).bbl: phsp.tex tex/*.tex *.bib Makefile
+$(MAINFILE).bbl: $(MAINFILE).tex tex/*.tex *.bib Makefile
 	-bibtex --min-crossrefs=20 $(MAINFILE)
 
 $(MAINFILE).pdf: $(MAINFILE).aux $(MAINFILE).bbl
