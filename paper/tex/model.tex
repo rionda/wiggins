@@ -1,113 +1,162 @@
 \section{Problem Definition}\label{sec:prelims}
 In this section we introduce the \probname and formally define our goal. We
-define it in very general but formal terms and present examples to
-show how it applies to information diffusion in networks.
+start by giving some intuition about \probname, and then introduce it formally.
 
-\begin{definition}[Generating Process]
-Let $U$ be a universe, $\F$ be a family of subsets of $U$, and
-$\pi$ a function from $\F$ to $[0,1]$. A \emph{generating process} $\sys = (U,
-\F,\pi)$ is an \emph{infinite time process} that at each time $t$, generates a
-collection $\S_t\subseteq\F$ of subsets of $U$ such that $S\in \F$ is included
-in $\S_t$ with probability $\pi(S)$, independent of other sets. 
+In a social network, news and pictures are shared and re-shared over time, and
+each such shared ``item'' reaches a certain set of users. A resource-limited
+agent is interested in knowing what items get shared on the network. Also, the
+agent would like to know as soon as possible that an item has been shared,
+because the value of this piece of information decreases over time. Being
+resource-limited, the only way that the agent can observe (catch) the sharing of
+items is to probe some nodes (i.e., users) of the social network, for example by
+accessing their profile and getting a list of the items that they received from
+other users or that they shared. Therefore, the agent needs a probing schedule
+that allows her to catch as many items as possible while minimizing the time
+between the sharing of an item and its being caught. Equivalently, the schedule
+must be such that the ``value'' of the information that is not caught by the
+agent is minimized. Intuitively, the schedule must be such that nodes that
+receive a high number of items shortly after they have been generated should
+have a higher probability of being probed. These nodes act, in some sense, as
+``information hubs''. As such, identifying them can be seen as the complement of
+the \emph{influence maximization problem}~\citep{Kempe2003,Kempe2005}. In the
+influence maximization problem we look for a set of nodes that \emph{generate}
+information that reach most nodes. In the information hubs problem we are
+interested in a set of nodes that \emph{receive} the most of information, thus
+the most informative nodes for an observer.
+
+The \probname involves studying a \emph{generating process} $\sys$, which
+describes how items are generated (formalized in Def.~\ref{def:generating}).
+This is an unknown process that the agent observes by probing nodes. The
+\probname has two parameters:
+\begin{itemize*}
+	\item a \emph{probe limit} parameter $c\in\mathbb{N}$ denoting how many
+		nodes the agent can probe at each time step. This parameter describes
+		her ``resource limitations'', as she can not probe all the network at
+		each time step.
+	\item A \emph{freshness parameter} $\theta\in(0,1]$, which specifies
+		how fast the (agent-perceived) value of items decreases over time.
+\end{itemize*}
+Given two fixed values for $\theta$ and $c$, the $(\theta,c)$-PHSP on $\sys$
+requires to study $\sys$ as it will be formalized in Def.~\ref{def:phsp}.
+
+We now move to introduce the \probname and its components more formally.
+
+\begin{definition}[Generating Process]\label{def:generating}
+	Let $G=(V,E)$ be a graph, $\F$ be a family of subsets of $V$, and $\pi$ a
+	function from $\F$ to $[0,1]$. A \emph{generating process} $\sys =
+	(V,\F,\pi)$ is an \emph{infinite time process} that at each time $t$,
+	generates a collection $\S_t\subseteq\F$ of subsets of $V$ such that $S\in
+	\F$ is included in $\S_t$ with probability $\pi(S)$, independent of other
+	sets generated at $t$ and at time $t'<t$.
 \end{definition}
 
-As an example, in a graph $G=(V,E)$, if we let $U=V$, then the process $\sys$
-can, for specific choices of $\pi$ and $\F$, represent the process of
-generation and diffusion of rumors in the graph. At each time $t$, a set of
-rumors is generated, one rumor for each set $S\in\S_t$, and it instantaneously
-diffuse to all nodes in $S$, after which it stops diffusing. This is a natural
-model of rumors spreading as observed by a resource-limited agent that can not
-monitor all the network continuously at all times: the diffusion of a rumor
-happen too fast for its progress to be observable by such a resource-limited
-agent, to whom the rumor appears therefore to diffuse instantaneously. 
+For example, let $\sys$ represents the process of generation and diffusion of
+rumors in the graph $G$. At each time $t$, a set of rumors is generated, one
+rumor for each set $S\in\S_t$ and it \emph{instantaneously} spreads to all
+nodes in $S$, and then \emph{stops spreading}. This is a natural model of rumor
+spreading as observed by the \emph{resource-limited} agent that can not monitor
+all the network continuously at all times: the diffusion of a rumor happens too
+fast for its progress to be observable by the resource-limited agent, to whom
+the rumor appears therefore to spread instantaneously.
 
-Moreover, the agent can actually observe new rumors only by \emph{probing} a few
-nodes at each time $t$, checking whether any new rumor reached them. Formally,
-we can formulate this idea as follows.
+As we mentioned, the agent can actually observe new rumors only by
+\emph{probing} up to $c$ nodes at each time $t$, checking whether any new
+rumor reached them. We can formalize this idea as follows.
 
 An \emph{item} is a pair $(t,S)$, for any $t$ and any $S\in\S_t$. For any
-element $u\in U$, let $I_{t,u}$ be the set of items $(t',S)$ such that $t'\le t$
-and $u\in S$:
+node $v\in V$, let $I_{t,v}$ be the set of items $(t',S)$ such that ``reached''
+$v$ up to and including time $t$:
 \[
-	I_{t,u}=\set{(t',S) ~:~ t'\le t \mbox{ and } u\in S}\enspace.
+	I_{t,v}=\set{(t',S) ~:~ t'\le t \mbox{ and } v\in S}\enspace.
 \]
-By \emph{probing} an element $u\in U$ at time $u$ we mean observing and
-collecting the set $I_{t,u}$. Note that probing an element is not (assumed to
-be) a computationally expensive operation: accessing (probing) an element gives
-immediate access to $I_{t,u}$.
+By \emph{probing} a node $v\in V$ at time $u$ we mean observing and
+collecting the set $I_{t,}$. Probing an element is not (assumed to be) a
+computationally expensive operation: accessing (probing) an element gives
+immediate access to $I_{t,u}$. This is a realistic assumption: for example,
+accessing the profile of a user in a social network gives access to the list of
+items that reached that user.
 
-An item $(t',S)$ is \emph{caught at time $t\geq t'$} iff: \emph{1.}~an element
-$u\in S$ is probed at time $t$; and \emph{2.} no element of $S$ was probed in
-the interval $[t',t-1]$.
+An item $(t',S)$ is \emph{caught at time $t\geq t'$} iff:
+\begin{enumerate*}
+	\item a node $v\in S$ is probed at time $t$; and
+	\item no node in $S$ was probed in the interval $[t',t-1]$.
+\end{enumerate*}
 
-At each time step $t$, the resource-limited agent chooses a limited number
-of nodes to probe, according to a probing schedule, defined as follows.
-
-\begin{definition}[$c$-Schedule]
-Let $\p$ be a probability distribution over the universe $U$, and $c$ be a
-positive natural. A \emph{(probing) $c-$schedule} $\sigma=(c,\p)$ is a infinite
-time process that at each time $t$ generates a set $P_t\subseteq U$ of size
-$|P_t|\le c$ such that the elements of $P_t$ are chosen independently according
-to $\p$, independently from $t$ and from the elements generated at previous time
-steps.
-\end{definition}
-
-The goal, for the resource-limited agent, is to design a probing $c$-schedule
-catch items that have been generated recently, as they are intuitively more
-valuable. We measure the value of an item by its \emph{freshness}, which decays
-exponentially with time, according to a agent-defined parameter
-$\theta\in(0,1)$. 
+The larger the interval between the time an item is generated and the time it is
+caught, the less valuable that item is for the agent. This idea is formalized
+by the \emph{$\theta$-freshness} of an item.
 
 \begin{definition}[$\theta$-freshness]
-	Let $\theta\in(0,1)$. The \emph{freshness} of an uncaught item $(t,S)$ at
-	time $t'\ge t$, is $\theta^{t'-t}$. 
+	Let $\theta$ be the freshness parameter of a $(\theta,c)$-PHSP on $\sys$.
+	The \emph{$\theta$-freshness} of an uncaught item $(t,S)$ at time $t'\ge t$,
+	is $\theta^{t'-t}$.
 \end{definition}
+We believe that the choice of an exponential decaying freshness is realistic, as
+the value of information decreases fast with time. Moreover it allows for a
+rigorous theoretical study of \probname. Other definitions of freshness are
+possible and we plan to study them in the future.
 
-In order to compare different schedules, we define a \emph{cost measure for
-schedules} based on the sum of the freshness of uncaught items, as follows.
+At each time step $t$, the resource-limited agent picks $c$ nodes to probe
+according to a probing schedule, defined as follows.
 
-The \emph{$\theta$-load $L_\sys(\theta, t)$ of the generating process $\sys$ at
-time $t$} is the sum of the $\theta$-freshness of uncaught items at the end of
-time step $t$ (i.e., after the agent has probed the elements of $U$ according to
-a schedule). 
+\begin{definition}[$c$-Schedule]\label{def:schedule}
+	Let $c$ be the probing limit parameter of a $(\theta,c)$-PHSP on $\sys$, and
+	let $\p$ be a probability distribution over the set $V$ of nodes. A
+	\emph{(probing) $c-$schedule} $\sigma=(c,\p)$ is an infinite time process
+	that at each time $t$ generates a set $P_t\subseteq V$ of size $|P_t|\le c$
+	such that the elements of $P_t$ are chosen independently according to $\p$,
+	independently from $t$ and from the elements generated at previous time
+	steps.
+\end{definition}
+At each time step, the agent probes the node in $P_t$. According to
+Def.~\label{def:schedule}, a $c$-schedule must be \emph{memoryless}. We postpone
+the study of adaptive or sequential schedules to future work.
+
+The goal, for the resource-limited agent, is to design a probing $c$-schedule
+catch items that have higher freshness (which correspond to those generated
+most recently). In order to compare different schedules, we define a \emph{cost
+measure for schedules} based on the sum of the freshness of \emph{uncaught}
+items, as follows.
+
+Let $\theta$ be the freshness parameter of a $(\theta,c)$-PHSP on $\sys$. The
+\emph{$\theta$-load $L_\sys(t)$ of the generating process $\sys$ at time $t$} is
+the sum of the $\theta$-freshness of \emph{uncaught} items at the end of time
+step $t$ (i.e., after the agent has probed the nodes in the set $P_t$ generated
+by a $c$-schedule.
 
 \begin{definition}[$\theta$-cost]
-	The $\theta$-\emph{cost} $\cost(c,p)$ of a $c$-schedule $(c,\p)$ is the
-	limit of the average expected $\theta$-load of $\sys$:
+	Given a $(\theta,c)$-PHSP on $\sys$, the $\theta$-\emph{cost} $\cost{c,p}$
+	of a $c$-schedule $(c,\p)$ is the limit of the average expected
+	$\theta$-load of $\sys$:
 	\[
-	\lim\limits_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\E(L_\sys(\theta,t'))\enspace.
+		\cost{c,p}=\lim\limits_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^{t}\E(L_\sys(\theta,t'))\enspace.
 	\]
 \end{definition}
 The limit above always exists as proven in Lemma~\ref{lem:explicit}.
 \todo{Is the proof of existence actually there?}
 
-The problem we focus on in this work is to find a schedule with minimum cost.
+We have now all the ingredients to formally state the $(\theta,c)$-PHSP on a
+generating process $\sys$.
 
-\begin{definition}[\probname]
- The goal in a $(\theta,c)$-{\probname}, or $(\theta,c)$-PHSP, for a generating
- system $\sys$ is to find  a $c$-schedule $(c,\p)$ with the minimum
- $\theta$-cost. 
- 
- A $c$-schedule \emph{optimal} iff it has the minimum $\theta$-cost among all
- possible $c$-schedules.
+\begin{definition}[\probname]\label{def:phsp}
+	The goal in a $(\theta,c)$-{\probname}, or $(\theta,c)$-PHSP, for a
+	generating process $\sys$ is to find a $c$-schedule $(c,\p)$ with the
+	minimum $\theta$-cost.
+
+	A $c$-schedule \emph{optimal} iff it has the minimum $\theta$-cost among all
+	possible $c$-schedules.
 \end{definition}
 
 In $(\theta,c)$-PHSP, the parameter $\theta$ controls how fast the freshness of
 an item decays, i.e., how fast they loose value for the agent. A value of
 $\theta$ very close to $0$ requires to catch the item  as soon as they are
-generated (or at most shortly thereafter). In the other extreme, the items have
-always maximum freshness, and an ideal schedule should try to maximize the
-number of caught items. 
-
-In other words, an ideal schedule $(c,\p)$ for $(\theta, c)$-PHSP is such that
-elements of $U$ more likely to receive ``fresh'' items have higher probability
-of being probed (i.e., higher $\p$). Intuitively, if we see the items as the
-``information'' flowing in the network $G$, then an ideal schedule should assign
-higher probability of being probed to nodes that act as \emph{information hubs}.
-Hence by examining the probability distribution $\p$ of an optimal schedule, we
-can identify information hubs among the nodes. As such, the problem we deal with
-in this work can be seens as the complement of the ``influence maximization
-problem''~\citep{Kempe2003,Kempe2005}. In the influence maximization we look for
-a set of nodes that generate the information that reach most nodes. In the
-information hubs problem we are looking for the set of nodes that receive the
-most amount of information, thus the most informative nodes.
+generated (or at most shortly thereafter). At the other extreme ($\theta=1$),
+the items have always maximum freshness, and an ideal schedule should maximize
+the number of caught items.  In other words, an ideal schedule $(c,\p)$ for
+$(\theta, c)$-PHSP is such that elements of $U$ more likely to receive ``fresh''
+items have higher probability of being probed (i.e., higher $\p$). Intuitively,
+if we see the items as the ``information'' flowing in the network $G$, then an
+ideal schedule should assign higher probability of being probed to nodes that
+act as information hubs, as described at the beginning of this section. Hence by
+examining the probability distribution $\p$ of an optimal schedule, we can
+identify information hubs among the nodes.
