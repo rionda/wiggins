@@ -57,7 +57,7 @@ Let $C_t$ be the set of items caught by the observer at any time $t'\le t$. We
 have $C_t\subseteq U_t$. Let $N_t= U_t\setminus C_t$ be the \emph{set of
 uncaught items at time $t$}, i.e., items that were generated at any time
 $t'\le t$ and have not been caught yet at time $t$. For any item $(t',S)\in
-N_t$, we define the \emph{$\theta$-freshness of $(t',S)$ at time $t$ as
+N_t$, we define the \emph{$\theta$-freshness of $(t',S)$ at time $t$} as
 \[
 	\fresh_\theta(t,t',S)\defeq\theta^{t-t'},
 \]
@@ -70,9 +70,9 @@ limit. In the rest of the paper we drop the $\theta$ from the notation of
 freshness of an item at time $t'$ as it will be clear from the context.
 
 \para{Load of the system and cost of a schedule} The set $N_t$ of uncaught items
-at time $t$ imposes a \emph{\theta-load $L(t)$} on the graph at time $t$,
-defined as the sum of the $\theta$-freshness at time $t$ of the items
-in $N_t$:
+at time $t$ imposes a \emph{$\theta$-load $L_\theta(t)$ on the graph at time
+$t$}, defined as the sum of the $\theta$-freshness at time $t$ of the items in
+$N_t$:
 \[
 	L_\theta(t)\defeq\sum_{(t',S)\in N_t} \fresh_\theta(t,t',S)\enspace.
 \]
