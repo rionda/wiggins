@@ -81,11 +81,12 @@ the probing schedule $\sched$, and as such it has an expectation
 $\expect[L_\theta(t)]$ w.r.t.~all the randomness in the system. The
 \emph{$\theta$-cost of a schedule $\sched$} is defined as the limit, for
 $t\rightarrow\infty$, of the average expected load of the system:
-\[
-	\cost_\theta(\sched)\defeq\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'\le
-	t}\expect[L_\theta(t)]=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'\le
+\begin{align*}
+	\cost_\theta(\sched)&\defeq\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'\le
+	t}\expect[L_\theta(t)]\\
+	&=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'\le
 	t}\expect\left[\sum_{(t'',S)\in N_{t'}}\fresh_\theta(t',t'',S)\right]\enspace.
-\]
+\end{align*}
 \todo{Add some motivation/intuition for this choice of cost measure.}
 The limit above always exists as proven in Lemma~\ref{lem:explicit}.
 \todo{Is the proof of existence actually there?}
@@ -115,7 +116,7 @@ likely to receive ``fresh'' items have higher probability of being probed.
 Intuitively, if we see the items as the ``information'' flowing in the network,
 then an ideal schedule should assign higher probability of being probed to nodes
 that act as \emph{fresh information hubs}, i.e., receive a large number of
-items. Hence by examining the optimal schedule $\sched$, we can identify
+items. Hence by examining the optimal schedule $\sched^*$, we can identify
 information hubs among the nodes. This task (finding information hubs) can be
 seen as the complement of the \emph{influence maximization
 problem}~\citep{Kempe2003,Kempe2005}. In the influence maximization problem we
