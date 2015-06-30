@@ -327,6 +327,69 @@ void compare(const string filename, const string samp_file, const string test_fi
 	fout_comp.close();
 }
 
+void compare_with_file(const string samp_file, const string test_file,
+			const int num_iter, const int probes,
+			const double theta) {
+
+	
+
+	int number_of_nodes, len_samp;
+	
+	ifstream fin(test_file + ".stat");	
+	fin >> number_of_nodes >> len_samp;	
+	fin.close();
+
+	string pp_file = samp_file + "_probes-" + to_string(probes)+ ".p";
+	
+	// getting p
+	vdoub_t p = load_p(pp_file, number_of_nodes, num_iter);
+
+	fin.open(test_file);
+	if (! fin.is_open()) {
+		cerr << "cost: file not found: " << test_file << endl;		
+	}
+
+	// getting uniform:
+	vdoub_t unif(number_of_nodes, 1.0/number_of_nodes);
+
+	
+
+
+	vdoub_t cost_val(2,0);	
+	int k, u;
+	double pS_p, pS_unif;
+	double cost_p = 0, cost_unif = 0;
+	while (fin >> k) {
+		// vector<double> pS(pp.size(), 0);
+		pS_p = 0;
+		pS_unif = 0;
+
+		for (int i=0; i<k; ++i) {			
+			fin >> u;
+			pS_p += p[u];
+			pS_unif += unif[u];
+			
+		}
+
+		cost_p += 1.0/(1 - theta*pow(1-pS_p,probes));
+		cost_unif += 1.0/(1 - theta*pow(1-pS_unif,probes));
+
+
+	}
+	fin.close();
+
+	cost_p /= len_samp;
+	cost_unif /= len_samp;
+
+	
+	ofstream fout_comp(samp_file + "_probes-" + to_string(probes) + ".compare");
+	fout_comp << "p\t" << cost_p << endl;
+	fout_comp << "unif\t" << cost_unif << endl;
+
+
+	fout_comp.close();
+}
+
 	
 
 
@@ -335,7 +398,7 @@ int main(int argc, char *argv[]) {
 	/*
 		Parsing the arguments
 	*/
-	string TASK, filename;
+	string TASK, filename, SFILE, TFILE;
 	uint64_t len_samp, len_test;
 
 	int num_iter = 51, probes, num_simuls = 1, ind; 
@@ -363,6 +426,10 @@ int main(int argc, char *argv[]) {
 			num_simuls = stod(argv[i+1]);
 		} else if (! strcmp(argv[i],"-IND")) {
 			ind = stod(argv[i+1]);
+		} else if (! strcmp(argv[i],"-SAMPLE_FILE")) {
+			SFILE = argv[i+1];
+		} else if (! strcmp(argv[i],"-TEST_FILE")) {
+			TFILE = argv[i+1];
 		}
 
 	}
@@ -382,7 +449,12 @@ int main(int argc, char *argv[]) {
 
 	} else if (TASK == "solver") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
-		solver(samp_file, theta, num_iter, probes);		
+		solver(samp_file, theta, num_iter, probes);	
+
+	} else if (TASK == "solver-with-file") {
+		string samp_file = SFILE;
+		solver(samp_file, theta, num_iter, probes);	
+
 	} else if (TASK == "indexed_solver") {
 		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
 		solver(samp_file, theta, num_iter, probes);	
@@ -399,10 +471,15 @@ int main(int argc, char *argv[]) {
 		
 	} else if (TASK == "simulator") {
 		simulator(filename, num_simuls, num_iter, theta, epsilon);
+	
 	} else if (TASK == "compare") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_test);
-		compare(filename, samp_file, test_file, num_iter, probes, theta);
+		compare(filename, samp_file, test_file, num_iter, probes, theta);	
+	} else if (TASK == "compare-with-file") {
+		string samp_file = SFILE;
+		string test_file = TFILE;
+		compare_with_file(samp_file, test_file, num_iter, probes, theta);	
 	
 	} else if (TASK == "indexed_compare") {
 		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
