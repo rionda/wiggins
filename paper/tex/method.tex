@@ -108,7 +108,7 @@ $c$-schedules. We then use this result to show how to compute an optimal schedul
 	We start by showing that $g_S(\sched) = \theta(1-\sched(S))^c$ is convex.
 	This is because its Hessian matrix is positive semidefinite. Indeed we have:
 	\[
-		\frac{\partial}{\partial p_i \partial p_j} g_S(\sched) = \left\{
+		\frac{\partial}{\partial \sched_i \partial \sched_j} g_S(\sched)=\left\{
 		\begin{array}{lr}
 		\theta c(c-1) (1-\sched(S))^{c-2} &  i,j \in S\\
 		0 &  \text{otherwise}
@@ -145,8 +145,8 @@ constrained convex optimization problem:
 	\boxed{
 	\begin{array}{rrclcl}
 	\displaystyle \min_{\sched} & \multicolumn{3}{l}{\cost{\sched}} \\
-	&\displaystyle \sum_{i=1}^{n} p_i & = & 1 \\
-	&p_i & \geq & 0 & & \forall i \in \{1,\ldots,n\} \\
+	&\displaystyle \sum_{i=1}^{n} \sched_i & = & 1 \\
+	&\sched_i & \geq & 0 & & \forall i \in \{1,\ldots,n\} \\
 	\end{array} }
 \end{equation}
 
@@ -159,13 +159,13 @@ time to the final schedule, that schedule is provably optimal (see below).
 
 \mynote{How is gradient descent handling the constraints? Also, the function has
 	also a Hessian, so we could use Newton's method, which is even faster than
-gradient descent}
+gradient descent
 
-\mynote{What is the real issue with gradient descent? Is it that we have to
+What is the real issue with gradient descent? Is it that we have to
 	evaluate the cost function multiple times and this is computationally too
-expensive. Is there a way to formalize this cost?}
+expensive (is it?). Is there a way to formalize this cost?
 
-\mynote{There are tons of methods for convex optimization. Why don't we care
+There are tons of methods for convex optimization. Why don't we care
 about them?}
 
 \paragraph{Gradient Descent} As we showed in Theorem~\ref{thm:convexity}
@@ -174,50 +174,43 @@ method for the optimization in~\eqref{eq:optimization}, as converging to any
 local minimum is guaranteed to give a global minimum.
 
 \paragraph{Lagrange Multipliers: nonlinear iterative method} Generally, to use
-the nonlinear iterative method, we need a function $Q:\triangle^{n-1}\rightarrow
-\triangle^{n-1}$ such that $Q(\sched^*) = \sched^*$ for any optimal schedule $\sched^*$.
+the nonlinear iterative method, we need a function $Q$ from the set
+$\mathsf{S}_c$ of $c$-schedule to itself such that $Q(\sched^*) = \sched^*$ for
+any optimal schedule $\sched^*$. Let us now define $Q$.
 
-\mynote{What is $\triangle^{n-1}$ ?}
-
-\mynote{Is the following correct?}
 From the method of Lagrance multipliers, we have that,
 if a schedule $\sched^*$ is optimal, then $p^*$ is a solution to following system of
 $n$ equations:
 \begin{equation}\label{eq:lagrange}
-	\nabla [\cost{\sched} + \lambda (p_1+\ldots+p_n)] = 0,
+	\nabla [\cost{\sched} + \lambda (\sched_1+\ldots+\sched_n-1)] = 0,
 \end{equation}
-\mynote{Shouldn't it be $p_1\ldots+p_n-1$ ?}
-where the gradient on the l.h.s.~(which has $n+1$ components) is taken with
-respect to (the components of) $\sched$ and to $\lambda$.
+where the gradient on the l.h.s.~(which has $n+1$ components) is taken
+w.r.t.~(the components of) $\sched$ and to $\lambda$.
 
 For $1\le i\le n$, the $i$-th equation induced by~\eqref{eq:lagrange} is
 \[
-	\frac{\partial}{\partial p_i} \cost{\sched} + \lambda = 0,
+	\frac{\partial}{\partial \sched_i} \cost{\sched} + \lambda = 0,
 \]
 or, equivalently,
 \[
-	\sum_{S:i\in S} \frac{\theta c \pi(S)
+	\sum_{\substack{\S\in\family\\\mbox { s.t. } i\in S}} \frac{\theta c \pi(S)
 		(1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2} = \lambda\enspace.
 \]
 For notational convenience let
 \[
-	W_i(\sched) = \frac{\theta c \pi(S)
-		(1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}
+	W_i(\sched) \defeq\substack{\S\in\family\\\mbox { s.t. } i\in S}
+	\\frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}
 \]
-\mynote{Is there supposed to be a sum in front above?}
-
 and let $f: \mathbb{R} \rightarrow \mathbb{R}$ be an \emph{invertible} function.
-We define $Q(\sched) = (Q_1(\sched), \ldots, Q_n(\sched))$ as the vector whose $i$-th
-component $Q_i(\sched)$ is
+We define $Q(\sched) = (Q_1(\sched), \ldots, Q_n(\sched))$ as the vector whose
+$i$-th component $Q_i(\sched)$ is
 \[
-	Q_i(\sched) = \frac{p_i f(W_i(\sched))}{\sum_{j} p_j f(W_j(\sched))}\enspace.
+	Q_i(\sched) = \frac{\sched_i f(W_i(\sched))}{\sum_{j} \sched_j f(W_j(\sched))}\enspace.
 \]
-We have
+For any optimal schedule $\sched^*$, we have
 \[
-	Q_i(\sched^*) = \frac{p^*_i\cdot \lambda}{\sum_j p^*_j\cdot \lambda} =
+	Q_i(\sched^*) = \frac{p^*_if(\lambda)}{\sum_j p^*_jf(\lambda)} =
 p^*_i,\]
-\mynote{I don't understand the above. Should it be $f(\lambda)$?}
-
 and thus $Q(\sched^*) = \sched^*$.
 
 There is no guarantee that the method converges,
@@ -227,11 +220,11 @@ method yet.}
 but we have that $Q(\sched) = \sched$ if and only if $\sched$ is optimal, as shown by
 Thm.~\ref{thm:iff}. In Sect.~\ref{sec:experiments} we show our experimental
 results illustrating the convergence of this method in different cases.
-\mynote{Do we actually have these?}
+\mynote{Do we actually have these results?}
 
 \begin{theorem}\label{thm:iff}
-	If $\sched$ is a schedule, then $Q(\sched) = \sched$ if and only if $\sched$ is an optimal
-	schedule.
+	The identity $Q(\sched) = \sched$ holds if and only if $\sched$ is an
+	optimal schedule.
 \end{theorem}
 
 \begin{proof}
@@ -240,21 +233,18 @@ results illustrating the convergence of this method in different cases.
 		description of the method (currently missing, in my opinion) outside the
 	theorem?}
 
-	Now assume that $Q(\sched)=\sched$. Therefore $p_i = Q_i(\sched)$ for $1\leq i \leq n$,
-	and we have
+	Now assume that $Q(\sched)=\sched$. Therefore $Q_i(\sched) = sched_i$ for
+	$1\leq i \leq n$, and we have
 	\begin{align*}
-	Q_i(\sched) = p_i = \frac{p_i f(W_i(\sched))}{\sum_{j} p_j f(W_j(\sched))}
+	Q_i(\sched) = \frac{\sched_i f(W_i(\sched))}{\sum_{j} \sched_j
+f(W_j(\sched))} = \sched_i
 	\Rightarrow
-	W_i(\sched) = f^{-1}\left(\sum_{j} p_j f(W_j(\sched))\right).
+	W_i(\sched) = f^{-1}\left(\sum_{j} \sched_j f(W_j(\sched))\right).
 	\end{align*}
-	Hence, $W_i(p)$ is a constant (independent of $i$)
-
-	\mynote{I don't see the above.}
-
-	and we have
-	$W_1(\sched)=\ldots=W_n(\sched)$. Now, by letting $\lambda = W_i(\sched)$, we obtain a
-	solution for the system of equations in Lagrange multipliers method, and
-	thus, $\sched$ is an optimal schedule.
+	Hence, $W_i(p)$ is independent from $i$ and we have
+	$W_1(\sched)=\ldots=W_n(\sched)$. Now, by letting $\lambda = W_i(\sched)$,
+	we obtain a solution for the system of equations in Lagrange multipliers
+	method, and thus, $\sched$ is an optimal schedule.
 \end{proof}
 
 In this work, we apply the second method as it is very fast on large datasets
@@ -264,56 +254,75 @@ simplicity we took the identity function for $f$, and our method for the
 optimization problem in~\eqref{eq:optimization} is given in
 Algorithm~\ref{alg:iterative}.
 
-
 \begin{algorithm}[ht]
 	\DontPrintSemicolon
 	\SetKwInOut{Input}{input}
 	\SetKwInOut{Output}{output}
 	\SetKwComment{tcp}{//}{}
-	\Input{Number $iter$ of iterations. XXX what about other?}
-	\Output{XXX}
-	$\sched \leftarrow (1/n, \ldots, 1/n)$\;
-	\For{$i\in\{1,\ldots, \texttt{iterations}\}$}{
-		$W \leftarrow (0,\ldots, 0)$\;
+	\Input{$\family$, $\pi$, $c$, $\theta$, and number $\lambda$ of iterations}
+	\Output{An optimal $c$-schedule $\sched$ with minimum $\theta$-cost}
+	$\sched_i \leftarrow 1/n$, $1\le i\le n$\;
+	\For{$j\leftarrow 1$ \KwTo $\lambda$} {
+		$W_i\leftarrow 0$, $1\le i\le n$\;
 		\For{$S\in \family$} {
-			\For{$u \in S$} {
-				$W_i \leftarrow W_i - \frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}$\;%\frac{-\theta\pi(S)}{(1-\theta(1-p(S)))^2}$\;
+			\For{$i\in S$} {
+				$W_i \leftarrow W_i + \frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}$\;
 			}
 		}
-		$\sched \leftarrow \frac{1}{\sum_{i} p_iW_i} (p_1W_1, \ldots, p_nW_n)$\;
+		$\sched_i\leftarrow \frac{\sched_iW_i}{\sum_{i} \sched_iW_i}$, $1\le i\le n$;
 	}
 	\Return{$\sched$}\;
-	\caption{$\optimizer(\texttt{iterations})$}
+	\caption{\algoname}
 	\label{alg:iterative}
 \end{algorithm}
-	%However, this iterative method is convergent if the Jacobian norm of $F$ is less than 1, i.e., $\|DF\| < 1$.
+%However, this iterative method is convergent if the Jacobian norm of $F$ is less than 1, i.e., $\|DF\| < 1$.
 
 
-\iffalse
+\subsection{Approximating the best schedule through sampling}\label{sec:sampcomp}
 
-\subsection{Cost Approximation through Sampling}\label{sec:sampcomp}
-	In a generating process $\sys = (U, \family, \pi)$, computing the cost of a schedule can be very challenging due to the parameters $\family$ and $\pi$ as they might not be known to us.
-	Instead we have access to sampled {\ins} from $\family$ during the time. In particular, at any time step an {\ins} $S\in\family$ may be generated, and observed or sampled, with probability $\pi(S)$. A sample $\Sample$ of {\ins} during a time interval $[t_1, t_2]$ is $\Sample=\Sample_{t_1}\cup\ldots\cup\Sample_{t_2}$ where each $\Sample_t$ is the set of all observed {\ins} at time $t$.
+In a generating process $\sys = (U, \family, \pi)$, computing the cost of a
+schedule can be very challenging due to the parameters $\family$ and $\pi$ as
+they might not be known to us.
 
-	In this section, we study the optimization problem~(\ref{eq:optimization}) in generating processes for which we only have access to samples of $\family$. Specifically, we show that a sample $\Sample$ gathered during a time interval of length $\tilde O(\log(n))$ suffices to estimate and optimize the cost function.
+Instead we have access to sampled {\ins} from $\family$ during the time. In
+particular, at any time step an {\ins} $S\in\family$ may be generated, and
+observed or sampled, with probability $\pi(S)$. A sample $\Sample$ of {\ins}
+during a time interval $[t_1, t_2]$ is
+$\Sample=\Sample_{t_1}\cup\ldots\cup\Sample_{t_2}$ where each $\Sample_t$ is the
+set of all observed {\ins} at time $t$.
 
-	% In this section, we show how using a sample of sets in $\family$, formed during a short time interval of length $\tilde O(\log(n))$ we can estimate the $\cost{\sched}$, $\nabla\cost{\sched}$, and $W(\sched)$ for any schedule $\sched$ (during the optimization) accurately.  This shows the feasibility and accuracy of the Gradient Descent and the iterative methods when we have access to a sample of $\family$.
+In this section, we study the optimization problem~(\ref{eq:optimization}) in
+generating processes for which we only have access to samples of $\family$.
+Specifically, we show that a sample $\Sample$ gathered during a time interval of
+length $\tilde O(\log(n))$ suffices to estimate and optimize the cost function.
 
-	We start by defining the cost of a schedule according to a sample:
-	\begin{definition}[Cost according to a sample]
-	Suppose $\sched$ is a $c$-schedule and $\Sample$ is a sample of {\ins}s gathered during a time interval of length $\ell$. The cost of $\sched$ according to $\Sample$, denoted by $\cost{\sched,\Sample}$, is
+% In this section, we show how using a sample of sets in $\family$, formed during a short time interval of length $\tilde O(\log(n))$ we can estimate the $\cost{\sched}$, $\nabla\cost{\sched}$, and $W(\sched)$ for any schedule $\sched$ (during the optimization) accurately.  This shows the feasibility and accuracy of the Gradient Descent and the iterative methods when we have access to a sample of $\family$.
+
+We start by defining the cost of a schedule according to a sample:
+
+\begin{definition}[Cost according to a sample]
+	Suppose $\sched$ is a $c$-schedule and $\Sample$ is a sample of {\ins}s
+	gathered during a time interval of length $\ell$. The cost of $\sched$
+	according to $\Sample$, denoted by $\cost{\sched,\Sample}$, is
 	$\frac{1}{\ell}\sum_{S\in \Sample} \frac{1}{1-\theta(1-\sched(S))^c}$.
-	\end{definition}
-	For a sample $\Sample$, $\cost{\sched,\Sample}$ is an approximation of $\cost{\sched}$, and the larger the size of $\Sample$ is, by the Law of Large Numbers we get better approximation. Lets denote the length of the time interval from which the sample $\Sample$ is obtained by $\ell(\Sample)$. The question we want to answer in this section is ``How large should $\ell(\Sample)$ be, so that for every schedule $\sched$ we have $|\cost{\sched,\Sample} - \cost{\sched}| < \epsilon\cdot\cost{\sched}$ w.h.p for $\epsilon > 0$?''
+\end{definition}
 
-	We have the following theorem.
-	\begin{theorem}\label{thm:chernoffcost}
+For a sample $\Sample$, $\cost{\sched,\Sample}$ is an approximation of
+$\cost{\sched}$, and the larger the size of $\Sample$ is, by the Law of Large
+Numbers we get better approximation. Lets denote the length of the time interval
+from which the sample $\Sample$ is obtained by $\ell(\Sample)$. The question we
+want to answer in this section is ``How large should $\ell(\Sample)$ be, so that
+for every schedule $\sched$ we have $|\cost{\sched,\Sample} - \cost{\sched}| <
+\epsilon\cdot\cost{\sched}$ w.h.p for $\epsilon > 0$?'' We have the following theorem.
+
+\begin{theorem}\label{thm:chernoffcost}
 	Suppose $\Sample$ is a sample gathered during a time interval of length $\ell(\Sample)
 	\geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} =
 	O\left(\frac{\log(n)}{\epsilon^2}\right)$. Then, for every schedule $\sched$ we have
 	$$\Pr(|\cost{\sched,\Sample} - \cost{\sched}|\geq \epsilon\cdot\cost{\sched}) < \frac{1}{n^r}.$$
-	\end{theorem}
-	\begin{proof}
+\end{theorem}
+
+\begin{proof}
 	Let $X_S$ be a random variable which is $\frac{1}{1-\theta(1-\sched(S))^c}$ with probability $\pi(S)$, and zero otherwise. So, $1\leq X_S \leq \frac{1}{1-\theta}$. Also let  $X = \sum_{S\in \family} X_S$, and thus,
 	\begin{equation}\label{eq:boundcost}
 		\cost{\sched} = \expect[X] = \sum_{S\in\family} \expect[X_{S}] \geq |\family|,
@@ -321,20 +330,25 @@ Algorithm~\ref{alg:iterative}.
 and $|\family| \leq X \leq \frac{|\family|}{1-\theta}$. Let $X^i_S$ be the $i$-th draw of $X_S$ during the time interval $\Sample$ was sampled from and define $X^i = \sum_{S\in\family}X_S^i$. Note that
 $\cost{\sched,\Sample} = \frac{1}{\ell(\Sample)}\sum_{i}X^i$. Now, denote $\mu=\frac{\ell(\Sample)(1-\theta)}{|\family|}\cost{\sched}$. Using the fact that $\frac{1-\theta}{|\family|}X \in [0,1]$ and the Chernoff bound we have
 \begin{align*}
-\Pr\paran{\left|\cost{\sched,\Sample} - \cost{\sched}\right| \geq \epsilon \cdot \cost{\sched}}
+\Pr\left(\left|\cost{\sched,\Sample} - \cost{\sched}\right| \geq \epsilon \cdot
+\cost{\sched}\right)
 &=
-\Pr\paran{\left|\sum_i X^i - \ell(\Sample)\cost{\sched}\right| \geq \epsilon \ell(\Sample) \cost{\sched}} \\
+\Pr\left(\left|\sum_i X^i - \ell(\Sample)\cost{\sched}\right| \geq \epsilon
+\ell(\Sample) \cost{\sched}\right) \\
 &=
-\Pr\paran{\left|\frac{1-\theta}{|\family|}\sum_i X^i - \mu\right| \geq \epsilon \mu} \\
-&\leq 2\exp\paran{-\frac{\epsilon^2\mu}{3}}\\
-% \Pr\paran{\left|\frac{1-\theta}{|\family|}\sum_i X^i - \frac{\ell(\Sample)(1-\theta)}{|\family|}\cost{\sched}\right| \geq \epsilon \frac{\ell(\Sample)(1-\theta)}{|\family|}\cost{\sched}} \\
+\Pr\left(\left|\frac{1-\theta}{|\family|}\sum_i X^i - \mu\right| \geq \epsilon
+\mu\right) \\
+&\leq 2\exp\left(-\frac{\epsilon^2\mu}{3}\right)\\
+% \Pr\left(\left|\frac{1-\theta}{|\family|}\sum_i X^i - \frac{\ell(\Sample)(1-\theta)}{|\family|}\cost{\sched}\right| \geq \epsilon \frac{\ell(\Sample)(1-\theta)}{|\family|}\cost{\sched}} \\
 &=
-2\exp\paran{-\frac{\epsilon^2 \ell(\Sample) (1-\theta) \cost{\sched}}{3|\family|}} \\
+2\exp\left(-\frac{\epsilon^2 \ell(\Sample) (1-\theta)
+	\cost{\sched}}{3|\family|}\right) \\
 &\leq
-2\exp\paran{-\frac{\epsilon^2 \ell(\Sample) (1-\theta)}{3}},
+2\exp\left(-\frac{\epsilon^2 \ell(\Sample) (1-\theta)}{3}\right),
 \end{align*}
 where the last inequality holds since $\cost{\sched}\geq |\family|$, as shown in Inequality (\ref{eq:boundcost}).
-So, if $\ell(\Sample) \geq \frac{3 (\ell \log(n)+\log(2))}{\epsilon^2(1-\theta)} = O\paran{\log(n)/\epsilon^2}$, for every schedule $\sched$, $\left|\cost{\sched,\Sample} - \cost{\sched}\right| < \epsilon \cdot \cost{\sched}$ with probability at least $1-1/n^r$.
+So, if $\ell(\Sample) \geq \frac{3 (\ell \log(n)+\log(2))}{\epsilon^2(1-\theta)}
+= O\left(\log(n)/\epsilon^2\right)$, for every schedule $\sched$, $\left|\cost{\sched,\Sample} - \cost{\sched}\right| < \epsilon \cdot \cost{\sched}$ with probability at least $1-1/n^r$.
 \qed
 \end{proof}
 
@@ -345,7 +359,7 @@ Using a very similar argument we have the following theorem:
 \begin{theorem}\label{thm:chernoffW}
  Suppose $\Sample$ is a sample gathered during a time interval of length
  $\ell(\Sample) \geq \frac{3(r\log(n)+\log(2))}{\epsilon^2(1-\theta)} =
- O\paran{\frac{\log(n)}{\epsilon^2}}$. Then, for every schedule $\sched$ and
+ O\left(\frac{\log(n)}{\epsilon^2}\right)$. Then, for every schedule $\sched$ and
  $i\in\{1,\dots,n\}$ we have
  $$\Pr(|W_i(\sched,\Sample) - W_i(\sched)|\geq \epsilon\cdot W_i(\sched)) < \frac{1}{n^r}.$$
 \end{theorem}
@@ -357,25 +371,20 @@ We conclude this section by providing an algorithm, Algorithm~\ref{alg:iterative
 {\bf Inputs:} The number of  $\texttt{iterations}$, and a sample of {\ins}s $\Sample$.
 
 \Begin{
-$\sched \leftarrow \paran{1/n, \ldots, 1/n}$\;
-\For{$i\in\set{1,\ldots, \texttt{iterations}}$}{
+$\sched \leftarrow \left(1/n, \ldots, 1/n\right)$\;
+\For{$i\in\{1,\ldots, \texttt{iterations}\}$}{
 	$W \leftarrow (0,\ldots, 0)$\;
 	\For{$S\in \family$} {
 		\For{$u \in S$} {
 			$W_i \leftarrow W_i - \frac{\theta c (1-\sched(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\sched(S))^c)^2}$\;%\frac{1}{\ell(S)\cdot(1-\theta(1-p(S)))^2}$\;
 		}
 	}
-	$\sched \leftarrow \frac{1}{\sum_{i} p_iW_i} (p_1W_1, \ldots, p_nW_n)$\;
+	$\sched \leftarrow \frac{1}{\sum_{i} \sched_iW_i} (\sched_1W_1, \ldots, \sched_nW_n)$\;
 }
   return $\sched$\;
 }
-\caption{$\appoptimizer(\texttt{iterations},\Sample)$}\label{alg:iterative_with_sample}
+\caption{XXX}\label{alg:iterative_with_sample}
 \end{algorithm}
-
-
-
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -404,8 +413,8 @@ $\D_1 \leftarrow \emptyset$\;
 $\D_2 \leftarrow \emptyset$\;
  \For{nodes $u\in U$}{
    \For{items $i$ at $u$, not older than \texttt{time\_length} time steps}{
-      $\D_1 \leftarrow \D_1 \cup \set{i}$\;
-      $\D_2 \leftarrow \D_2 \cup \set{(i,u)}$\;
+	   $\D_1 \leftarrow \D_1 \cup \{i\}$\;
+      $\D_2 \leftarrow \D_2 \cup \{(i,u)\}$\;
       }
     }
 
@@ -414,9 +423,9 @@ $\Sample \leftarrow \emptyset$\;
 \For{$i \in D_1$}{
   $S \leftarrow \emptyset$\;
   \For{$(i, u) \in D_2$}{
-  $S \leftarrow S \cup \set{u}$\;
+  $S \leftarrow S \cup \{u\}$\;
   }
-  $\Sample \leftarrow \Sample \cup \set{S}$\;
+  $\Sample \leftarrow \Sample \cup \{S\}$\;
   }
 
   return $\Sample$\;
@@ -440,13 +449,13 @@ $\Sample \leftarrow \emptyset$\;
 %   $c\leftarrow (0,\ldots,0)$\;
 %    \For{$S \in \M$}{
 %      \For{$i \in \Sample$}{
-%       $c_i \leftarrow c_i + \paran{\frac{p_i}{\sum_{j\in S p_j}}}^2$ \;
+%       $c_i \leftarrow c_i + \paran{\frac{\sched_i}{\sum_{j\in S \sched_j}}}^2$ \;
 %       }
 %     }
 %
 %   }
 % \For{$i\in \set{1,\ldots,n}$}{
-%   $p_i \leftarrow \frac{1}{\sum_{i=1}^n c_i}(c_1, \ldots, c_n)$\;
+%   $\sched_i \leftarrow \frac{1}{\sum_{i=1}^n c_i}(c_1, \ldots, c_n)$\;
 %   }
 % return $\sched$\;
 % }
@@ -470,8 +479,8 @@ $\Sample \leftarrow \emptyset$\;
 % Identifying an optimal function among a set of functions using one sample collection requires strong statistical properties of the sample.
 % We need to show that the cost of {\em any} schedule $\sched$, considered though out the optimization process, on the sample is a close approximation of the cost of $\sched$ on the entire distribution $\pi$.
 % In particular we require that for very $i=1,\dots,n$, and any schedule $\sched$, the estimate
-% $${C}_i(\sched,\M)=\frac{1}{m}\sum_{i=1}^m \left( \frac{p_i}{\sum_{j\in S_i} p_j} \right )^2$$ is sufficiently good estimate for
-% $${C}_i(\sched)=\sum_{S:i\in S} \pi(S) \left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2.$$
+% $${C}_i(\sched,\M)=\frac{1}{m}\sum_{i=1}^m \left( \frac{\sched_i}{\sum_{j\in S_i} \sched_j} \right )^2$$ is sufficiently good estimate for
+% $${C}_i(\sched)=\sum_{S:i\in S} \pi(S) \left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2.$$
 % Thus, we need a {\em uniform convergence result} of the sample with respect to this functions over all possible schedules.
 %
 % We use the {\em Rademacher complexity} method~\cite{shalev2014understanding} to analyze our sample:
@@ -502,12 +511,12 @@ $\Sample \leftarrow \emptyset$\;
 % \end{theorem}
 %
 % To apply this theorem to our problem we observe that
-% $$\frac{{C}_i(\sched)}{ \sum_{S:i\in S} \pi(S) }=\frac{1}{ \sum_{S:i\in S} \pi(S) }\sum_{S:i\in S} \pi(S) \left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2$$
-% is the expectation of the function $f^i_{\sched}(S)=\left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2$ over the distribution $D_{|i}$ (the distribution of sets that include node $i$). To bound the Rademacher empirical sum of the set of functions
-% $$F=\left \{f^i_{\sched}(S)=\left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2~\big |~1\leq i\leq n,~\sched\in [0,1]^n, ~\sum_{i=1}^n p_i=1\right \}$$
+% $$\frac{{C}_i(\sched)}{ \sum_{S:i\in S} \pi(S) }=\frac{1}{ \sum_{S:i\in S} \pi(S) }\sum_{S:i\in S} \pi(S) \left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2$$
+% is the expectation of the function $f^i_{\sched}(S)=\left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2$ over the distribution $D_{|i}$ (the distribution of sets that include node $i$). To bound the Rademacher empirical sum of the set of functions
+% $$F=\left \{f^i_{\sched}(S)=\left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2~\big |~1\leq i\leq n,~\sched\in [0,1]^n, ~\sum_{i=1}^n \sched_i=1\right \}$$
 % we consider a discrete version of this family of functions, $DF$, where
-% $p_i\in\{n^{-2}(1+\frac{1}{8\log n})^k,~0\leq k\leq  16\log^2 n\}$ and
-% $\sum_{i=1}^n p_i \leq 1+\frac{1}{8\log n}.$ Thus, each $p_i$ is restricted to $16\log^2 n +1$ values, and rounding to this set of values increases the value of the functions we consider by no more than
+% $\sched_i\in\{n^{-2}(1+\frac{1}{8\log n})^k,~0\leq k\leq  16\log^2 n\}$ and
+% $\sum_{i=1}^n \sched_i \leq 1+\frac{1}{8\log n}.$ Thus, each $\sched_i$ is restricted to $16\log^2 n +1$ values, and rounding to this set of values increases the value of the functions we consider by no more than
 %  $\left (\frac{\frac{1}{n^2} +(1+\frac{1}{8\log n})}{1-\frac{1}{8\log n}}\right )^2 \leq (1+\frac{1}{\log n})$.
 %
 % We apply Massart Lemma~\cite[Lemma 26.8]{shalev2014understanding} (adapted to our case):
@@ -517,7 +526,7 @@ $\Sample \leftarrow \emptyset$\;
 % $$R_m(F)\leq \frac{R\sqrt{2\log N}}{m}.$$
 % \end{lemma}
 % The number of functions in our case is $N=n(16\log n+1)^n$, and $R\leq \sqrt{m}$, since for any $\sched$ and $S$,
-% $\left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2 \leq 1$.
+% $\left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2 \leq 1$.
 % Thus,
 % $$R_m(F)\leq (1+\frac{1}{\log n}) R_m(DF)\leq (1+\frac{1}{\log n})\sqrt{\frac{{4n\log\log n}}{{m}}}.$$
 %
@@ -529,9 +538,11 @@ $\Sample \leftarrow \emptyset$\;
 %
 %
 \subsection{Scaling up: MapReduce Algorithm}\label{sec:mapreduce}
-In this section, we show the scalability of {\optimizer} and {\appoptimizer} (see Algorithms~\ref{alg:iterative} and \ref{alg:iterative_with_sample}) in MapReduce framework \cite{dean2008mapreduce}. A MapReduce model consists of two parts: mapping by \texttt{mappers}, and reducing by \texttt{reducers}. At each round of MapReduce the input dataset is partitioned into independent chunks and each chunk is sent to a \texttt{mapper}. Each mapper will process the received chunk and outputs pairs of key-values, $\langle k, v \rangle$. Then, the  platform shuffles the key-value pairs and aggregate the values of a same key and sends them to \texttt{reducers}. Therefore, each \texttt{reducer} receives inputs of form $\langle k, (v_1, \ldots, v_r) \rangle$, where $v_1, \ldots, v_r$ are all the values with the key $k$ generated by \texttt{mappers}. Finally, \texttt{reducers} process their inputs and return the final outputs.
+In this section, we show the scalability of \algoname (see Algorithms~\ref{alg:iterative} and \ref{alg:iterative_with_sample}) in MapReduce framework \cite{dean2008mapreduce}. A MapReduce model consists of two parts: mapping by \texttt{mappers}, and reducing by \texttt{reducers}. At each round of MapReduce the input dataset is partitioned into independent chunks and each chunk is sent to a \texttt{mapper}. Each mapper will process the received chunk and outputs pairs of key-values, $\langle k, v \rangle$. Then, the  platform shuffles the key-value pairs and aggregate the values of a same key and sends them to \texttt{reducers}. Therefore, each \texttt{reducer} receives inputs of form $\langle k, (v_1, \ldots, v_r) \rangle$, where $v_1, \ldots, v_r$ are all the values with the key $k$ generated by \texttt{mappers}. Finally, \texttt{reducers} process their inputs and return the final outputs.
 
-In following, we show how computing the cost and $W_i$ functions (and consequently $Q$)  can be done in a MapReduce given a sample $\Sample$ for a generating process $\sys=(U,\family,\pi)$. Therefore, {\appoptimizer} can be easily scaled to larger dataset.
+In following, we show how computing the cost and $W_i$ functions (and
+consequently $Q$)  can be done in a MapReduce given a sample $\Sample$ for a
+generating process $\sys=(U,\family,\pi)$. Therefore, XXX can be easily scaled to larger dataset.
 %for a generating process $\sys=(U,\family,\pi)$, with  full access to $\family$ and $\pi$. In a very similar argument, the method extends to the case when we only have access to a sample  $\Sample$ of $\family$ and we have to compute the cost and $W_i$ functions according to the sample $\Sample$.
 So, lets assume the input dataset is $\Sample$, and the {\ins} in $\Sample$ are partitioned and sent to \texttt{mappers}. We also assume that \texttt{mappers} have a copy of $\sched$.
 
@@ -549,32 +560,35 @@ Each \texttt{mappers}, for every $S\in \Sample$ that it receives, outputs all th
 $$\left\langle i,  \frac{-\theta c (1-\sched(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\sched(S))^c)^2} \right\rangle, \forall i \in S.$$
 Next, each \texttt{reducer} receives an input of the form
 $$\left\langle i,  \left[\frac{-\theta c (1-\sched(S))^{c-1}}{\ell(\Sample)(1-\theta(1-\sched(S))^c)^2}\right]_{S\in \Sample: i\in S} \right\rangle,$$
-and would be able to compute $p_iW_i(\sched, \Sample)$, by adding the ``values'' and multiply by $p_i$.
-% $$p_iW_i(\sched) = \sum_{S: i\in S}\frac{-\theta}{\ell(\Sample)\paran{1-\theta(1-\sched(S))}^2}.$$
-Finally, the aggregator (or the central processing unit) can normalize the vector $(p_1W_1(\sched), \ldots, p_nW_n(\sched))$, and compute $Q(\sched)$.
+and would be able to compute $\sched_iW_i(\sched, \Sample)$, by adding the ``values'' and multiply by $\sched_i$.
+% $$\sched_iW_i(\sched) = \sum_{S: i\in S}\frac{-\theta}{\ell(\Sample)\paran{1-\theta(1-\sched(S))}^2}.$$
+Finally, the aggregator (or the central processing unit) can normalize the vector $(\sched_1W_1(\sched), \ldots, \sched_nW_n(\sched))$, and compute $Q(\sched)$.
 
-Using a very similar technique, one can compute the cost and $W_i$'s functions in MapReduce framework when having full access to $\family$ and $\pi$ parameters of the generating process $\sys=(U,\family,\pi)$. This shows the scalability of {\optimizer}.
+Using a very similar technique, one can compute the cost and $W_i$'s functions
+in MapReduce framework when having full access to $\family$ and $\pi$ parameters
+of the generating process $\sys=(U,\family,\pi)$. This shows the scalability of
+\algoname
 %Each \texttt{mappers}, for every $S\in \Sample'$ that it receives, outputs all the following key-value pairs:
 %$$\left\langle i,  \frac{\theta^2 f(S)^2}{|\Sample'|} \right\rangle, \forall i \in S.$$
 %Next, each \texttt{reducer} receives an input of the form
 %$$\left\langle i,  \left[\frac{\theta^2 f(S)^2}{|\Sample'|}\right]_{S\in \Sample': i\in S} \right\rangle,$$
 %and would be able to compute the $i$-th coordinate of the gradient:
-%$$\frac{\partial}{\partial p_i} \cost{\sched} = - \frac{\theta^2}{|\Sample'|}\sum_{S\in \Sample': i\in S} f(S)^2.$$
+%$$\frac{\partial}{\partial \sched_i} \cost{\sched} = - \frac{\theta^2}{|\Sample'|}\sum_{S\in \Sample': i\in S} f(S)^2.$$
 
 % Now, we show how each round of iteration in Algorithm~\ref{alg:optimizer} can be implemented in a MapReduce model: Note that the goal in each iteration is to compute
-% $$c_i = \sum_{S\in \M: i\in S} \paran{\frac{p_i}{\sum_{j\in S}p_j}}^2,$$
+% $$c_i = \sum_{S\in \M: i\in S} \paran{\frac{\sched_i}{\sum_{j\in S}\sched_j}}^2,$$
 % for $1 \leq i \leq n$. The input dataset is $\M$, and the informed sets in $\M$ are partitioned and sent to \texttt{mappers}. We also assume that \texttt{mappers} have a copy of $\sched$. Each \texttt{mapper} for any $S\in\M$ that it receives, outputs all the following key-value pairs:
-% $$\langle i,  (\paran{p_i, p(S)})\rangle, \forall i \in S,$$
-% where $p(S) = \sum_{j\in S} p_j$ (note that each value is also an ordered pair).
-% Next, each \texttt{reducer} receives inputs of form $\langle i, [(p_i, p(S_1)), \ldots, (p_i, p(S_r))]\rangle$
+% $$\langle i,  (\paran{\sched_i, p(S)})\rangle, \forall i \in S,$$
+% where $p(S) = \sum_{j\in S} \sched_j$ (note that each value is also an ordered pair).
+% Next, each \texttt{reducer} receives inputs of form $\langle i, [(\sched_i, p(S_1)), \ldots, (\sched_i, p(S_r))]\rangle$
 % where $S_1, \ldots, S_r$ are all the informed set in $\M$ that include the node $i$, and outputs
-% $$c_i = \sum_{t=1}^r \paran{\frac{p_i}{\sum_{j\in S_t} p_j}}^2,$$
+% $$c_i = \sum_{t=1}^r \paran{\frac{\sched_i}{\sum_{j\in S_t} \sched_j}}^2,$$
 % which is the result of one iteration in Algorithm~\ref{alg:optimizer}.
 %
 % Note that the running time of $\optimizer$ is $O(|\M|)$ (linear) given a constant number of iterations. In particular, if $|\M| = O(|V|+|E|)$ the whole process of sampling and optimizing is linear in the network size, where $V$ and $E$ are the nodes and edges sets of the network, respectively.
 %
-% Given a schedule $\sched=(p_1,\dots,p_n)$ the expected time to probe at least one node in a set $S$ is $\frac{1}{\sum_{j\in S}p_j} $. Since $\pi(S)$ is the probability of generating an item that is distributed to an informed set $S$, the cost of schedule $\sched$ is
-% $\cost{\sched} =\sum_{S\subseteq V} \frac{\pi(S)}{\sum_{j\in S} p_j},$ and our goal is to compute an optimal schedule $\sched^*=\arg\min_{\sched} \cost{\sched,\pi}$. There are two main difficulties in computing the optimal schedule: (1) the number of terms in the expression for the cost is exponential in $n$; and (2) we do not know that distribution $\pi$, and it can vary in time.
+% Given a schedule $\sched=(\sched_1,\dots,\sched_n)$ the expected time to probe at least one node in a set $S$ is $\frac{1}{\sum_{j\in S}\sched_j} $. Since $\pi(S)$ is the probability of generating an item that is distributed to an informed set $S$, the cost of schedule $\sched$ is
+% $\cost{\sched} =\sum_{S\subseteq V} \frac{\pi(S)}{\sum_{j\in S} \sched_j},$ and our goal is to compute an optimal schedule $\sched^*=\arg\min_{\sched} \cost{\sched,\pi}$. There are two main difficulties in computing the optimal schedule: (1) the number of terms in the expression for the cost is exponential in $n$; and (2) we do not know that distribution $\pi$, and it can vary in time.
 %
 % Our solution consists of two major components. We first prove, and demonstrate in simulations, that a relatively small sample size is sufficient to characterize
 % a close to optimal schedule, we then show how to efficiently compute an optimal schedule with respect to the sample.
@@ -583,9 +597,8 @@ Using a very similar technique, one can compute the cost and $W_i$'s functions i
 %
 % \begin{eqnarray}
 % \label{eq:cost}
-% \cost{p}&= &\sum_{S\subseteq V} \frac{\pi(S)}{\sum_{j\in S} p_j} \nonumber \\
-% &=& \sum_{i\in V} \sum_{S:i\in S} \frac{\pi(S)}{\sum_{j\in S} p_j} \frac{p_i}{\sum_{j\in S} p_j}  \nonumber
+% \cost{p}&= &\sum_{S\subseteq V} \frac{\pi(S)}{\sum_{j\in S} \sched_j} \nonumber \\
+% &=& \sum_{i\in V} \sum_{S:i\in S} \frac{\pi(S)}{\sum_{j\in S} \sched_j} \frac{\sched_i}{\sum_{j\in S} \sched_j}  \nonumber
 % \\ &=&
-%  \sum_{i\in V} \frac{1} {p_i}\sum_{S:i\in S} \pi(S) \left( \frac{p_i}{\sum_{j\in S} p_j} \right )^2
+%  \sum_{i\in V} \frac{1} {\sched_i}\sum_{S:i\in S} \pi(S) \left( \frac{\sched_i}{\sum_{j\in S} \sched_j} \right )^2
 %  \end{eqnarray}
-\fi
