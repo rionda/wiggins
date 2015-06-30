@@ -21,6 +21,7 @@
 \usepackage{nicefrac}
 \usepackage{floatrow}
 \usepackage{xspace}
+\usepackage[show]{notes-alt}
 
 \ifacmstyle
 \else
@@ -42,29 +43,25 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1.}}
+\newcommand{\para}[1]{\noindent{\bf #1.}}
+
 \newcommand*{\algoname}{\textsc{wiggins}\xspace}
 \newcommand*{\cost}{\mathsf{cost}}
 \newcommand*\degree{\mathsf{deg}}
 \newcommand*\expect{\mathbb{E}}
 \newcommand*\family{\mathcal{F}}
 \newcommand*\fresh{\mathsf{f}}
-\newcommand*\sched{\mathbf{p}}
 \newcommand*\Sample{\mathcal{I}}
+\newcommand*\sched{\mathsf{p}}
+\newcommand*\sys{\Gamma}
 
 \newcommand*\M{{\cal M}}
 \newcommand*\T{\mathcal{T}}
 
 \newcommand*\D{\mathcal{D}}
-\newcommand*\optimizer{\texttt{optimizer}}
-\newcommand*\appoptimizer{\texttt{approx\_optimizer}}
 \newcommand*\sampler{\texttt{sampler}}
-\newcommand*\sys{\Gamma}
 \newcommand*\fr{\text{fr}}
 \newcommand*\ins{informed-set}
 \newcommand*\escos{\text{cost}}
 \newcommand*\mi{\text{mi}}
-
-\newcommand{\spara}[1]{\smallskip\noindent{\bf #1.}}
-\newcommand{\para}[1]{\noindent{\bf #1.}}
-
-\usepackage[show]{notes-alt}
