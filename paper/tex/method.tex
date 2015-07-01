@@ -1,7 +1,7 @@
-\section{The \algoname Algorithm}\label{sec:method}
-In this section, we study the $(\theta,c)$-OPSP  for a generating process
-$\sys=(\family,\pi)$ on a graph $G=(V,E)$ and present the algorithm \algoname (and
-its variants) to solve it.
+\section{The \algonamebase Algorithm}\label{sec:method}
+In this section, we study the $(\theta,c)$-OPSP for a generating process
+$\sys=(\family,\pi)$ on a graph $G=(V,E)$ and present the algorithm \algoname
+(and its variants) to solve it.
 
 We start we start by assuming that we have complete knowledge of $\sys$, i.e.,
 we know $\family$ and $\pi$. This strong assumption allows us to study the
@@ -14,8 +14,14 @@ Finally, we show an algorithm for the MapReduce framework that allows us to
 scale to large networks.
 
 \subsection{Computing the Optimal Schedule}\label{sec:optimize}
+We now first conduct a theoretical analysis of the cost function $\cost_\theta$,
+and then use the results to develop \algoname, our algorithm to compute the
+optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
+
+\paragraph{Analysis of the cost function}
 Assume for now that we know $\sys$, i.e., we have complete knowledge $\family$,
-and $\pi$. With this assumption, we can exactly compute the $\theta$-cost of a $c$-schedule.
+and $\pi$. With this assumption, we can exactly compute the $\theta$-cost of a
+$c$-schedule.
 
 \begin{lemma}\label{lem:explicit}
 Let $\sched$ be a $c$-schedule. Then
@@ -87,9 +93,10 @@ where $\sched(S) = \sum_{v\in S} \sched_v$.
 	\end{align*}
 \end{proof}
 
-We now show that $\cost_\theta(\sched)$, as expressed by the r.h.s.~of~\eqref{eq:explicit}
-is a convex function over its domain $\mathsf{S}_c$, the set of all possible
-$c$-schedules. We then use this result to show how to compute an optimal schedule.
+We now show that $\cost_\theta(\sched)$, as expressed by the
+r.h.s.~of~\eqref{eq:explicit} is a convex function over its domain
+$\mathsf{S}_c$, the set of all possible $c$-schedules. We then use this result
+to show how to compute an optimal schedule.
 
 \begin{theorem}\label{thm:convexity}
 	The cost function $\cost_\theta(\sched)$ is a convex function over
@@ -131,152 +138,198 @@ If for every $v\in V$, $S=\{v\}$ belongs to $\family$, then the
 function $g_S$ in the above proof is \emph{strictly} convex, and so is $f_S$.
 
 We then have the following corollary of Thm.~\ref{thm:convexity}.
-\begin{corollary}
-	A schedule $\sched$ with locally minimum cost, has also a global minimum cost
-	and is an optimal schedule. Furthermore, if for every $v\in V$, $\{v\}$
-	belongs to $\family$, the optimal schedule is \emph{unique}.
+
+\begin{corollary}\label{corol:convexity}
+	Any schedule $\sched$ with locally minimum cost is an optimal schedule
+	(i.e., it has global minimum cost). Furthermore, if for every $v\in V$,
+	$\{v\}$ belongs to $\family$, the optimal schedule is \emph{unique}.
 \end{corollary}
 
-\todo{All the following discussion needs to be rewritten.}
-
-Finding the optimal schedule is then equivalent to solve the following
-constrained convex optimization problem:
+\paragraph{The algorithm}
+Corollary~\ref{corol:confexity} implies that one can compute an optimal
+$c-$schedule $p^*$ (i.e., solve the $(\theta,c)$-OPSP) by solving the
+unconstrained minimization of $\cost_\theta$ over the set $\mathsf{S}_c$ of all
+$c$-schedules, or equivalently by solving the following constrained minimization
+problem on $\mathbb{R}^+$:
 \begin{equation}\label{eq:optimization}
 	\boxed{
 	\begin{array}{rrclcl}
-	\displaystyle \min_{\sched} & \multicolumn{3}{l}{\cost{\sched}} \\
+	\displaystyle \min_{\sched\in\mathbb{R}_n} & \multicolumn{3}{l}{\cost{\sched}} \\
 	&\displaystyle \sum_{i=1}^{n} \sched_i & = & 1 \\
 	&\sched_i & \geq & 0 & & \forall i \in \{1,\ldots,n\} \\
 	\end{array} }
 \end{equation}
-
-Here, we present two approaches for solving this optimization problem: one by
-using \emph{gradient descent} and one based on \emph{Lagrange multipliers}.
-Using gradient descent, provides theoretical guarantee for converging to the
-optimal schedule but is slow in practice for large networks. The other method is
-fast but does not give a theoretical guarantee, though if it converges in finite
-time to the final schedule, that schedule is provably optimal (see below).
-
-\mynote{How is gradient descent handling the constraints? Also, the function has
-	also a Hessian, so we could use Newton's method, which is even faster than
-gradient descent
-
-What is the real issue with gradient descent? Is it that we have to
-	evaluate the cost function multiple times and this is computationally too
-expensive (is it?). Is there a way to formalize this cost?
-
-There are tons of methods for convex optimization. Why don't we care
-about them?}
-
-\paragraph{Gradient Descent} As we showed in Theorem~\ref{thm:convexity}
-the cost function is  (smoothly) convex. Thus, we can apply the gradient descent
-method for the optimization in~\eqref{eq:optimization}, as converging to any
-local minimum is guaranteed to give a global minimum.
-
-\paragraph{Lagrange Multipliers: nonlinear iterative method} Generally, to use
-the nonlinear iterative method, we need a function $Q$ from the set
-$\mathsf{S}_c$ of $c$-schedule to itself such that $Q(\sched^*) = \sched^*$ for
-any optimal schedule $\sched^*$. Let us now define $Q$.
-
-From the method of Lagrance multipliers, we have that,
-if a schedule $\sched^*$ is optimal, then $p^*$ is a solution to following system of
-$n$ equations:
-\begin{equation}\label{eq:lagrange}
-	\nabla [\cost{\sched} + \lambda (\sched_1+\ldots+\sched_n-1)] = 0,
-\end{equation}
-where the gradient on the l.h.s.~(which has $n+1$ components) is taken
-w.r.t.~(the components of) $\sched$ and to $\lambda$.
-
-For $1\le i\le n$, the $i$-th equation induced by~\eqref{eq:lagrange} is
-\[
-	\frac{\partial}{\partial \sched_i} \cost{\sched} + \lambda = 0,
-\]
-or, equivalently,
-\[
-	\sum_{\substack{\S\in\family\\\mbox { s.t. } i\in S}} \frac{\theta c \pi(S)
-		(1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2} = \lambda\enspace.
-\]
-For notational convenience let
-\[
-	W_i(\sched) \defeq\substack{\S\in\family\\\mbox { s.t. } i\in S}
-	\\frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}
-\]
-and let $f: \mathbb{R} \rightarrow \mathbb{R}$ be an \emph{invertible} function.
-We define $Q(\sched) = (Q_1(\sched), \ldots, Q_n(\sched))$ as the vector whose
-$i$-th component $Q_i(\sched)$ is
-\[
-	Q_i(\sched) = \frac{\sched_i f(W_i(\sched))}{\sum_{j} \sched_j f(W_j(\sched))}\enspace.
-\]
-For any optimal schedule $\sched^*$, we have
-\[
-	Q_i(\sched^*) = \frac{p^*_if(\lambda)}{\sum_j p^*_jf(\lambda)} =
-p^*_i,\]
-and thus $Q(\sched^*) = \sched^*$.
-
-There is no guarantee that the method converges,
-\mynote{Which method? There has been no mention or description of an iterative
-method yet.}
-
-but we have that $Q(\sched) = \sched$ if and only if $\sched$ is optimal, as shown by
-Thm.~\ref{thm:iff}. In Sect.~\ref{sec:experiments} we show our experimental
-results illustrating the convergence of this method in different cases.
+Since the function $\cost_\theta$ is convex and the constraints are linear, the
+optimal solution can, theoretically, be found efficiently~\citep{BoydV04}. In
+practice though, available convex optimization problem solvers can not scale
+well with the number $n$ of variables, especially when $n$ is in the millions,
+as is the case for modern graphs like online social networks or the Web. Hence
+we developed \algoname, an iterative method based on \emph{Lagrange
+multipliers}\citemissing, which can scale efficiently and can be adapted to the
+MapReduce framework of computation~\citep{dean2008mapreduce}, as we show in
+Sect.~\ref{sec:mapreduce}. While we can not prove that this iterative method
+always converges, we can prove that (i) if at any iteration the algorithm
+examines an optimal schedule, then it will reach convergence at the next
+iteration, and (ii) if it converges to a schedule, that schedule is optimal (see
+Thm.~\ref{thm:optimal}). In Sect.~\ref{sec:experiments} we show our experimental
+results illustrating the convergence of \algoname in different cases.
 \mynote{Do we actually have these results?}
 
-\begin{theorem}\label{thm:iff}
-	The identity $Q(\sched) = \sched$ holds if and only if $\sched$ is an
-	optimal schedule.
+\algoname takes as inputs the collection $\family$, the function $\pi$, and the
+parameters $c$ and $\theta$, and outputs a schedule $\sched$ which, if
+convergence (defined in the following) has been reached, is the optimal
+schedule. It starts from a uniform schedule $\sched^{(0)}$, i.e.,
+$\sched^{(0)}_i=1/n$ for all $1\le i\le n$, and iteratively refines it until
+convergence (or until a user-specified maximum number of iterations have been
+performed). At iteration $j\ge 1$, we compute, for each value $i$, $1\le i\le
+n$, the function
+\begin{equation}\label{eq:functionw}
+	W_i(\sched^{(j-1)}) \defeq \sum_{\substack{S \in \family \\ \mbox{s.t.} i\in
+S}} \frac{\theta c \pi(S)
+	(1-\sched^{(j-1)}(S))^{c-1}}{(1-\theta(1-\sched^{(j-1)}(S))^c)^2}
+\end{equation}
+and then set
+\[
+	\sched^{(j)}_i = \frac{\sched^{(j-1)}_i W_i(\sched^{(j-1)})}{\sum_{z=1}^n
+	\sched^{(j-1)}_z W_z(\sched^{(j-1)})}\enspace.
+\]
+The algorithm then checks whether $\sched^{(j)}=\sched^{(j-1)}$. If so, then we
+reached convergence and we can return $\sched^{(j)}$ in output, otherwise we
+perform iteration $j+1$. The pseudocode for \algoname is in
+Algorithm~\ref{alg:iterative}. The following theorem shows the correctness of
+the algorithm in case of convergence.
+
+\begin{theorem}\label{thm:optimal}
+	Let $\sched^*$ be an optimal $c$-schedule. We have that:
+	\begin{enumerate*}
+		\item if at any iteration $j$ the schedule $\sched^{(j)}$ is optimal,
+			then the \algoname reaches convergence at iteration $j+1$; and
+		\item if \algoname reaches convergence, then the returned schedule
+			$\sched$ is optimal
+	\end{enumerate*}
 \end{theorem}
 
 \begin{proof}
-	As shown above, if $\sched$ is an optimal schedule $Q(\sched)=\sched$ holds.
-	\mynote{Wouldn't it be better to have the proof here and only the
-		description of the method (currently missing, in my opinion) outside the
-	theorem?}
+	From the method of the Lagrange multipliers~\citemissing, we have that, if a
+	schedule $\sched$ is optimal, then there exists a value
+	$\lambda\in\mathbb{R}$ such that $\sched$ and $\lambda$ form a solution to
+	the following system of $n+1$ equations in $n+1$ unknowns:
+	\begin{equation}\label{eq:lagrange}
+		\nabla [\cost{\sched} + \lambda (\sched_1+\ldots+\sched_n-1)] = 0,
+	\end{equation}
+	where the gradient on the l.h.s.~is taken w.r.t.~(the components of)
+	$\sched$ and to $\lambda$ (i.e., has $n+1$ components).
 
-	Now assume that $Q(\sched)=\sched$. Therefore $Q_i(\sched) = sched_i$ for
-	$1\leq i \leq n$, and we have
-	\begin{align*}
-	Q_i(\sched) = \frac{\sched_i f(W_i(\sched))}{\sum_{j} \sched_j
-f(W_j(\sched))} = \sched_i
-	\Rightarrow
-	W_i(\sched) = f^{-1}\left(\sum_{j} \sched_j f(W_j(\sched))\right).
-	\end{align*}
-	Hence, $W_i(p)$ is independent from $i$ and we have
-	$W_1(\sched)=\ldots=W_n(\sched)$. Now, by letting $\lambda = W_i(\sched)$,
-	we obtain a solution for the system of equations in Lagrange multipliers
-	method, and thus, $\sched$ is an optimal schedule.
+	For $1\le i\le n$, the $i$-th equation induced by~\eqref{eq:lagrange} is
+	\[
+		\frac{\partial}{\partial \sched_i} \cost{\sched} + \lambda = 0,
+	\]
+	or, equivalently,
+	\begin{equation}\label{eq:lagrange_i}
+		\sum_{\substack{S\in\family\\\mbox{s.t.} i\in S}} \frac{\theta c
+			\pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2} =
+			\lambda\enspace.
+	\end{equation}
+	The term on the l.h.s.~is exactly $W_i(\sched)$.
+	The $n+1$-th equation of the system~\eqref{eq:lagrange} (i.e., the one
+	involving the partial derivative w.r.t.~$\lambda$) is
+	\begin{equation}\label{eq:lagrange_l}
+		\sum_{z=1}^n \sched_z = 1\enspace.
+	\end{equation}
+
+	Consider now the point 1 in the statement of the theorem, and assume that we
+	are at iteration $j$ such that $j$ is the minimum iteration index for which
+	the schedule $\sched^{(j)}$ computed at the end of iteration $j$ is optimal.
+	Then, for any $i$, $1\le i\le n$, we have
+	\[
+		W_i(\sched^{(j)})=\lambda
+	\]
+	because $\sched^{(j)}$ is optimal and hence all identities in the form
+	of~\eqref{eq:lagrange_i} must be true.  Moreover, \eqref{eq:lagrange_l} must
+	also hold for $\sched^{(j)}$, so we have
+	\[
+		\sum_{z=1}^n \sched^{(j)}_z = 1\enspace.
+	\]
+	Hence, for any $1\le i\le n$, we can write the value $\sched^{(j+1)}_i$
+	computed at the end of iteration $j+1$ as
+	\[
+		\sched^{(j+1)}_i = \frac{\sched^{(j)}_i W_i(\sched^{(j)})}{\sum_{z=1}^n
+		\sched^{(j)}_z W_z(\sched^{(j)})}=
+		\frac{\sched^{(j)}_i\lambda}{1\lambda}=\sched^{(j)}_i,
+	\]
+	which means that we reached convergence and \algoname will return
+	$\sched^{(j+1)}$ in output, which is optimal because
+	$\sched^{(j+1)}=\sched^{(j)}$.
+
+	Consider now point 2 in the statement of the theorem, and let $j$ be the
+	first iteration for which $\sched^{(j)}=\sched^{(j-1)}$. Then we have, for
+	any $1\le i\le n$,
+	\[
+		\sched^{(j)}_i = \frac{\sched^{(j-1)}_i W_i(\sched^{(j-1)})}{\sum_{z=1}^n
+		\sched^{(j-1)}_z W_z(\sched^{(j-1)})} = \sched^{(j-1)}_i\enspace.
+	\]
+	This implies
+	\begin{equation}\label{eq:identityw}
+		W_i(\sched^{(j-1)}) = \sum_{z=1}^n \sched^{(j-1)}_z W_z(\sched^{(j-1)})
+	\end{equation}
+	and the r.h.s.~does not depend on $i$, and so neither does
+	$W_i(\sched^{(j-1)})$. Hence we have
+	$W_1(\sched^{(j-1)})=\dotsb=W_n(\sched^{(j-1)})$ and can
+	rewrite~\eqref{eq:identityw} as
+	\[
+		W_i(\sched^{(j-1)}) =  \sum_{z=1}^n \sched^{(j-1)}_z
+		W_i(\sched^{(j-1)}),
+	\]
+	which implies that the identity~\eqref{eq:lagrange_l} holds for
+	$\sched^{(j-1)}$. Moreover, if we set
+	\[
+		\lambda = W_1(\sched^{(j-1)})
+	\]
+	we have that all the identities in the form of~\eqref{eq:lagrange_i} hold.
+	Then, $\sched^{(j-1)}$ and $\lambda$ form a solution to the
+	system~\eqref{eq:lagrange}, which implies that $\sched^{(j-1)}$ is optimal
+	and so must be $\sched^{(j)}$, the returned schedule, as it is equal to
+	$\sched^{(j-1)}$ because \algoname reached convergence.
 \end{proof}
-
-In this work, we apply the second method as it is very fast on large datasets
-that we use in our experiments. Also, although the convergence of this method is
-not guaranteed, we show that in practice it converges quickly. For sake of
-simplicity we took the identity function for $f$, and our method for the
-optimization problem in~\eqref{eq:optimization} is given in
-Algorithm~\ref{alg:iterative}.
 
 \begin{algorithm}[ht]
 	\DontPrintSemicolon
 	\SetKwInOut{Input}{input}
 	\SetKwInOut{Output}{output}
 	\SetKwComment{tcp}{//}{}
-	\Input{$\family$, $\pi$, $c$, $\theta$, and number $\lambda$ of iterations}
+	\SetKw{KwBreak}{break}
+	\Input{$\family$, $\pi$, $c$, $\theta$, and maximum number $T$ of iterations}
 	\Output{An optimal $c$-schedule $\sched$ with minimum $\theta$-cost}
-	$\sched_i \leftarrow 1/n$, $1\le i\le n$\;
-	\For{$j\leftarrow 1$ \KwTo $\lambda$} {
-		$W_i\leftarrow 0$, $1\le i\le n$\;
+	\ForEach{$i\leftarrow 1$ \KwTo $n$}{
+		$\sched_i \leftarrow 1/n$\;
+	}
+	\For{$j\leftarrow 1$ \KwTo $T$} {
+		\ForEach{$i\leftarrow 1$ \KwTo $n$}{
+			$W_i\leftarrow 0$\;
+		}
 		\For{$S\in \family$} {
 			\For{$i\in S$} {
 				$W_i \leftarrow W_i + \frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}$\;
 			}
 		}
-		$\sched_i\leftarrow \frac{\sched_iW_i}{\sum_{i} \sched_iW_i}$, $1\le i\le n$;
+		$\sched_{\mathrm{old}}\leftarrow \sched$\;
+		\ForEach{$i\leftarrow 1$ \KwTo $n$}{
+			$\sched_i\leftarrow \frac{\sched_iW_i}{\sum_{i} \sched_iW_i}$\;
+		}
+		\If(// test for convergence){$\sched_{\mathrm{old}} = \sched$} {
+			%\tcp{Reached convergence}
+			\KwBreak\;
+		}
 	}
 	\Return{$\sched$}\;
 	\caption{\algoname}
 	\label{alg:iterative}
 \end{algorithm}
-%However, this iterative method is convergent if the Jacobian norm of $F$ is less than 1, i.e., $\|DF\| < 1$.
-
+% Matteo 7/1. The following sentence is commented because we do not know whether
+% is true. It is not clear what $F$ is to me. Ahmad may have an idea.
+%
+%``However, this iterative method is convergent if the Jacobian norm of $F$ is
+%less than 1, i.e., $\|DF\| < 1$.''
 
 \subsection{Approximating the best schedule through sampling}\label{sec:sampcomp}
 
