@@ -1,11 +1,12 @@
 \section{Conclusions}\label{sec:concl}
+\todo[Matteo]{This has not been done yet.}
 We formulate and study the Probabilistic Hitting Set Paradigm (PHSP),
 a general framework for design and analysis of search and detection algorithms
 in large scale dynamic networks, that  captures a wide range of applications. The goal in PHSP is to find an optimal probing schedule that captures the items as soon as possible (based on their freshness or relevance).
 
 In this work we studied the problem of finding optimal memoryless schedules for $(\theta,c)$-PSHP and showed that the optimal probing schedule can be obtained efficiently via a non-linear iterative method. In particular we provided a scalable iterative method for computing the probing schedule in MapReduce framework.
 
-We also studied the sample complexity of the set of {\ins}s, and showed a sample of {\ins} gathered during a time interval of length $O(\log(n)/\epsilon^2)$ provides enough accuracy by using Chernoff bound arguments.
+We also showed that a sample of gathered during a time interval of length $O(\log(n)/\epsilon^2)$ provides enough accuracy by using Chernoff bound arguments.
 
 Finally, we applied our method on variety of real social networks, that illustrates the optimality and practicality of our solution.
 
