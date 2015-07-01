@@ -6,7 +6,7 @@ trend in algorithmic stock trading is the use of automatic search through the
 Web and social networks for pieces of information that can be used in trading
 decisions before they appear in the more popular news
 sites~\citep{Delaney2009,ALPHA2014,AlphaFlash,mitra2011handbook,latar2015robot,wallstreet2015,McKinney2011}.
-\mynote[Matteo]{Do we really want all these newspaper journals and software
+\mynote[All]{Do we really want all these newspaper journals and software
 	manuals in the references? I would love to cite the TwoSigma
 	one~\citep{wallstreet2015}, obviously ;), but it seems a bit too much to
 have 7 references for this?}
@@ -58,7 +58,7 @@ problem are the following:
 		items. We then introduce a \emph{cost} measure to compare different
 		schedules. The cost of a schedule is the limit of the average expected
 		freshness of uncaught items at each time step.
-		\todo{Mention the actual name of the problem we study.}
+		\todo[Matteo]{Mention the actual name of the problem we study.}
 	\item We conduct a theoretical study of the cost of a schedule, showing that
 		it can be computed explicitly and that is a convex function over the
 		space of schedules. We then introduce \algoname,\footnote{In the Sherlock
@@ -67,11 +67,12 @@ problem are the following:
 			urchins employed by Holmes as intelligence agents.} an algorithm to
 		compute the optimal schedule by solving a constrained convex
 		optimization problem.
-		\todo{Mention iterative method through Lagrange multipliers.}
+		\todo[Matteo]{Mention iterative method through Lagrange multipliers.}
 	\item We discuss variants of \algoname for the realistic situation where
 		the parameters of the process needs to be learned or can change over
 		time. Among these variants, we present an adaptation for the MapReduce
 		framework of computation, which allow us to handle very large networks.
+		\todo[Matteo]{Mention approx quality.}
 	\item Finally, we conduct an extensive experimental evaluation of \algoname
 		and its variants, comparing the performances of the schedules it
 		computes with natural baselines, and showing how it performs extremely
