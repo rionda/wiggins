@@ -509,6 +509,8 @@ We can now prove Thm.~\ref{thm:approx_sample}.
 
 
 \subsection{Learning Dynamic Parameters}\label{sec:dynamic}
+\todo[Matteo]{I haven't done this yet. Ahmad and I discussed a bit about it, and
+I am still not sure about how to present some limitations carefully\ldots}
 In this short section, we consider the case when the parameters of the network change (i.e, the distribution over the possible informed-sets changes).  To apply our method to a dynamic environment we first sample the process to generate a sufficiently large sample collection. This can be done by probing
  all nodes with uniform distribution during a short time interval, or using a round robin schedule (Algorithm~\ref{alg:sampler}). For an item the sampling process stores the set of nodes that received this item. We then compute an optimal schedule with respect to that sample (Algorithm~\ref{alg:iterative}). We use this schedule and monitor the cost to detect significant changes. In that case we obtain a new sample, optimize with respect to that sample and apply the new schedule.
 
