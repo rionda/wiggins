@@ -33,7 +33,7 @@ Let $\sched$ be a $c$-schedule. Then
 where $\sched(S) = \sum_{v\in S} \sched_v$.
 \end{lemma}
 
-\todo[All]{I reorganized the proof, so please review.}
+%\todo[All]{I reorganized the proof, so please review.}
 \begin{proof}
 	Let $t$ be a time step, and consider the quantity $\expect[L_\theta(t)]$. By
 	definition we have
@@ -80,15 +80,18 @@ where $\sched(S) = \sum_{v\in S} \sched_v$.
 	We can plug this quantity in the rightmost term of~\eqref{eq:loadexp} and
 	write
 	\begin{align}
-		\expect[L_\theta(t)]&=\sum_{S\in\family}\sum_{t'=0}^t\theta^{t-t'}\pi(S)(1-\sched(S))^{c(t-t')}\nonumber\\
-		&=\sum_{S\in\family}\pi(S)\sum_{t'=0}^t(\theta(1-\sched(S))^c)^{t'}\nonumber\\
+		\lim_{t\rightarrow\infty}\expect[L_\theta(t)]
+		&=\lim_{t\rightarrow\infty}\sum_{S\in\family}\sum_{t'=0}^t\theta^{t-t'}\pi(S)(1-\sched(S))^{c(t-t')}\nonumber\\
+		&=\lim_{t\rightarrow\infty}\sum_{S\in\family}\pi(S)\sum_{t'=0}^t(\theta(1-\sched(S))^c)^{t'}\nonumber\\
 		&=\sum_{S\in\family}\frac{\pi(S)}{1-\theta(1-\sched(S))^c},
 	\end{align}
-	where we used the fact that $\theta(1-\sched(S))^c< 1$. Hence the quantity
-	$\expect[L_\theta(t)]$ does not depend on $t$, and we have
+	\ahmad{where we used the fact that $\theta(1-\sched(S))^c< 1$. So, $\expect[L_\theta(t)]$ is convergent as $t\rightarrow \infty$. Therefore, the Cesaro mean~\cite{cesaro} of the sequence $\{\expect[L_\theta(t)]\}_{t\in\mathbb{N}}$, i.e. $\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_\theta(t)]$, equals to its limit, and we have}
 	\begin{align*}
-		\cost_\theta(\sched)&=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_\theta(t)]\\
-		&=\lim_{t\rightarrow\infty}\frac{1}{t}t\sum_{S\in\family}\frac{\pi(S)}{1-\theta(1-\sched(S))^c}\\
+		\cost_\theta(\sched)&=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_\theta(t)] = 
+		\lim_{t\rightarrow\infty} \expect[L_\theta(t)]\\
+%		&= 
+%		\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t \sum_{S\in\family}\pi(S)\sum_{t'=0}^t(\theta(1-\sched(S))^c)^{t'}\\
+%		&=\lim_{t\rightarrow\infty}\frac{1}{t}t\sum_{S\in\family}\frac{\pi(S)}{1-\theta(1-\sched(S))^c}\\
 		&=
 		\sum_{S\in\family}\frac{\pi(S)}{1-\theta(1-\sched(S))^c}\enspace.
 	\end{align*}
@@ -114,7 +117,7 @@ to show how to compute an optimal schedule.
 	$S\in\family$, $f_S(\sched)$ is convex.
 
 	We start by showing that $g_S(\sched) = \theta(1-\sched(S))^c$ is convex.
-	This is because its Hessian matrix is positive semidefinite. Indeed we have:
+	This is because its Hessian matrix is positive semidefinite (see~\cite{boyd2004convex}). Indeed we have:
 	\[
 		\frac{\partial}{\partial \sched_i \partial \sched_j} g_S(\sched)=\left\{
 		\begin{array}{lr}
@@ -155,7 +158,7 @@ problem on $\mathbb{R}^+$:
 \begin{equation}\label{eq:optimization}
 	\boxed{
 	\begin{array}{rrclcl}
-	\displaystyle \min_{\sched\in\mathbb{R}_n} & \multicolumn{3}{l}{\cost{\sched}} \\
+	\displaystyle \min_{\sched\in\mathbb{R}_n} & \multicolumn{3}{l}{\cost_\theta(\sched)} \\
 	&\displaystyle \sum_{i=1}^{n} \sched_i & = & 1 \\
 	&\sched_i & \geq & 0 & & \forall i \in \{1,\ldots,n\} \\
 	\end{array} }
@@ -170,7 +173,7 @@ multipliers}\citemissing, which can scale efficiently and can be adapted to the
 MapReduce framework of computation~\citep{dean2008mapreduce}, as we show in
 Sect.~\ref{sec:mapreduce}.
 \todo[Ahmad]{You mentioned something about main memory as motivation for using
-	the iterative method, please add that observation here.}
+	the iterative method, please add that observation here: \ahmad{That is for \algonameapx, when have access to a large sample, we don't need to load it to the main memory. Where did we define \algonameapx b.t.w?}}
 While we can not prove that this iterative method
 always converges, we can prove that (i) if at any iteration the algorithm
 examines an optimal schedule, then it will reach convergence at the next
@@ -218,14 +221,14 @@ the algorithm in case of convergence.
 	$\lambda\in\mathbb{R}$ such that $\sched$ and $\lambda$ form a solution to
 	the following system of $n+1$ equations in $n+1$ unknowns:
 	\begin{equation}\label{eq:lagrange}
-		\nabla [\cost{\sched} + \lambda (\sched_1+\ldots+\sched_n-1)] = 0,
+		\nabla [\cost_\theta(\sched) + \lambda (\sched_1+\ldots+\sched_n-1)] = 0,
 	\end{equation}
 	where the gradient on the l.h.s.~is taken w.r.t.~(the components of)
 	$\sched$ and to $\lambda$ (i.e., has $n+1$ components).
 
 	For $1\le i\le n$, the $i$-th equation induced by~\eqref{eq:lagrange} is
 	\[
-		\frac{\partial}{\partial \sched_i} \cost{\sched} + \lambda = 0,
+		\frac{\partial}{\partial \sched_i} \cost_\theta(\sched) + \lambda = 0,
 	\]
 	or, equivalently,
 	\begin{equation}\label{eq:lagrange_i}
@@ -353,7 +356,7 @@ We start by defining the cost of a schedule according to a sample.
 \begin{definition}\label{def:costsample}
 	Suppose $\sched$ is a $c$-schedule and $\Sample$ is as in~\eqref{eq:sample},
 	with $b-a=\ell$. The $\theta$-cost of $\sched$ according to $\Sample$
-	denoted by $\cost_\theta{\sched,\Sample}$ is defined as
+	denoted by $\cost_\theta(\sched,\Sample)$ is defined as
 	\[
 		\cost_\theta(\sched,\Sample)\defeq\frac{1}{\ell}\sum_{S\in \Sample}
 		\frac{1}{1-\theta(1-\sched(S))^c}\enspace.
@@ -371,7 +374,7 @@ the $W_i(\sched,\Sample)$ instead of $W_i(\sched)$ (i.e., on
 line~\ref{algline:w} in Alg.~\ref{alg:iterative}).
 
 \todo[Ahmad]{I trusted you when you told me that the following is true. Please
-check.}
+check: \ahmad{I Checked, but don't trust me :) plz make sure it sounds clear.}}
 If \algonameapx reaches convergence, it returns a schedule with the minimum cost
 w.r.t.~the sample $\Sample$. More formally, by following the same steps as in
 the proof of Thm.~\ref{thm:optimal}, we can prove the following result about
@@ -396,21 +399,20 @@ and intuitively the larger $\ell$, the better the approximation.
 We now show that, if $\ell(\Sample)$ is large enough, then, with high
 probability (i.e., with probability at least $1-1/n^r$ for some constant $r$),
 the schedule $\sched$ returned by \algonameapx in case of convergence has a cost
-$\cost(\sched)$ that is close to the cost $\cost(\sched^*)$ of an optimal
+$\cost_\theta(\sched)$ that is close to the cost $\cost_\theta(\sched^*)$ of an optimal
 schedule $\sched^*$.  Specifically, we show the following.
 
 \begin{theorem}\label{thm:approx_sample}
-	Let $r$ be a natural number, and let $\Sample$ be a sample gathered during a
+	Let $r$ be a positive integer, and let $\Sample$ be a sample gathered during a
 	time interval of length
 	\begin{equation}\label{eq:samplesize}
 		\ell(\Sample) \geq
 		\frac{3(r\ln(n)+\ln(4))}{\varepsilon^2(1-\theta)}\enspace.
 	\end{equation}
-	Let $\sched^*$ be an optimal schedule, i.e., a schedule with minimum cost
-	$\cost(\sched)$. If \algonameapx converges, then the returned schedule
+	Let $\sched^*$ be an optimal schedule, i.e., a schedule with minimum cost. If \algonameapx converges, then the returned schedule
 	$\sched$ is such that
 	\[
-		\cost(\sched^*)\le\cost(\sched)\le\frac{1+\varepsilon}{1-\varepsilon}\cost(\sched^*)\enspace.
+		\cost_\theta(\sched^*)\le\cost_\theta(\sched)\le\frac{1+\varepsilon}{1-\varepsilon}\cost(\sched^*)\enspace.
 	\]
 \end{theorem}
 
@@ -459,14 +461,14 @@ technical lemma.
 	By using the Chernoff bound for Binomial random
 	variables~\citep[Corol.~4.6]{MitzenmacherU05}, we have
 	\begin{align*}
-		&\Pr\left(\left|\cost_\theta(\sched,\Sample) - \cost(\sched)\right| \geq \varepsilon
+		&\Pr\left(\left|\cost_\theta(\sched,\Sample) - \cost_\theta(\sched)\right| \geq \varepsilon
 		\cost_\theta(\sched)\right)\\
 		&=\Pr\left(\left|\sum_i X^i - \ell(\Sample)\cost_\theta(\sched)\right| \geq \varepsilon
-		\ell(\Sample) \cost(\sched)\right) \\
+		\ell(\Sample) \cost_\theta(\sched)\right) \\
 		&= \Pr\left(\left|\frac{1-\theta}{|\family|}\sum_i X^i - \mu\right| \geq \varepsilon
 		\mu\right) \leq 2\exp\left(-\frac{\varepsilon^2\mu}{3}\right)\\
 		&\le 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)
-			\cost(\sched)}{3|\family|}\right) \leq 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)}{3}\right),
+			\cost_\theta(\sched)}{3|\family|}\right) \leq 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)}{3}\right),
 	\end{align*}
 	where the last inequality follows from the rightmost inequality
 	in~\eqref{eq:boundcost}. The thesis follows from our choice of
@@ -478,21 +480,21 @@ We can now prove Thm.~\ref{thm:approx_sample}.
 	For our choice of $\ell(\Sample)$ we have, through the union bound, that,
 	with probability at least $1-1/n^r$, at the same time:
 	\begin{align}\label{eq:boundedcosts}
-		(1-\varepsilon)\cost(\sched)&\leq \cost(\sched,\Sample) &\le
-		(1+\varepsilon)\cost(\sched) & \mbox{, and}\\
-		(1-\varepsilon)\cost(\sched)&\leq \cost(\sched,\Sample) &\le
-		(1+\varepsilon)\cost(\sched)&\nonumber
+		(1-\varepsilon)\cost_\theta(\sched)&\leq \cost_\theta(\sched,\Sample) &\le
+		(1+\varepsilon)\cost_\theta(\sched) & \mbox{, and}\nonumber\\
+		(1-\varepsilon)\cost_\theta(\sched^*)&\leq \cost_\theta(\sched^*,\Sample) &\le
+		(1+\varepsilon)\cost_\theta(\sched^*)&
 	\end{align}
 	Since we assumed that \algonameapx reached convergence when computing
 	$\sched$, then Thm.~\ref{thm:approx_sample} holds, and $\sched$ is a
 	schedule with minimum cost w.r.t.~$\Sample$. In particular, it must be
 	\[
-		\cost(\sched,\Sample)\le \cost(\sched^*,\Sample)\enspace.
+		\cost_\theta(\sched,\Sample)\le \cost_\theta(\sched^*,\Sample)\enspace.
 	\]
 	From this and~\eqref{eq:boundedcosts}, We then have
 	\[
-		(1-\varepsilon)\cost(\sched)\leq \cost(\sched,\Sample) \le
-		\cost(\sched^*,\Sample)\le (1+\varepsilon)\cost(\sched^*)
+		(1-\varepsilon)\cost_\theta(\sched)\leq \cost_\theta(\sched,\Sample) \le
+		\cost_\theta(\sched^*,\Sample)\le (1+\varepsilon)\cost_\theta(\sched^*)
 	\]
 	and by comparing the leftmost and the rightmost terms we get the thesis.
 \end{proof}
@@ -670,7 +672,7 @@ the same key are sent to the same machine (called the \emph{reducer} for that
 key), where a function $\mathsf{reduce}$ is applied to the whole set of received
 pairs, to emit the final output.
 
-\todo[Ahmad]{Please review.}
+\todo[Ahmad]{Please review: \ahmad{2 rounds is enough, the aggregator that receives $(p_1W_1,\ldots,p_nW_n)$ can normalize it itself.}}
 
 Each iteration of \algonameapx is spread over three rounds of \algonamemr. At
 each round, we assume that the current schedule $\sched$ is available to all
