@@ -5,19 +5,14 @@ detecting the events decays rapidly as times passes. For example, an emerging
 trend in algorithmic stock trading is the use of automatic search through the
 Web and social networks for pieces of information that can be used in trading
 decisions before they appear in the more popular news
-sites~\citep{Delaney2009,ALPHA2014,AlphaFlash,mitra2011handbook,latar2015robot,wallstreet2015,McKinney2011}.
-\mynote[All]{Do we really want all these newspaper journals and software
-	manuals in the references? I would love to cite the TwoSigma
-	one~\citep{wallstreet2015}, obviously ;), but it seems a bit too much to
-have 7 references for this?}
-Similarly, intelligence, business and politics analysts are scanning online
-sources for new information or rumors. While new items are often reblogged,
-retweeted, and posted on a number of sites, it is sufficient to find an item
-once, as fast as possible, before it loses its relevance. There is no benefit in
-seeing more copies of the same news item, or rumor. A similar situation also
-arises in the need to detecting intrusions, infections, or defects in,
-respectively, a computer network, a public water system, or a large electronic
-circuit.
+sites~\citep{Delaney2009,latar2015robot,wallstreet2015,McKinney2011}. Similarly,
+intelligence, business and politics analysts are scanning online sources for new
+information or rumors. While new items are often reblogged, retweeted, and
+posted on a number of sites, it is sufficient to find an item once, as fast as
+possible, before it loses its relevance. There is no benefit in seeing more
+copies of the same news item, or rumor. A similar situation also arises in the
+need to detecting intrusions, infections, or defects in, respectively, a
+computer network, a public water system, or a large electronic circuit.
 
 Indeed this is a fundamental search and detection problem in a distributed data
 setting, not limited to social networks or graph analysis. In this setting, the
@@ -30,9 +25,9 @@ in the system, but it can only \emph{probe} (i.e., check for new items on) a few
 nodes at a time. To minimize the time to find new items, the search application
 needs to optimize the schedule of probing nodes, taking into account (i) the
 distribution of copies of items among the nodes (to see where to probe), and
-(ii) the decay of items' \emph{\ahmad{novelty}} (or relevance) over time (to focus the
-search on most relevant items). The  main challenge is in devising a good
-probing schedule in absence of prior knowledge on the generation and
+(ii) the decay of items' \emph{\ahmad{novelty}} (or relevance) over time (to
+focus the search on most relevant items). The  main challenge is in devising a
+good probing schedule in absence of prior knowledge on the generation and
 distribution of items in the network.
 
 % Commented by Matteo on 06/29
@@ -44,10 +39,10 @@ distribution of items in the network.
 %older ones).
 
 \paragraph*{Contributions}
-In this work we study the problem of computing an optimal node probing schedule
-for detecting new items in a network under resource scarceness, i.e., when only
-a few nodes can be probed at a time. Our contributions to the study of this
-problem are the following:
+In this work we study the novel problem of computing an optimal node probing
+schedule for detecting new items in a network under resource scarceness, i.e.,
+when only a few nodes can be probed at a time. Our contributions to the study of
+this problem are the following:
 
 \begin{itemize*}
 	\item We formalize a generic process that describe the creation and
@@ -55,24 +50,26 @@ problem are the following:
 		studying this process by probing the nodes in the network according to a
 		schedule. The process and task are parametrized by the resource
 		limitations of the observer and the decay rate of the \ahmad{novelty} of
-		items. We then introduce a \emph{cost} measure to compare different
+		items. We introduce a \emph{cost} measure to compare different
 		schedules. The cost of a schedule is the limit of the average expected
-		\ahmad{novelty} of uncaught items at each time step.
-		\todo[Matteo]{Mention the actual name of the problem we study.}
+		\ahmad{novelty} of uncaught items at each time step. We formally define
+		the Optimal Probing Schedule Problem, which requires to find the
+		schedule with minimum cost.
 	\item We conduct a theoretical study of the cost of a schedule, showing that
 		it can be computed explicitly and that is a convex function over the
 		space of schedules. We then introduce \algoname,\footnote{In the Sherlock
-			Holmes novel \emph{A study in scarlet} by A.~Conan Doyle, Wiggins is
-			the leader of the ``Baker Street Irregulars'', a band of street
-			urchins employed by Holmes as intelligence agents.} an algorithm to
-		compute the optimal schedule by solving a constrained convex
-		optimization problem.
-		\todo[Matteo]{Mention iterative method through Lagrange multipliers.}
+		Holmes novel \emph{A study in scarlet} by A.~Conan Doyle, Wiggins is the
+	leader of the ``Baker Street Irregulars'', a band of street urchins employed
+by Holmes as intelligence agents.} an algorithm to compute the optimal schedule
+by solving a constrained convex optimization problem through the use of an
+iterative method based on Lagrange multipliers.
 	\item We discuss variants of \algoname for the realistic situation where
 		the parameters of the process needs to be learned or can change over
-		time. Among these variants, we present an adaptation for the MapReduce
-		framework of computation, which allow us to handle very large networks.
-		\todo[Matteo]{Mention approx quality.}
+		time. We show how it to compute a schedule which is (probabilistically)
+		guaranteed to have a cost very close to the optimal by only observing
+		the process for a limited amount of time. We also present an adaptation
+		for the MapReduce framework of computation, which allow us to handle
+		very large networks.
 	\item Finally, we conduct an extensive experimental evaluation of \algoname
 		and its variants, comparing the performances of the schedules it
 		computes with natural baselines, and showing how it performs extremely
