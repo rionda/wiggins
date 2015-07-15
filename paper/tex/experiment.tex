@@ -15,6 +15,7 @@ illustrate that the sequence $\cost_\theta(\sched^1,\Sample), \cost_\theta(\sche
 $\sched^{i+1}$ is solely a function of $\Sample$ and $\sched^i$. 
 
 \todo[all]{Technically speaking, Theorem~\ref{thm:optimal} says if the sequence converges and get 'constant'. However, since in computers (using 64bits) numbers we do not have infinite convergence. }
+\reply[Ahmad]{Sure, that's ok. Matteo}
 Next, we compare the output schedule of \algonameapx to three other schedules: (i) uniform schedules, (ii) proportional to out-degrees, and (iii) proportional to in-degrees. Specifically, we compute the costs of these schedules according to a sample $\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and compare them.
 %Next, for further investigation, for each generated sequence of
 %$\sched^1,\sched^2,\ldots$ according to a sample $\Sample$, we compute the cost
@@ -39,6 +40,8 @@ Our experiments were run on a Opteron 6282 SE CPU (2.6 GHz) using 12G memory. We
  \item Twitter~\cite{McAuleyL12}: A combined ego network, where each edge is directed from a node to another node that it follows. 
 \end{itemize*}
 \mynote[Matteo]{Do we need to introduce the datasets here? what about just reference and the Table 1?}
+\reply[Ahmad]{No, you can remove this list, we don't even need to have the
+references, the link to snap.stanford.edu is enough. Matteo}
 
 
 \paragraph*{Parameters and model of propagation}
