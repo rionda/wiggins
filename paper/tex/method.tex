@@ -173,7 +173,7 @@ practice though, available convex optimization problem solvers can not scale
 well with the number $n$ of variables, especially when $n$ is in the millions
 as is the case for modern graphs like online social networks or the Web. Hence
 we developed \algoname, an iterative method based on \emph{Lagrange
-multipliers}\citep[Sect.~5.1]{BodydV04}, which can scale efficiently and can be
+multipliers}\citep[Sect.~5.1]{BoydV04}, which can scale efficiently and can be
 adapted to the MapReduce framework of computation~\citep{dean2008mapreduce}, as
 we show in Sect.~\ref{sec:mapreduce}. While we can not prove that this iterative
 method always converges, we can prove (Thm.~\ref{thm:optimal}) that (i) if at
@@ -516,52 +516,73 @@ We can now prove Thm.~\ref{thm:approx_sample}.
 % $$\Pr(|W_i(\sched,\Sample) - W_i(\sched)|\geq \varepsilon\cdot W_i(\sched)) < \frac{1}{n^r}.$$
 %\end{theorem}
 
+\subsection{Dynamic settings}\label{sec:dynamic}
+In this section we discuss how to handle changes in the parameters $\family$ and
+$\pi$ of the (unknown) process $\sys$ that may realistically appear over time.
+The idea is to keep track, for each set $S$ from $\family$ that we detect by
+probing nodes, of an estimation $\tilde{\pi}(S)$ of $\pi(S)$ and of the last
+time $t$ such that an item $(t,S)$ has been generated (and caught at a time
+$t'>t$). If we have not caught an item in the form $(t'',S)$ in an interval
+significantly longer than $1/\tilde{\pi}(S)$, then we make the hypothesis that
+the parameters of $\sys$ changed. Hence, we trigger the collection of a new
+sample and compute a new schedule as described in Sect.~\ref{sec:sampcomp}.
 
-\subsection{Learning Dynamic Parameters}\label{sec:dynamic}
-\todo[Matteo]{I haven't done this yet. Ahmad and I discussed a bit about it, and
-I am still not sure about how to present some limitations carefully\ldots}
-In this short section, we consider the case when the parameters of the network change (i.e, the distribution over the possible informed-sets changes).  To apply our method to a dynamic environment we first sample the process to generate a sufficiently large sample collection. This can be done by probing
- all nodes with uniform distribution during a short time interval, or using a round robin schedule (Algorithm~\ref{alg:sampler}). For an item the sampling process stores the set of nodes that received this item. We then compute an optimal schedule with respect to that sample (Algorithm~\ref{alg:iterative}). We use this schedule and monitor the cost to detect significant changes. In that case we obtain a new sample, optimize with respect to that sample and apply the new schedule.
+%In this short section, we consider the case when the parameters of the network
+%change (i.e, the distribution over the possible informed-sets changes).  To
+%apply our method to a dynamic environment we first sample the process to
+%generate a sufficiently large sample collection. This can be done by probing
+% all nodes with uniform distribution during a short time interval, or using a
+% round robin schedule (Algorithm~\ref{alg:sampler}). For an item the sampling
+% process stores the set of nodes that received this item. We then compute an
+% optimal schedule with respect to that sample (Algorithm~\ref{alg:iterative}).
+% We use this schedule and monitor the cost to detect significant changes. In
+% that case we obtain a new sample, optimize with respect to that sample and
+% apply the new schedule.
 
- Note that when we adapt our schedule to the new environment (using the most recent sample) the system converges to its stable setting exponentially (in $\theta$) fast: Suppose $L$ items have been generated since the change of the parameters until we adapt the new schedule. These items, if not caught, loose their freshness exponentially fast: after $t$ steps their freshness is at most $L\theta^t$ and gets diminished very quickly.
-
- In our experiments we provide different examples that illustrate how load of the generating process stables after the algorithm adapts itself to the changes of parameters (see Section\ref{sec:exp}).
-
+Note that when we adapt our schedule to the new environment (using the most
+recent sample) the system converges to its stable setting exponentially (in
+$\theta$) fast: Suppose $L$ items have been generated since we detected the
+change in the parameters until we adapt the new schedule. These items, if not
+caught, loose their freshness exponentially fast: after $t$ steps their
+freshness is at most $L\theta^t$ and decreases exponentially. In our experiments
+(Sect.~\ref{sec:exp}) we provide different examples that illustrate how the load
+of the generating process becomes stable after the algorithm adapts itself to
+the changes of parameters.
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Optimizer %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{algorithm}[!h]
-\BlankLine
-{\bf Inputs:} The length of the time interval that we sample from, $\texttt{time\_length}$.
-
-\Begin{
-$\D_1 \leftarrow \emptyset$\;
-$\D_2 \leftarrow \emptyset$\;
- \For{nodes $u\in U$}{
-   \For{items $i$ at $u$, not older than \texttt{time\_length} time steps}{
-	   $\D_1 \leftarrow \D_1 \cup \{i\}$\;
-      $\D_2 \leftarrow \D_2 \cup \{(i,u)\}$\;
-      }
-    }
-
-
-$\Sample \leftarrow \emptyset$\;
-\For{$i \in D_1$}{
-  $S \leftarrow \emptyset$\;
-  \For{$(i, u) \in D_2$}{
-  $S \leftarrow S \cup \{u\}$\;
-  }
-  $\Sample \leftarrow \Sample \cup \{S\}$\;
-  }
-
-  return $\Sample$\;
-
-}
-
-\caption{XXXX}\label{alg:sampler}
-\end{algorithm}
-
+%\begin{algorithm}[!h]
+%\BlankLine
+%{\bf Inputs:} The length of the time interval that we sample from, $\texttt{time\_length}$.
+%
+%\Begin{
+%$\D_1 \leftarrow \emptyset$\;
+%$\D_2 \leftarrow \emptyset$\;
+% \For{nodes $u\in U$}{
+%   \For{items $i$ at $u$, not older than \texttt{time\_length} time steps}{
+%	   $\D_1 \leftarrow \D_1 \cup \{i\}$\;
+%      $\D_2 \leftarrow \D_2 \cup \{(i,u)\}$\;
+%      }
+%    }
+%
+%
+%$\Sample \leftarrow \emptyset$\;
+%\For{$i \in D_1$}{
+%  $S \leftarrow \emptyset$\;
+%  \For{$(i, u) \in D_2$}{
+%  $S \leftarrow S \cup \{u\}$\;
+%  }
+%  $\Sample \leftarrow \Sample \cup \{S\}$\;
+%  }
+%
+%  return $\Sample$\;
+%
+%}
+%
+%\caption{XXXX}\label{alg:sampler}
+%\end{algorithm}
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Optimizer %%%%%%%
@@ -679,9 +700,7 @@ the same key are sent to the same machine (called the \emph{reducer} for that
 key), where a function $\mathsf{reduce}$ is applied to the whole set of received
 pairs, to emit the final output.
 
-\todo[Ahmad]{Please review: \ahmad{2 rounds is enough, the aggregator that receives $(p_1W_1,\ldots,p_nW_n)$ can normalize it itself.}}
-
-Each iteration of \algonameapx is spread over three rounds of \algonamemr. At
+Each iteration of \algonameapx is spread over two rounds of \algonamemr. At
 each round, we assume that the current schedule $\sched$ is available to all
 machines (this is done in practice through a distributed cache). In the first
 round, we compute the values $p_iW_i$, $1\le i\le n$, in the second round these
@@ -696,20 +715,19 @@ $(i,v_S)$ for each $i\in S$, with
 The reducer for the key $i$ receives the pairs $(i,v_S)$ for each $S\in\Sample$
 such that $i\in S$, and aggregates them to output the pair $(i,g_i)$, with
 \[
-g_i=\sched_i\sum v_S = g_i W_i\enspace.
+g_i=\sched_i\sum v_S = \sched_i W_i\enspace.
 \]
 The set of pairs $(i, g_i)$, $1\le i\le n$ constitutes the input to the
-next round which is just a parallel sum of all these values to obtain
+next round. Each input pair is sent to the same reducer,\footnote{This step can
+	be made more scalable through \emph{combiners}, an advanced MapReduce
+feature.} which computes the
+value
 \[
 	g = \sum_{i=1}^n g_i = \sum_{i=1}^n\sched_iW_i
 \]
-This can be done in a single round thanks to the use of \emph{combiners}, i.e.,
-partial sums computed after the map phase of the round. Finally in the third
-round, the value $g$ is used in the $\mathsf{map}_3$ function applied to each
-pair $(i, g_i)$ to compute the new value for $\sched_i = g_1 / g$, and output
-$(i,\sched_i)$. In this third round the reducers just output the same pair
-received in input, after which the new schedule is distributed to all machines
-again and a new iteration can start.
+and uses it to obtain the new values $\sched_i = g_i / g$, for $1\le i\le n$.
+The reducer then outputs $(i,\sched_i)$.  At this point, the new schedule is
+distributed to all machines again and a new iteration can start.
 
 The same results we had for the quality of the final schedule computed by
 \algonameapx in case of convergence carry over to \algonamemr.
