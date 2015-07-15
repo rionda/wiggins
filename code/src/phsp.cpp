@@ -12,6 +12,11 @@ string my_get_dir_name(const string filename) {
 	return dir;
 }
 
+int getAutoLenSamp(int n, double eps, double theta) {
+	int output =  ceil(3*(log(n)+log(2))/ ((1-theta)*pow(eps,2)));
+	cout << "len_samp (auto): " << output << endl;
+	return output;
+}
 // ************************************************
 //	Functins for Sampler task
 // ************************************************
@@ -28,6 +33,19 @@ void sampler(Graph g, const string dir, const uint64_t len_samp) {
 	fout << len_samp;
 	fout.close();		
 }
+
+// void sampler(Graph g, const string dir, const uint64_t len_samp, const string suffix) {
+// 	/*
+// 		len_samp: the lenght of the time interval of samples
+// 	*/
+// 	string samp_file = dir+"samples/S-"+to_string(len_samp)+'.'+suffix;
+// 	g.gen_sample(len_samp, samp_file);
+	
+// 	ofstream fout(samp_file + ".stat");	
+// 	fout << g.number_of_nodes << endl;
+// 	fout << len_samp;
+// 	fout.close();		
+// }
 
 void indexed_sampler(Graph g, const string dir, const uint64_t len_samp, const int ind) {
 	/*
@@ -120,6 +138,86 @@ void solver(const string samp_file,
 }
 
 
+void randsolver(const string samp_file, 
+			const double theta, 
+			const int num_iter, const int probes) {
+
+	int number_of_nodes, len_samp;
+	ifstream fin(samp_file + ".stat");
+	
+	fin >> number_of_nodes >> len_samp;	
+	fin.close();
+
+	vector<double> p(number_of_nodes, 0.0);	//random initial schedule	-------->
+	random_device my_rd;
+	mt19937 gen(my_rd());
+	uniform_real_distribution<> my_rand(0, 1);
+
+	double Z = 0;
+	for (int i=0; i<number_of_nodes; ++i) {
+		p[i] = my_rand(gen);
+		Z += p[i];
+	}
+
+	for (int i=0; i<number_of_nodes; ++i) {
+		p[i] /= Z;
+	}
+	// <--------------------
+
+
+	vector<double> cost(num_iter, 0);
+	vector<clock_t> iteration_time(num_iter);
+	
+
+	int k, u;
+	double pS, tmp;
+	ofstream fout_p(samp_file+ "_probes-" + to_string(probes) + ".p");	
+	for (int r=0; r < num_iter; ++r) {				
+		// saving the schedule:
+		for (double d : p) {
+			fout_p << d << "\t";
+		}
+		fout_p << endl;		
+		clock_t round_time = clock();
+		fin.open(samp_file);
+		vector<double> W(number_of_nodes, 0);			
+		while (fin >> k) {
+			pS = 0;
+			deque<int> S; // TODO: check if it gets new everytime
+			for (int i=0; i<k; ++i) {
+				fin >> u;				
+				pS += p[u];
+				S.push_back(u);
+			}			
+			tmp = 1.0/(1 - theta*pow(1-pS,probes));
+			cost[r] += tmp;
+
+			// update W:
+			tmp = pow(tmp,2)*pow(1-pS,probes-1);
+			for (int v : S) {
+				W[v] += tmp;
+			}
+		}		
+		fin.close();		
+		cost[r] /= len_samp;
+		update(p, W);
+		iteration_time[r] = clock()-round_time; 
+	}
+	fout_p.close();
+	
+	ofstream fout_conv(samp_file + "_probes-" + to_string(probes) + ".conv");
+	for (double c : cost)
+		fout_conv << c << "\t";
+	fout_conv << endl;
+
+	for (clock_t t : iteration_time)
+		fout_conv << t << "\t";
+	fout_conv << endl;
+	fout_conv.close();
+
+}
+
+
 // ************************************************
 //	Functins for Tester task
 // ************************************************
@@ -149,7 +247,8 @@ void tester(const string samp_file, const string test_file,
 			const double theta) {
 
 	int number_of_nodes, len_samp;
-	ifstream fin(samp_file + ".stat");	
+	// ifstream fin(samp_file + ".stat");	
+	ifstream fin(test_file + ".stat");	
 	fin >> number_of_nodes >> len_samp;	
 	fin.close();
 
@@ -226,9 +325,7 @@ vdoub_t load_p(const string pp_file, const int number_of_nodes,
 	fin.open(pp_file);
 	if (! fin.is_open()) {
 		cerr << "load_pp: file not found: " << pp_file << endl;
-	} else {
-		cout << "opened: " <<pp_file << endl;
-	}
+	} 
 	double p_val;
 	vdoub_t p(number_of_nodes);
 	for (int r=0; r < num_iter-1; ++r) {
@@ -241,7 +338,7 @@ vdoub_t load_p(const string pp_file, const int number_of_nodes,
 		p[i] = p_val;
 	}
 
-	cout << "number of nodes : " << p.size() << endl;
+	// cout << "number of nodes : " << p.size() << endl;
 	return p;
 }
 
@@ -392,7 +489,95 @@ void compare_with_file(const string samp_file, const string test_file,
 
 	
 
+double unif_compare_with_file(const string samp_file, const string test_file,
+			const int num_iter, const int probes,
+			const double theta) {
 
+	
+
+	int number_of_nodes, len_samp;
+	
+	ifstream fin(test_file + ".stat");	
+	fin >> number_of_nodes >> len_samp;	
+	fin.close();
+
+	string pp_file = samp_file + "_probes-" + to_string(probes)+ ".p";
+	
+	// getting p
+	vdoub_t p = load_p(pp_file, number_of_nodes, num_iter);
+	double vardist = 0;
+	for (int i=0; i<number_of_nodes; ++i) {
+		vardist += abs(p[i]-1.0/number_of_nodes);
+	}
+	vardist /= 2;
+
+	fin.open(test_file);
+	if (! fin.is_open()) {
+		cerr << "cost: file not found: " << test_file << endl;		
+	}
+
+
+	int k, u;
+	double pS_p;
+	double cost_p = 0;
+	while (fin >> k) {
+		// vector<double> pS(pp.size(), 0);
+		pS_p = 0;
+		
+		for (int i=0; i<k; ++i) {			
+			fin >> u;
+			pS_p += p[u];
+			
+		}
+
+		cost_p += 1.0/(1 - theta*pow(1-pS_p,probes));
+		// cost_unif += 1.0/(1 - theta*pow(1-pS_unif,probes));
+
+
+	}
+	fin.close();
+
+	cost_p /= len_samp;
+	cost_p /= 5050; // this is for D100 sample;
+	
+
+	
+	// ofstream fout_comp(samp_file + "_probes-" + to_string(probes) + ".compare");
+	// fout_comp << "p\t" << cost_p << endl;
+	// fout_comp << "unif\t" << cost_unif << endl;
+
+
+	// fout_comp.close();
+	
+
+	return cost_p;
+	// return vardist;
+}
+
+double vardist_f(const string samp_file, const string test_file,
+			const int num_iter, const int probes,
+			const double theta) {
+
+	
+
+	int number_of_nodes, len_samp;
+	
+	ifstream fin(test_file + ".stat");	
+	fin >> number_of_nodes >> len_samp;	
+	fin.close();
+
+	string pp_file = samp_file + "_probes-" + to_string(probes)+ ".p";
+	
+	// getting p
+	vdoub_t p = load_p(pp_file, number_of_nodes, num_iter);
+	double vardist = 0;
+	for (int i=0; i<number_of_nodes; ++i) {
+		vardist += abs(p[i]-1.0/number_of_nodes);
+	}
+	vardist /= 2;
+
+	return vardist;
+}
 
 int main(int argc, char *argv[]) {
 	/*
@@ -443,11 +628,22 @@ int main(int argc, char *argv[]) {
 	if (TASK == "sampler") {
 		Graph g(filename, theta);
 		sampler(g, my_get_dir_name(filename), len_samp);
+	} else if (TASK == "auto_sampler") {
+		Graph g(filename, theta);
+		len_samp = getAutoLenSamp(g.number_of_nodes, epsilon, theta); // computing the sample size
+		sampler(g, my_get_dir_name(filename), len_samp);
+
 	} else if (TASK == "indexed_sampler") {
 		Graph g(filename, theta);
 		indexed_sampler(g, my_get_dir_name(filename), len_samp, ind);
 
 	} else if (TASK == "solver") {
+		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
+		solver(samp_file, theta, num_iter, probes);	
+
+	} else if (TASK == "auto_solver") {
+		Graph g(filename, theta);
+		len_samp = getAutoLenSamp(g.number_of_nodes, epsilon, theta); // computing the sample size
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		solver(samp_file, theta, num_iter, probes);	
 
@@ -485,7 +681,77 @@ int main(int argc, char *argv[]) {
 		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
 		string test_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_test)+"-"+to_string(ind);
 		compare(filename, samp_file, test_file, num_iter, probes, theta);
+	} else if (TASK == "solver_uniform") {
+		vector<int> lens = {5,10,20,50,100,200,500,1000,2000,5000,10000,20000};
+		// vector<int> lens = {10};
+		probes = 1;
+		// num_iter = 101;
+		theta = 0.99;
+		
+		string samp_file;
+		for (auto l : lens) {
+			cout << "working on lenght " << l << ": ";
+			for (int idx=0; idx<10; ++idx) {
+				samp_file = my_get_dir_name(filename) + "S-" + to_string(l) + "-" + to_string(idx);
+				cout << idx << ", ";
+				randsolver(samp_file, theta, num_iter, probes);
+				// cout << samp_file << endl;
+				
+			}
+			cout << endl;
+		}
+	} else if (TASK == "cost_uniform") {
+		vector<int> lens = {5,10,20,50,100,200,500,1000,2000,5000,10000,20000};
+		
+		probes = 1;
+		// num_iter = 101;
+		theta = 0.99;
+		
+		string samp_file, test_file;
+		double c;
+		ofstream fout("D100-costs");
+
+		for (auto l : lens) {
+			cout << "working on lenght " << l << ": ";
+			fout << l << "\t";
+			for (int idx=0; idx<10; ++idx) {
+				samp_file = my_get_dir_name(filename) + "S-" + to_string(l) + "-" + to_string(idx);
+				test_file = my_get_dir_name(filename) + "T";
+				// cout << idx << ", ";
+				
+				c = unif_compare_with_file(samp_file, test_file, num_iter,probes, theta);
+				cout << " " << c;
+				fout << c << "\t";
+				
+			}
+			cout << endl;
+			fout << endl;
+		}
+		fout.close();
+
+		cout << endl << endl;
+		fout.open("D100-vardist");
+		for (auto l : lens) {
+			cout << "working on lenght " << l << ": ";
+			fout << l << "\t";
+			for (int idx=0; idx<10; ++idx) {
+				samp_file = my_get_dir_name(filename) + "S-" + to_string(l) + "-" + to_string(idx);
+				test_file = my_get_dir_name(filename) + "T";
+				// cout << idx << ", ";
+				
+				c = vardist_f(samp_file, test_file, num_iter,probes, theta);
+				cout << " " << c;
+				fout << c << "\t";
+				
+			}
+			cout << endl;
+			fout << endl;
+		}
+		fout.close();
+
 	}
+
+
 	
 	return 0;
 }

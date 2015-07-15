@@ -1,8 +1,8 @@
 \section{Experimental Results}\label{sec:exp}
-\todo[Ahmad]{Please adapt to the new presentation and add the new results. I
-	haven't touch almost anything here, except some notation to make the paper
-compile, and some of this was done mechanically, so it may be wrong, please
-adjust where needed. I'll review after your pass.}
+%\todo[Ahmad]{Please adapt to the new presentation and add the new results. I
+%	haven't touch almost anything here, except some notation to make the paper
+%compile, and some of this was done mechanically, so it may be wrong, please
+%adjust where needed. I'll review after your pass.}
 %\subsection{}
 In this section, we present our experimental results on optimality and
 efficiency of \algonameapx, as in realistic scenarios we only have access to
@@ -15,15 +15,15 @@ illustrate that the sequence $\cost_\theta(\sched^1,\Sample), \cost_\theta(\sche
 $\sched^{i+1}$ is solely a function of $\Sample$ and $\sched^i$. 
 
 \todo[all]{Technically speaking, Theorem~\ref{thm:optimal} says if the sequence converges and get 'constant'. However, since in computers (using 64bits) numbers we do not have infinite convergence. }
+Next, we compare the output schedule of \algonameapx to three other schedules: (i) uniform schedules, (ii) proportional to out-degrees, and (iii) proportional to in-degrees. Specifically, we compute the costs of these schedules according to a sample $\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and compare them.
+%Next, for further investigation, for each generated sequence of
+%$\sched^1,\sched^2,\ldots$ according to a sample $\Sample$, we compute the cost
+%of $\sched^i$'s according to another test sample $\Sample'$, and see that the
+%sequence $\cost_\theta(\sched^1,\Sample'), \cost_\theta(\sched^2,\Sample'),\ldots$ is still
+%descending and converges after few steps.
+Then, we demonstrate how our method can adapt itself to the changes in the network parameters. Finally, we consider a specific example for which we know the \emph{unique} optimal schedule, and show that for larger samples \algonameapx outputs a schedule closer to the optimal optimal.
 
-Next, for further investigation, for each generated sequence of
-$\sched^1,\sched^2,\ldots$ according to a sample $\Sample$, we compute the cost
-of $\sched^i$'s according to another test sample $\Sample'$, and see that the
-sequence $\cost_\theta(\sched^1,\Sample'), \cost_\theta(\sched^2,\Sample'),\ldots$ is still
-descending and converges after few steps.
-\ahmad{Then, we consider a specific example for which we know the \emph{unique} optimal schedule, and show that for large enough samples \algonameapx outputs a schedule close to optimal optimal one.}
 
-Finally, we demonstrate how our method can adapt itself to the changes in the network parameters.
 
 % Finally,  we show how one can use {\optimizer} to extract a set of nodes as a solution the the Influence-Maximization problem, and we compare it to \texttt{TIM+}\cite{??}. \texttt{TIM+} is an algorithm for Influence-Maximization problem that is based on sampling \emph{hyper-edges} (see \cite{borgs,??}) and running a greedy algorithm for submodular optimization. We see that by {\optimizer} we can obtain seeds whose influence are close to \texttt{TIM+}'s output seeds with much smaller running time.
 
@@ -34,7 +34,7 @@ Our experiments were run on a Opteron 6282 SE CPU (2.6 GHz) using 12G memory. We
  \item Brightkite~\cite{ChoML11}: A location-based online social network, where each edge represents a friendship tie.
  \item Epinion~\cite{richardson2003trust}: The trust relationships in \texttt{Epinion.com}.
 %  \item wiki-Vote~\cite{wikivote1,wikivote2}: A network between Wikipedia users where each edge shows a vote from a user for another one.
-%  \item web-Notredame~\cite{notredame}: Network of ``University of Notre Dame'' where each edge represents a hyperlink from a page to another page.
+  \item web-Notredame~\cite{notredame}: Network of ``University of Notre Dame'' where each edge represents a hyperlink from a page to another page.
  \item web-Google~\cite{webgoogle}: A dataset released by Google in 2002, where each node is a page and a directed edge represents a hyperlink between the pages.
  \item Twitter~\cite{McAuleyL12}: A combined ego network, where each edge is directed from a node to another node that it follows. 
 \end{itemize*}
@@ -42,14 +42,15 @@ Our experiments were run on a Opteron 6282 SE CPU (2.6 GHz) using 12G memory. We
 
 
 \paragraph*{Parameters and model of propagation}
-Throughout our experiments, for sake of simplicity we focus on $(\theta,c)$-OPSP for $c=1,3,5$ and $\theta = 0.75$. We always assume the graphs are directed by replacing undirected edges with two directed ones. By $\degree^+(i)$ (resp. $\degree^-(i)$) we mean the out-degree (resp. in-degree) of the node $i$. In each network $G=(V,E)$ we group the nodes into four groups (see Table~\ref{table:datasets}):
+%Throughout our experiments, for sake of simplicity we focus on $(\theta,c)$-OPSP for $c=1,3,5$ and $\theta = 0.75$.
+ We always assume the graphs are directed by replacing undirected edges with two directed ones. By $\degree^+(i)$ (resp. $\degree^-(i)$) we mean the out-degree (resp. in-degree) of node $i$, where the direction of an edge indicates the direction of the propagation. In each network $G=(V,E)$ we group the nodes into four groups (see Table~\ref{table:datasets}):
 \begin{itemize*}
  \item $V_{1000} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
  \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
  \item $V_{100}  = \{i\in V ~:~ 100\leq \degree^+(i) < 500\}$, and
  \item $V_{0}    = \{i\in V ~:~ \degree^+(i) < 100\}$.
 \end{itemize*}
-We assume each node may generate a new item, that will be propagated, at each time based on the group the node is assigned to. In particular, the probability that the node $i$ generates a new item, $\pi_i$, is as follows:
+We assume each node may generate a new item, that will be propagated, at each time based on the group the node is assigned to. In particular, we assume that the probability of  node $i$ generating a new item, $\pi_i$, is as follows, based on the intuition that active individuals are  likely to have more followers/friends:
 %  $\pi=(\pi_1, \ldots, \pi_n)$, where
 $$
    \pi_i = \left\{
@@ -61,12 +62,16 @@ $$
      \end{array}
    \right.
 $$
-based on the intuition that active individuals are  likely to have more followers/friends. In Table~\ref{table:datasets} the expected number of new items at each time step is given, for each dataset, as the \emph{rate of new items}.
+ In Table~\ref{table:datasets} the expected number of new items at each time step is given, for each dataset, as the \emph{rate of new items}.
 
 \todo[Ahmad]{Please use the ctable package for tables, they look much better.}
 
 
-As the model of propagation, we consider the Independent-Cascade model\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability $p_e$ that a new item at node $v$ is propagated through this edge to node $w$, and events for different items are independent. Following the parameters reported in the literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
+
+
+
+
+As the model of propagation, we consider the Independent-Cascade model~\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability $p_e$ that a new item at node $v$ is propagated through this edge to node $w$, and events for different items are independent. Following the parameters reported in the literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
 %For every edge $e=(a,b)$ we let the activation probability $p_e$ to be $\frac{1}{\degree^-(b)}$ which is a commonly used parameter~.
 
 
@@ -110,20 +115,27 @@ Twitter 	&81306	&1768149&43	&108	&2674& 36.44\\
 \subsection{The Efficiency and Accuracy of \algonameapx}
 In Section~\ref{sec:optimize}  we showed that when a run of \algonameapx converges
 (according to a sample $\Sample$) the computed $c$-schedule is optimal with
-respect to the sample $\Sample$ (Theorem~\ref{thm:approx_sample}). Our first set
+respect to the sample $\Sample$ (Lemma~\ref{lem:optimal_sample}). Our first set
 of experiments measure the rate of convergence and the execution time of the
-optimization algorithm, \algonameapx. Formally, 
-suppose $\sched^i$ is the obtained schedule by \algonameapx, according to the
-sample $\Sample$, at the $i$-th round of iteration. An important question
-regarding the  convergence of \algonameapx according to a sample $\Sample$ is this: If $\Sample'$ is another sample (with probably larger size) is the sequence $\cost_\theta(\sched^1,\Sample'),\cost_\theta(\sched^2,\Sample'),\ldots$ still descending and converging? This is important as we have to  avoid over-fitting our schedule with the sample $\Sample$.
-
-To demonstrate the convergence of \algonameapx we sample all the sets generated during
-a time interval of length 2000, $\Sample$. For $c\in\{1,3,5\}$ the cost of each $c$-schedule during the iterative method according to $\Sample$ is shown in Figure~\ref{fig:conv}. Also, in Figure~\ref{fig:conv}, the cost of each intermediate $c$-schedule generated during the iterative method (applied to $\Sample$) is computed according to a test sample $\Sample'$ that has been obtained during a time interval of length 10000. In both cases the cost values are decreasing. 
+optimization algorithm, \algonameapx. Here, for the sake demonstration, we let $\epsilon=0.1$, $\theta=0.75$, and consider $c\in\{1,3,5\}$. For each dataset, we used a sample $\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and ran \algonameapx for 30 rounds of iterations. Denote the schedule computed at round $i$ by $\sched^i$.
+As shown in Figure~\ref{fig:conv}, the sequence of cost values of the schedules $\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges after few iterations.
 
 
+%the sequences of cost values according to both sample $\Sample$ and the test sample $\Sample'$ are descending and converge after few steps. Also note that the cost values according to $\Sample$ and $\Sample'$ are close (in some cases almost identical), which agrees with the theoretical analysis in Section~\ref{sec:sampcomp}.
 
-As shown in Figure~\ref{fig:conv}, the sequences of cost values according to both sample $\Sample$ and the test sample $\Sample'$ are descending and converge after few steps. Also note that the cost values according to $\Sample$ and $\Sample'$ are close (in some cases almost identical), which agrees with the theoretical analysis in Section~\ref{sec:sampcomp}.
-
+%
+%Formally, 
+%suppose $\sched^i$ is the obtained schedule by \algonameapx, according to the
+%sample $\Sample$, at the $i$-th round of iteration. An important question
+%regarding the  convergence of \algonameapx according to a sample $\Sample$ is this: If $\Sample'$ is another sample (with probably larger size) is the sequence $\cost_\theta(\sched^1,\Sample'),\cost_\theta(\sched^2,\Sample'),\ldots$ still descending and converging? This is important as we have to  avoid over-fitting our schedule with the sample $\Sample$.
+%
+%To demonstrate the convergence of \algonameapx we sample all the sets generated during
+%a time interval of length 2000, $\Sample$. For $c\in\{1,3,5\}$ the cost of each $c$-schedule during the iterative method according to $\Sample$ is shown in Figure~\ref{fig:conv}. Also, in Figure~\ref{fig:conv}, the cost of each intermediate $c$-schedule generated during the iterative method (applied to $\Sample$) is computed according to a test sample $\Sample'$ that has been obtained during a time interval of length 10000. In both cases the cost values are decreasing. 
+%
+%
+%
+%As shown in Figure~\ref{fig:conv}, the sequences of cost values according to both sample $\Sample$ and the test sample $\Sample'$ are descending and converge after few steps. Also note that the cost values according to $\Sample$ and $\Sample'$ are close (in some cases almost identical), which agrees with the theoretical analysis in Section~\ref{sec:sampcomp}.
+%
 
 
 
@@ -159,26 +171,43 @@ For each graph, the size of the sample $\Sample$, the average size of sets in $\
 
 
 
+\begin{figure*}
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/brightkite.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/enron-email.pdf}}	
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/epinion.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/twitter.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/web-google.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/web-notredame.pdf}}
+\caption{The cost of intermediate $c$-schedules at iterations of \algonameapx  according to $\Sample$.}\label{fig:conv}
+\end{figure*}
+
 
 \begin{figure*}
-\subcaptionbox*{Enron-Email ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-enronEmail.pdf}}%\hspace{1em}%
-\subcaptionbox*{Enron-Email ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-enronEmail.pdf}}
-\subcaptionbox*{Enron-Email ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-enronEmail.pdf}}
-\subcaptionbox*{Brightkite ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-brightkite.pdf}}%\hspace{1em}%
-\subcaptionbox*{Brightkite ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-brightkite.pdf}}
-\subcaptionbox*{Brightkite ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-brightkite.pdf}}
-\subcaptionbox*{Epinion ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-epinion.pdf}}%\hspace{1em}%
-\subcaptionbox*{Epinion ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-epinion.pdf}}
-\subcaptionbox*{Epinion ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-epinion.pdf}}
-\subcaptionbox*{web-Google ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-webgoogle.pdf}}%\hspace{1em}%
-\subcaptionbox*{web-Google ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-webgoogle.pdf}}
-\subcaptionbox*{web-Google ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-webgoogle.pdf}}
-\subcaptionbox*{Twitter ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-twitter.pdf}}%\hspace{1em}%
-\subcaptionbox*{Twitter ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-twitter.pdf}}
-\subcaptionbox*{Twitter ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-twitter.pdf}}
-
-\caption{The cost of intermediate $c$-schedules at iterations of \algonameapx  according to training sample $\Sample$ and test sample $\Sample'$.}\label{fig:conv}
+	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/cost.pdf}}
+	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/vardist.pdf}}
+	\caption{......} \label{fig:D100}
 \end{figure*}
+
+
+%\begin{figure*}
+%\subcaptionbox*{Enron-Email ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-enronEmail.pdf}}%\hspace{1em}%
+%\subcaptionbox*{Enron-Email ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-enronEmail.pdf}}
+%\subcaptionbox*{Enron-Email ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-enronEmail.pdf}}
+%\subcaptionbox*{Brightkite ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-brightkite.pdf}}%\hspace{1em}%
+%\subcaptionbox*{Brightkite ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-brightkite.pdf}}
+%\subcaptionbox*{Brightkite ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-brightkite.pdf}}
+%\subcaptionbox*{Epinion ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-epinion.pdf}}%\hspace{1em}%
+%\subcaptionbox*{Epinion ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-epinion.pdf}}
+%\subcaptionbox*{Epinion ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-epinion.pdf}}
+%\subcaptionbox*{web-Google ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-webgoogle.pdf}}%\hspace{1em}%
+%\subcaptionbox*{web-Google ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-webgoogle.pdf}}
+%\subcaptionbox*{web-Google ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-webgoogle.pdf}}
+%\subcaptionbox*{Twitter ($c=1$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/1-twitter.pdf}}%\hspace{1em}%
+%\subcaptionbox*{Twitter ($c=3$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/3-twitter.pdf}}
+%\subcaptionbox*{Twitter ($c=5$)}{\includegraphics[width=0.31\textwidth]{figures/newconv/5-twitter.pdf}}
+%
+%\caption{The cost of intermediate $c$-schedules at iterations of \algonameapx  according to training sample $\Sample$ and test sample $\Sample'$.}\label{fig:conv}
+%\end{figure*}
 
 
 
@@ -198,6 +227,15 @@ For each graph, the size of the sample $\Sample$, the average size of sets in $\
 
 
 
+Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}.
+\todo[ahmad]{I'll add the table. Since yesterday filesystem is not working..} 
+\mynote[matteo]{Do we need 10 times of running for this specific table?}
+
+
+
+% --------------------------------------------------
+% --------------------------------------------------
+% --------------------------------------------------
 \subsection{Dynamic Settings}\label{sec:dynset}
 In this section, we provide some experiments that demonstrate the changes in the
 generating process and how our algorithm can adapt itself to the new situation.
@@ -213,8 +251,9 @@ Theorem~\ref{thm:approx_sample} (for $\epsilon=1$),
 \mynote[Ahmad]{$\epsilon=1$? But then you only know you're not overestimating.
 	It doesn't seem to make sense to me. Also, it clashes a bit with the result in
 	Thm.~\ref{thm:approx_sample}). I think you should use not use $\epsilon=1$: 
-	\ahmad{The goal here was not to show that our schedule is optimal, was to demonstrate how fast the fluctuation in the system change when we adapt the algorithm. But I agree would be nicer to use smaller $\epsilon$. I'll try to run with smaller values.}
+	\ahmad{Cannot run anything right now, as filesystem/grid is not working. }
 }
+\todo[ahmad]{for $\epsilon=0.1$ and without making nodes generate up to 10.}
 
 
 and other intervals (three time intervals before, between, and after the colored time intervals) have length $10R$. Also, for sake of illustration, we assumed at each time step each node $i$ may generated up to 10 items (each having a chance of $\pi_i$ to be generated). Thus, the number of generated items at each node is a binomial random variable with parameters 10 and $\pi$.
@@ -285,18 +324,19 @@ Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that 
 %   \caption{}\label{figure:inf}
 % \end{figure*}
 
-\todo[Ahmad]{The following section should be relocated. The assumption on IC-model is not valid here anymore}
-\subsection{Convergence to Unique Optimal}
-Suppose we know the optimal schedule, and we know that it is unique. How sensitive is the output of \algonameapx to the initial schedule (which we let to be uniform) in the iterations of \algonameapx? and how does the size of the sample size affects the output? In following, we study these questions, by investigating a specific example.
 
-Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$ for  $\family = \{S \in 2^{[n]} \mid 0 <|S| \leq 2\}$, and $\pi(S)=\frac{1}{|\family|}$. It is easy to see that $\cost_\theta(\sched)$ is a symmetric function, and thus, the uniform schedule is optimal. Moreover, by Corollary~\ref{corol:convexity} the uniform schedule is the only optimal schedule, since $\{v\} \in \family$ for every $v\in V$.
+\subsection{A Test on Convergence to  Optimal Schedule}
+We finish our experiments by an example for which we know the optimal schedule, and moreover, the optimal schedule is unique. Therefore, we use this example to investigate further the convergence of \algonameapx. In particular, we would like to see how close the \algonameapx output is to the optimal schedule, regarding (i) different initial schedules, $\sched^0$ (which we let to be uniform), and (ii) samples $\Sample$'s  obtained during time intervals of different lengths.
 
-In our experiments we run the \algonameapx algorithm, using (i) different random initial schedules, and (ii) samples $\Sample=U_t$ for different values of $t$. Specifically, for each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \emph{variation distance} between the output schedule and the uniform schedule. We plot our results in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using wider time intervals of sampling) the output schedules will be very close to the uniform schedule (the variance gets smaller and smaller).
+Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$ for  $\family = \{S \in 2^{[n]} \mid 1 \leq|S| \leq 2\}$, and $\pi(S)=\frac{1}{|\family|}$. It is easy to see that $\cost_\theta(\sched)$ is a symmetric function, and thus, the uniform schedule is optimal. Moreover, by Corollary~\ref{corol:convexity} the uniform schedule is the only optimal schedule, since $\{v\} \in \family$ for every $v\in V$.
 
-\todo[Ahmad]{I'll bring the figure here.}
+In our experiments we run the \algonameapx algorithm, using (i) different \emph{random} initial schedules, and (ii) samples $\Sample$ obtained from time intervals of different lengths. For each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \textbf{exact} cost of each schedule, and its variation distance to the uniform schedule. Our results are plotted in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using wider time intervals of sampling) the output schedules will be very close to the uniform schedule (the variance gets smaller and smaller).
 
-
-
+\begin{figure*}
+	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/cost.pdf}}
+	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/vardist.pdf}}
+	\caption{The cost of \algonameapx outputs and their variation distance to the optimal schedule.} \label{fig:unique}
+\end{figure*}
 
 
 

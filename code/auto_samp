@@ -1,0 +1,6 @@
+./phsp -TASK auto_sampler -DIR data/twitter/
+./phsp -TASK auto_sampler -DIR data/enronEmail/
+./phsp -TASK auto_sampler -DIR data/epinion/ 
+./phsp -TASK auto_sampler -DIR data/brightkite/
+./phsp -TASK auto_sampler -DIR data/webgoogle/ 
+./phsp -TASK auto_sampler -DIR data/notredame/
