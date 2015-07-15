@@ -373,12 +373,12 @@ For $1\le i\le n$, define now the functions
 \]
 
 We can then define a variant of \algoname, which we call \algonameapx. The
-differences from \algoname are: 
+differences from \algoname are:
 \begin{enumerate*}
-	\item \algonameapx uses the values $W_i(\sched,\Sample)$ instead of
-		$W_i(\sched)$ (line~\ref{algline:w} in Alg.~\ref{alg:iterative}) 
-	\item The sum on line~\ref{algline:sum} in Alg.~\ref{alg:iterative} is only
+	\item the loop on line~\ref{algline:sum} in Alg.~\ref{alg:iterative} is only
 		over the sets that appear in at least one $\Sample_j\in\Sample$.
+	\item \algonameapx uses the values $W_i(\sched,\Sample)$ instead of
+		$W_i(\sched)$ (line~\ref{algline:w} in Alg.~\ref{alg:iterative});
 \end{enumerate*}
 
 If \algonameapx reaches convergence, it returns a schedule with the minimum cost
