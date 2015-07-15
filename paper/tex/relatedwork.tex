@@ -1,22 +1,56 @@
 \section{Related Work}\label{sec:related_work}
-\todo[Matteo]{This hasn't been reviewed/edited yet.}
-There has been extensive work on  \emph{Outbreak Detection} using statistic or mobile sensor in physical domains, motivated in part by the ``Battle of Water Sensor Network'' challenge~\cite{BWSN2008}, where the goal was to optimize the placement of sensors in water networks to detect contamination~\cite{Leskovec2007,Krause2008,Hart2010}. 
-The optimization can be done with respect to a number of objectives, such as maximizing the probability of detection, minimizing the detection time, or minimizing the size of the subnetwork affected by the phenomena~\cite{Leskovec2007}. A related work~\cite{AgumbeSuresh2012} considered  sensors that are sent along fixed paths in the network with the goal of gathering sufficient information to locate possible contaminations. Early detection of contagious outbreaks
-by monitoring the neighborhood (friends) of a randomly chosen node (individual) was studied in~\cite{Christakis2010}. Efficient scheduling for minimizing energy consumption in battery operated sensors were studied in~\cite{Krause2009}, and distributed solutions with limited communication capacities and costs were studied in~\cite{Krause2011Kleinberg,Golovin2010,Krause2011}. 
+The problem we focus on is novel and generalizes and complements other problems
+studied in the literature.
 
-%Another objective in the Sensor Placement problem is to {\bf predict} the phenomena at locations without sensors (e.g., road speeds on highways).  studies this problem where there is restriction on the battery life of the sensors, and thus, the sensors need to be placed and \emph{scheduled} such that at each time just some of the sensors are \emph{active}. Also, \cite{Golovin2010} studies the same problem and provides a distributed solution where the sensors are not connected to a centralized optimizer and they activate themselves using local information. \cite{Krause2011} presents an algorithm in which sensors have to communicate through 
+The  ``Battle of Water Sensor Network'' challenge~\citep{BWSN2008} motivated a
+number of works on \emph{outbreak detection}: the goal is to optimally place
+static or fixed sensors in water networks to detect
+contamination~\citep{Leskovec2007,Krause2008,Hart2010}. The optimization can be
+done w.r.t.~a number of objectives, such as maximizing the probability of
+detection, minimizing the detection time, or minimizing the size of the
+subnetwork affected by the phenomena~\citep{Leskovec2007}. A related
+work~\citep{AgumbeSuresh2012} considered sensors that are sent along fixed paths
+in the network with the goal of gathering sufficient information to locate
+possible contaminations. Early detection of contagious outbreaks by monitoring
+the neighborhood (friends) of a randomly chosen node (individual) was studied
+by~\citet{Christakis2010}.  \citet{Krause2009} present efficient schedules for
+minimizing energy consumption in battery operated sensors, while other works
+analyzed distributed solutions with limited communication capacities and
+costs~\citep{Krause2011Kleinberg,Golovin2010,Krause2011}. % spacesaver
+%Another objective in the Sensor Placement problem is to {\bf predict} the phenomena at locations without sensors (e.g., road speeds on highways).  studies this problem where there is restriction on the battery life of the sensors, and thus, the sensors need to be placed and \emph{scheduled} such that at each time just some of the sensors are \emph{active}. Also, \cite{Golovin2010} studies the same problem and provides a distributed solution where the sensors are not connected to a centralized optimizer and they activate themselves using local information. \cite{Krause2011} presents an algorithm in which sensors have to communicate through
 %lossy channels in environmental monitoring, and \cite{Krause2011Kleinberg} brings the communication cost into account.
-% 
-In contrast, our work is geared to detection in virtual networks such as the Web or social networks embedded in the Internet, where a monitor can reach (almost) any node at about the same cost. The monitor is restricted to probing a small number of nodes per step, the optimization of the probing sequence is over a larger domain, and the goal is to identify the outbreaks (items) regardless of their size and solely by considering their interest value.
+In contrast, our work is geared to detection in huge but virtual networks such
+as the Web or social networks embedded in the Internet, where it is possible to
+``sense'' or probe (almost) any node at approximately the same cost. Still only
+a restricted number of nodes can be probed at each steps but the optimization of
+the probing sequence is over a much larger domain, and the goal is to identify
+the outbreaks (items) regardless of their size and solely by considering their
+interest value.
 
-Our methods complement the work on \emph{Emerging Topic Detection} where the goal is to identify emergent topics in a social network, assuming full access to the stream of all postings. Providers, such as Twitter or Facebook, have an immediate access to all tweets or postings as they are submitted to their server~\cite{Cataldi2010,Mathioudakis2010}. Outside observers need an efficient mechanism to monitor changes, such as the methods developed in this work.
-
-{An interesting related research direction aims at \emph{controlling} or \emph{stopping} contagions in the networks by changing the topology of the network (e.g, by protecting or blocking the edges and/or nodes)~\cite{Aspnes2006,Kimura2008Minimizing,Kimura2008,Kimura2009,Li2011,He2011,Kuhlman2013}. 
+An interesting related research direction aims at \emph{controlling} or
+\emph{stopping} contagions in the networks by changing the topology of the
+network (e.g, by protecting or blocking the edges and/or
+nodes)~\cite{Aspnes2006,Kimura2008Minimizing,Kimura2008,Kimura2009,Li2011,He2011,Kuhlman2013}. %
 %In our model, though, probing the nodes is the only action we can take.}
 %%%%%%%%%%%%%%
-Another related research direction is  \emph{Anomaly Detection} whose goal is to find the events (usually structural) that deviate from  \emph{normal} patterns~\cite{Noble2003,Sun2007,Eberle2007,Papadimitriou2010,Akoglu2010,Bogdanov2013}. }
+\emph{Anomaly Detection} instead requires to find the events (usually
+structural) that deviate from \emph{normal}
+patterns~\cite{Noble2003,Sun2007,Eberle2007,Papadimitriou2010,Akoglu2010,Bogdanov2013}.
 %%%%%%%%%%%%%%%%
-Finally, web-crawling is another interesting research area that relates to obtaining the most recent snapshots of the web. However, it differs from our model in two key points: our model allows items to propagate their copies, and they will be caught if any of their copies is discovered (where snapshots of a webpage belong to that page only), and all the generated items should be discovered (and not just the recent ones), e.g. see~\cite{dasgupta2007discoverability,wolf2002optimal}.
+
+Our methods complement the work on \emph{Emerging Topic Detection} where the
+goal is to identify emergent topics in a social network, assuming full access to
+the stream of all postings. Providers, such as Twitter or Facebook, have an
+immediate access to all tweets or postings as they are submitted to their
+server~\cite{Cataldi2010,Mathioudakis2010}. Outside observers need an efficient
+mechanism to monitor changes, such as the methods developed in this work.
+
+Finally, web-crawling is another research area that study how to obtain the
+most recent snapshots of the web. However, it differs from our model in two key
+points: our model allows items to propagate their copies, and they will be
+caught if any of their copies is discovered (where snapshots of a webpage belong
+to that page only), and all the generated items should be discovered (and not
+just the recent ones)~\cite{dasgupta2007discoverability,wolf2002optimal}.
 
 % Finally, there are many work on Influence Maximization  and the social network Centrality, but as explained in previous section, they are ``orthogonal'' to  1-PHSP. To see the work on Influence Maximization and Betweenness centrality you can refer to \cite{Kempe2007,Borgs} and \cite{Yoshida}, and their related work.
 
@@ -29,28 +63,28 @@ Finally, web-crawling is another interesting research area that relates to obtai
 % % % % % % Section: Related   work % % % % % % %
 % % % % % % % % % % % % % % % % % % % % % % % % %
 % \section{Related work}\label{sec:related_work}
-% There has been an extensive work on \emph{outbreak detecdion} in physical domains, in particular the "Battle of Water Sensor Network" challenge~\cite{BWSN2008}  for optimal placement of static sensors in water networks to detect contamination~\cite{Leskovec2007,Krause2008,Hart2010}. 
+% There has been an extensive work on \emph{outbreak detecdion} in physical domains, in particular the "Battle of Water Sensor Network" challenge~\cite{BWSN2008}  for optimal placement of static sensors in water networks to detect contamination~\cite{Leskovec2007,Krause2008,Hart2010}.
 % The optimization is done with respect to different objectives, such as maximizing the probability of detection, minimizing the detection time, or minimizing the size of the subnetwork affected by the phenomena~\cite{Leskovec2007}. A related work~\cite{AgumbeSuresh2012} considered  sensors that are sent along fixed paths in the network with the goal of gathering sufficient information to locate possible contaminations. Early detection of contagious outbreaks
-% by monitoring the neighborhood (friends) of a randomly chosen node (individual) was studied in~\cite{Christakis2010}. Efficient scheduling for minimizing energy consumption in battery operated sensors were studied in~\cite{Krause2009}, and distributed solutions with limited communication capacities and costs were studied in~\cite{Krause2011Kleinberg, Golovin2010, Krause2011}. 
-% 
-% %Another objective in the Sensor Placement problem is to {\bf predict} the phenomena at locations without sensors (e.g., road speeds on highways).  studies this problem where there is restriction on the battery life of the sensors, and thus, the sensors need to be placed and \emph{scheduled} such that at each time just some of the sensors are \emph{active}. Also, \cite{Golovin2010} studies the same problem and provides a distributed solution where the sensors are not connected to a centralized optimizer and they activate themselves using local information. \cite{Krause2011} presents an algorithm in which sensors have to communicate through 
+% by monitoring the neighborhood (friends) of a randomly chosen node (individual) was studied in~\cite{Christakis2010}. Efficient scheduling for minimizing energy consumption in battery operated sensors were studied in~\cite{Krause2009}, and distributed solutions with limited communication capacities and costs were studied in~\cite{Krause2011Kleinberg, Golovin2010, Krause2011}.
+%
+% %Another objective in the Sensor Placement problem is to {\bf predict} the phenomena at locations without sensors (e.g., road speeds on highways).  studies this problem where there is restriction on the battery life of the sensors, and thus, the sensors need to be placed and \emph{scheduled} such that at each time just some of the sensors are \emph{active}. Also, \cite{Golovin2010} studies the same problem and provides a distributed solution where the sensors are not connected to a centralized optimizer and they activate themselves using local information. \cite{Krause2011} presents an algorithm in which sensors have to communicate through
 % %lossy channels in environmental monitoring, and \cite{Krause2011Kleinberg} brings the communication cost into account.
-% % 
+% %
 % In contrast to these works our work is geared to detection in virtual networks such as the Web or social networks embedded in the Internet, where a monitor can reach (almost) any node at about the same cost. The monitor is still restricted to probing a small number of nodes per step, but the optimization of the probing sequence is over a larger and more complex domain.
-% 
+%
 % \ahmad{Another trend of studies, aim to \emph{controlling} or \emph{stopping} contagions in the networks by changing the topology of the network (e.g, by protecting or blocking the edges and/or nodes)~\cite{Aspnes2006,Kimura2008Minimizing,Kimura2008,Kimura2009,Li2011,He2011,Kuhlman2013}. In our model, though, probing the nodes is the only action we can take.}
-% 
+%
 % Our methods complement the work on \emph{Emerging Topic Detection} where the goal is to identify emergent topics in a social network, assuming full access to the stream all posting. Providers, such as Twitter of Facebook, have an immediate access to all tweets or postings as they are submitted to their server~\cite{Cataldi2010,Mathioudakis2010}. Outside observers need an efficient mechanism to monitor changes.
-% 
+%
 % %%%%%%%%%%%%%%
 % \ahmad{
 % There is a rich work in the area of \emph{Anomaly Detection} whose goal is to find the events (usually structural) that deviate from a \emph{normal} pattern, e.g see \cite{Noble2003,Sun2007,Eberle2007,Papadimitriou2010,Akoglu2010,Bogdanov2013}. In our work we assume a fixed set of parameters, and rather focusing on the pattern of the events (e.g., pattern of the subnetwork that an item has reached) we are interested in catching (all) the items.
 % }
 % %%%%%%%%%%%%%%%%
-% 
+%
 % Finally, the well-studied problem of \emph{Influence Maximization} problem aimed at optimizing the location of nodes that generated new items to obtain maximum spread of the items~\cite{Kempe2003,Kempe2005,Kempe2007,Chen2009,Chen2010,Goyal2011,Seeman13}. \ahmad{Note that the goal in Influence Maximization problem is to spread the items to the largest \emph{size}, while reversely, we aim to detect the items in shortest \emph{time}.}
-% 
+%
 % % \ahmad{ \st{measuring the influence of people }~\cite{Weng2010,Cha2010}}
-% 
-% 
-% 
+%
+%
+%
