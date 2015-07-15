@@ -1,91 +1,38 @@
 \section{Experimental Results}\label{sec:exp}
-%\todo[Ahmad]{Please adapt to the new presentation and add the new results. I
-%	haven't touch almost anything here, except some notation to make the paper
-%compile, and some of this was done mechanically, so it may be wrong, please
-%adjust where needed. I'll review after your pass.}
-%\subsection{}
-In this section, we present our experimental results on optimality and
-efficiency of \algonameapx, as in realistic scenarios we only have access to
-samples from $\sys$. First, we show that for a given sample $\Sample$,
-\algonameapx 
+In this section we present the results of our experimental evaluation of
+\algonameapx. We do not evaluate \algoname, as in realistic scenarios we only
+have access to samples from $\sys$.
+
+\para{Goals} First, we show that for a given sample $\Sample$, \algonameapx
 converges quickly to a schedule $\sched^*$ that minimizes $\cost_\theta(\sched,
 \Sample)$ (see Thm.~\ref{thm:optimal}). In particular, our experiments
 illustrate that the sequence $\cost_\theta(\sched^1,\Sample), \cost_\theta(\sched^2, \Sample),
-\ldots$ is descending and converges after few iterations.  Note that
-$\sched^{i+1}$ is solely a function of $\Sample$ and $\sched^i$. 
-
-\todo[all]{Technically speaking, Theorem~\ref{thm:optimal} says if the sequence converges and get 'constant'. However, since in computers (using 64bits) numbers we do not have infinite convergence. }
-\reply[Ahmad]{Sure, that's ok. Matteo}
-Next, we compare the output schedule of \algonameapx to three other schedules: (i) uniform schedules, (ii) proportional to out-degrees, and (iii) proportional to in-degrees. Specifically, we compute the costs of these schedules according to a sample $\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and compare them.
+\ldots$ is descending and converges after few iterations. Next, we compare the
+output schedule of \algonameapx to three other schedules: (i) uniform schedules,
+(ii) proportional to out-degrees, and (iii) proportional to in-degrees.
+Specifically, we compute the costs of these schedules according to a sample
+$\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and
+compare them.
 %Next, for further investigation, for each generated sequence of
 %$\sched^1,\sched^2,\ldots$ according to a sample $\Sample$, we compute the cost
 %of $\sched^i$'s according to another test sample $\Sample'$, and see that the
 %sequence $\cost_\theta(\sched^1,\Sample'), \cost_\theta(\sched^2,\Sample'),\ldots$ is still
 %descending and converges after few steps.
-Then, we demonstrate how our method can adapt itself to the changes in the network parameters. Finally, we consider a specific example for which we know the \emph{unique} optimal schedule, and show that for larger samples \algonameapx outputs a schedule closer to the optimal optimal.
-
-
+Then, we demonstrate how our method can adapt itself to the changes in the
+network parameters. Finally, we consider a specific example for which we know
+the \emph{unique} optimal schedule, and show that for larger samples
+\algonameapx outputs a schedule closer to the optimal optimal.
 
 % Finally,  we show how one can use {\optimizer} to extract a set of nodes as a solution the the Influence-Maximization problem, and we compare it to \texttt{TIM+}\cite{??}. \texttt{TIM+} is an algorithm for Influence-Maximization problem that is based on sampling \emph{hyper-edges} (see \cite{borgs,??}) and running a greedy algorithm for submodular optimization. We see that by {\optimizer} we can obtain seeds whose influence are close to \texttt{TIM+}'s output seeds with much smaller running time.
 
-% Next, for different samples and different number of iterations, we test the quality of the output schedule, according to a test sample $\Sample'$, i.e., we evaluate the cost of each of the schedules in the iterative method with respect to $\Sample'$, $\cost{\sched,\Sample'}$ . \ahmad{\st{Finally, we illustrate the behavior of {\optimizer} when the network parameters change.}} 
-Our experiments were run on a Opteron 6282 SE CPU (2.6 GHz) using 12G memory. We tested our method on the following networks\footnote{Available at \url{http://snap.stanford.edu/}.} (see Table~\ref{table:datasets} for details): 
-\begin{itemize*}
- \item Enron-Email~\cite{klimt2004introducing}: The email communication of Enron Corporation.
- \item Brightkite~\cite{ChoML11}: A location-based online social network, where each edge represents a friendship tie.
- \item Epinion~\cite{richardson2003trust}: The trust relationships in \texttt{Epinion.com}.
-%  \item wiki-Vote~\cite{wikivote1,wikivote2}: A network between Wikipedia users where each edge shows a vote from a user for another one.
-  \item web-Notredame~\cite{notredame}: Network of ``University of Notre Dame'' where each edge represents a hyperlink from a page to another page.
- \item web-Google~\cite{webgoogle}: A dataset released by Google in 2002, where each node is a page and a directed edge represents a hyperlink between the pages.
- \item Twitter~\cite{McAuleyL12}: A combined ego network, where each edge is directed from a node to another node that it follows. 
-\end{itemize*}
-\mynote[Matteo]{Do we need to introduce the datasets here? what about just reference and the Table 1?}
-\reply[Ahmad]{No, you can remove this list, we don't even need to have the
-references, the link to snap.stanford.edu is enough. Matteo}
+% Next, for different samples and different number of iterations, we test the quality of the output schedule, according to a test sample $\Sample'$, i.e., we evaluate the cost of each of the schedules in the iterative method with respect to $\Sample'$, $\cost{\sched,\Sample'}$ . \ahmad{\st{Finally, we illustrate the behavior of {\optimizer} when the network parameters change.}}
 
-
-\paragraph*{Parameters and model of propagation}
-%Throughout our experiments, for sake of simplicity we focus on $(\theta,c)$-OPSP for $c=1,3,5$ and $\theta = 0.75$.
- We always assume the graphs are directed by replacing undirected edges with two directed ones. By $\degree^+(i)$ (resp. $\degree^-(i)$) we mean the out-degree (resp. in-degree) of node $i$, where the direction of an edge indicates the direction of the propagation. In each network $G=(V,E)$ we group the nodes into four groups (see Table~\ref{table:datasets}):
-\begin{itemize*}
- \item $V_{1000} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
- \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
- \item $V_{100}  = \{i\in V ~:~ 100\leq \degree^+(i) < 500\}$, and
- \item $V_{0}    = \{i\in V ~:~ \degree^+(i) < 100\}$.
-\end{itemize*}
-We assume each node may generate a new item, that will be propagated, at each time based on the group the node is assigned to. In particular, we assume that the probability of  node $i$ generating a new item, $\pi_i$, is as follows, based on the intuition that active individuals are  likely to have more followers/friends:
-%  $\pi=(\pi_1, \ldots, \pi_n)$, where
-$$
-   \pi_i = \left\{
-     \begin{array}{ll}
-       0.1 &: i \in V_{1000}\\
-       0.05 &: i \in V_{500} \\       
-       0.01 &: i \in V_{50} \\
-       0 & : \text{otherwise} \\
-     \end{array}
-   \right.
-$$
- In Table~\ref{table:datasets} the expected number of new items at each time step is given, for each dataset, as the \emph{rate of new items}.
-
-\todo[Ahmad]{Please use the ctable package for tables, they look much better.}
-
-
-
-
-
-
-As the model of propagation, we consider the Independent-Cascade model~\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability $p_e$ that a new item at node $v$ is propagated through this edge to node $w$, and events for different items are independent. Following the parameters reported in the literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
-%For every edge $e=(a,b)$ we let the activation probability $p_e$ to be $\frac{1}{\degree^-(b)}$ which is a commonly used parameter~.
-
-
-
- 
 \begin{table*}[ht]
 \centering
 \resizebox{0.7\columnwidth}{!}{
 \begin{tabular}[scale=0.5]{|l|c|c|c|c|c|c|}
 \hline
-Datasets	& \# of nodes	& \# of edges & $|V_{1000}|$ & $|V_{500}|$ & $|V_{100}|$ & rate of new items\\
+Datasets	& nodes	& edges & $|V_{1000}|$ & $|V_{500}|$ & $|V_{100}|$ & rate of new items\\
 \hline \hline
 Enron-Email	& 36692	& 367662&9	&23	&517& 7.22\\
 \hline
@@ -106,34 +53,98 @@ Twitter 	&81306	&1768149&43	&108	&2674& 36.44\\
 \caption{The datasets and corresponding statistics.}\label{table:datasets}
 \end{table*}
 
+\para{Environment and Datasets.} We implemented \algonameapx in C++
+\inote{true?}. The implementation of \algonameapx never loads the entire sample
+to the main memory, which makes it very practical for running large samples on
+conventional machines. The experiments were run on a Opteron 6282 SE CPU (2.6
+GHz) using 12G memory. We tested our method on a number of datasets from the
+SNAP repository\footnote{\url{http://snap.stanford.edu}} (see
+Table~\ref{table:datasets} for details).
+%\begin{itemize*}
+% \item Enron-Email~\cite{klimt2004introducing}: The email communication of Enron Corporation.
+% \item Brightkite~\cite{ChoML11}: A location-based online social network, where each edge represents a friendship tie.
+% \item Epinion~\cite{richardson2003trust}: The trust relationships in \texttt{Epinion.com}.
+%%  \item wiki-Vote~\cite{wikivote1,wikivote2}: A network between Wikipedia users where each edge shows a vote from a user for another one.
+%  \item web-Notredame~\cite{notredame}: Network of ``University of Notre Dame'' where each edge represents a hyperlink from a page to another page.
+% \item web-Google~\cite{webgoogle}: A dataset released by Google in 2002, where each node is a page and a directed edge represents a hyperlink between the pages.
+% \item Twitter~\cite{McAuleyL12}: A combined ego network, where each edge is directed from a node to another node that it follows.
+%\end{itemize*}
+%\mynote[Matteo]{Do we need to introduce the datasets here? what about just reference and the Table 1?}
+%\reply[Ahmad]{No, you can remove this list, we don't even need to have the
+%references, the link to snap.stanford.edu is enough. Matteo}
+
+\para{Parameters and model of propagation}
+%Throughout our experiments, for sake of simplicity we focus on $(\theta,c)$-OPSP for $c=1,3,5$ and $\theta = 0.75$.
+We always assume the graphs are directed by replacing undirected edges with two directed ones.
+\todo[Ahmad]{Please explain why. The following is also not clear, as it is not
+well connected with the specification of $\sys$. It feels like an introduction
+is missing, to explain how we implicitly define $\sys$ by simulating an
+independent cascade model.}
+
+By $\degree^+(i)$ (resp. $\degree^-(i)$) we mean the out-degree (resp.
+in-degree) of node $i$, where the direction of an edge indicates the direction
+of the propagation. In each network $G=(V,E)$ we group the nodes into four
+groups (see Table~\ref{table:datasets}):
+\begin{itemize*}
+ \item $V_{1000} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
+ \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
+ \item $V_{100}  = \{i\in V ~:~ 100\leq \degree^+(i) < 500\}$, and
+ \item $V_{0}    = \{i\in V ~:~ \degree^+(i) < 100\}$.
+\end{itemize*}
+We assume each node may generate a new item, that will be propagated, at each
+time based on the group the node is assigned to. In particular, we assume that
+the probability of  node $i$ generating a new item, $\pi_i$, is as follows,
+based on the intuition that active individuals are  likely to have more
+followers/friends:
+%  $\pi=(\pi_1, \ldots, \pi_n)$, where
+$$
+   \pi_i = \left\{
+     \begin{array}{ll}
+       0.1 &: i \in V_{1000}\\
+       0.05 &: i \in V_{500} \\
+       0.01 &: i \in V_{50} \\
+       0 & : \text{otherwise} \\
+     \end{array}
+   \right.
+$$
+ In Table~\ref{table:datasets} the expected number of new items at each time
+ step is given, for each dataset, in the leftmost column (\emph{rate of new
+ items}).
+
+As the model of propagation, we consider the Independent-Cascade
+model~\cite{Kempe2003}:  each directed edge $e=v\rightarrow w$ has a probability
+$p_e$ that a new item at node $v$ is propagated through this edge to node $w$,
+and events for different items are independent. Following the parameters
+reported in the
+literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we
+set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
+%For every edge $e=(a,b)$ we let the activation probability $p_e$ to be $\frac{1}{\degree^-(b)}$ which is a commonly used parameter~.
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+\todo[Ahmad]{Please use the ctable package for tables, they look much better.}
 
 \subsection{The Efficiency and Accuracy of \algonameapx}
-In Section~\ref{sec:optimize}  we showed that when a run of \algonameapx converges
+In Sect.~\ref{sec:optimize} we showed that when a run of \algonameapx converges
 (according to a sample $\Sample$) the computed $c$-schedule is optimal with
-respect to the sample $\Sample$ (Lemma~\ref{lem:optimal_sample}). Our first set
-of experiments measure the rate of convergence and the execution time of the
-optimization algorithm, \algonameapx. Here, for the sake demonstration, we let $\epsilon=0.1$, $\theta=0.75$, and consider $c\in\{1,3,5\}$. For each dataset, we used a sample $\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and ran \algonameapx for 30 rounds of iterations. Denote the schedule computed at round $i$ by $\sched^i$.
-As shown in Figure~\ref{fig:conv}, the sequence of cost values of the schedules $\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges after few iterations.
-
+respect to the sample $\Sample$ (Lemma~\ref{lem:optimal_sample}). In our first
+experiment, we measure the rate of convergence and the execution time of
+\algonameapx. We fixed $\epsilon=0.1$, $\theta=0.75$, and consider
+$c\in\{1,3,5\}$. For each dataset, we used a sample $\Sample$ of a size that
+satisfies the condition in Lemma~\ref{lem:chernoffcost}, and ran \algonameapx
+for 30 iterations. Denote the schedule computed at round $i$ by $\sched^i$.
+As shown in Figure~\ref{fig:conv}, the sequence of cost values of the schedules
+$\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges after few iterations.
 
 %the sequences of cost values according to both sample $\Sample$ and the test sample $\Sample'$ are descending and converge after few steps. Also note that the cost values according to $\Sample$ and $\Sample'$ are close (in some cases almost identical), which agrees with the theoretical analysis in Section~\ref{sec:sampcomp}.
 
 %
-%Formally, 
+%Formally,
 %suppose $\sched^i$ is the obtained schedule by \algonameapx, according to the
 %sample $\Sample$, at the $i$-th round of iteration. An important question
 %regarding the  convergence of \algonameapx according to a sample $\Sample$ is this: If $\Sample'$ is another sample (with probably larger size) is the sequence $\cost_\theta(\sched^1,\Sample'),\cost_\theta(\sched^2,\Sample'),\ldots$ still descending and converging? This is important as we have to  avoid over-fitting our schedule with the sample $\Sample$.
 %
 %To demonstrate the convergence of \algonameapx we sample all the sets generated during
-%a time interval of length 2000, $\Sample$. For $c\in\{1,3,5\}$ the cost of each $c$-schedule during the iterative method according to $\Sample$ is shown in Figure~\ref{fig:conv}. Also, in Figure~\ref{fig:conv}, the cost of each intermediate $c$-schedule generated during the iterative method (applied to $\Sample$) is computed according to a test sample $\Sample'$ that has been obtained during a time interval of length 10000. In both cases the cost values are decreasing. 
+%a time interval of length 2000, $\Sample$. For $c\in\{1,3,5\}$ the cost of each $c$-schedule during the iterative method according to $\Sample$ is shown in Figure~\ref{fig:conv}. Also, in Figure~\ref{fig:conv}, the cost of each intermediate $c$-schedule generated during the iterative method (applied to $\Sample$) is computed according to a test sample $\Sample'$ that has been obtained during a time interval of length 10000. In both cases the cost values are decreasing.
 %
 %
 %
@@ -146,16 +157,9 @@ As shown in Figure~\ref{fig:conv}, the sequence of cost values of the schedules 
 %However in some cases the cost values are very close (and close to the uniform schedule) so their cost is already close to the optimal cost and their plot is almost horizontal.
 
 %  Figure~\ref{fig:conv} reports the convergence rate of runs of {XXX}  for the networks.
-% We see that for all networks and sample size the process converges in less than 12 iterations. 
-\begin{remark}
-The implementation of \algonameapx never loads the entire sample to the main memory, which makes it very practical for running large samples on conventional machines.
-\end{remark}
+% We see that for all networks and sample size the process converges in less than 12 iterations.
 
-
-
-For each graph, the size of the sample $\Sample$, the average size of sets in $\Sample$, and the average time of each iteration is given in Table~\ref{table:time}. Note that the running time of each iteration is a function of both sample size and sizes of the sets (informed-sets) inside the sample.
-
-\begin{table*}[h]
+\begin{table*}[htb]
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
 {\bf Datasets}& Enron-Email & Brightkite & Epinion  & webGoogle & Twitter\\
@@ -170,13 +174,18 @@ For each graph, the size of the sample $\Sample$, the average size of sets in $\
 \caption{Sample Sizes \& Running time of each iteration in \algonameapx.}\label{table:time}
 \end{table*}
 
+
+For each graph, the size of the sample $\Sample$, the average size of sets in
+$\Sample$, and the average time of each iteration is given in
+Table~\ref{table:time}. Note that the running time of each iteration is a
+function of both sample size and sizes of the sets (informed-sets) inside the
+sample.
+
 %As shown in Figure\ref{fig:optimizer}, {\optimizer} quickly converges to (an almost) optimal schedule.
 
-
-
-\begin{figure*}
+\begin{figure*}[htbp]
 \subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/brightkite.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/enron-email.pdf}}	
+\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/enron-email.pdf}}
 \subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/epinion.pdf}}
 \subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/twitter.pdf}}
 \subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/web-google.pdf}}
@@ -185,7 +194,7 @@ For each graph, the size of the sample $\Sample$, the average size of sets in $\
 \end{figure*}
 
 
-\begin{figure*}
+\begin{figure*}[htbp]
 	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/cost.pdf}}
 	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/vardist.pdf}}
 	\caption{......} \label{fig:D100}
@@ -219,19 +228,19 @@ For each graph, the size of the sample $\Sample$, the average size of sets in $\
 % \subsection{The quality of the computed schedule}
 
 % Next, we test the quality of the schedules computed by our method as a function of sample size and the number of iterations in the execution of {\optimizer}.  We measure the quality of our method by computing a schedule using one sample collection (training set)  $\F$, and measuring the cost of this schedule when applied to another sample collection (test set) $\Sample'$.
-% 
+%
 % For sake of illustration, we consider a sample $\F$ that is obtained through a time window of 1000 time steps, and a test sample $\Sample'$ that is obtained in a time interval of length 20,000.
-% 
-% % We apply the {\optimizer} algorithm on each training set sample, and at each iteration we plot $\cost{\sched, \Sample'}$ where $\sched$ is the schedule computed in that iteration. 
+%
+% % We apply the {\optimizer} algorithm on each training set sample, and at each iteration we plot $\cost{\sched, \Sample'}$ where $\sched$ is the schedule computed in that iteration.
 % % We compare all these schedule costs to the optimal schedule $\cost{\sched^*, \Sample'}$, for $\sched^*$ computed by applying {\optimizer} to the test set $\Sample'$.
-% 
-% The results for different graphs and different samples are shown in Figure~\ref{figure:quality}. It clearly demonstrate  that {\optimizer} achieves a close to optimal schedule in most cases with up to ?? iterations of the algorithm. 
+%
+% The results for different graphs and different samples are shown in Figure~\ref{figure:quality}. It clearly demonstrate  that {\optimizer} achieves a close to optimal schedule in most cases with up to ?? iterations of the algorithm.
 
 
 
 
 Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}.
-\todo[ahmad]{I'll add the table. Since yesterday filesystem is not working..} 
+\todo[ahmad]{I'll add the table. Since yesterday filesystem is not working..}
 \mynote[matteo]{Do we need 10 times of running for this specific table?}
 
 
@@ -249,11 +258,11 @@ the beginning of each ``green'' time interval our algorithm starts gathering
 samples of $\sys$. Then, algorithm computes the schedule for the new sample
 (??? -- 15 iterations) and starts probing. The length of each colored time
 interval is $R = \frac{3(\log(n)+\log(2))}{(1-\theta)}$ motivated by
-Theorem~\ref{thm:approx_sample} (for $\epsilon=1$),  
+Theorem~\ref{thm:approx_sample} (for $\epsilon=1$),
 
 \mynote[Ahmad]{$\epsilon=1$? But then you only know you're not overestimating.
 	It doesn't seem to make sense to me. Also, it clashes a bit with the result in
-	Thm.~\ref{thm:approx_sample}). I think you should use not use $\epsilon=1$: 
+	Thm.~\ref{thm:approx_sample}). I think you should use not use $\epsilon=1$:
 	\ahmad{Cannot run anything right now, as filesystem/grid is not working. }
 }
 \todo[ahmad]{for $\epsilon=0.1$ and without making nodes generate up to 10.}
@@ -269,7 +278,7 @@ Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that 
 \begin{figure*}
 %  \centering
   \subcaptionbox{Enron-Email\label{fig:change:enronEmail}}{\includegraphics[width=0.3\textwidth]{figures/change/enronEmail.pdf}} %\hspace{1em}%
-  \subcaptionbox{Brightkite\label{fig:change:brightkite}}{\includegraphics[width=0.3\textwidth]{figures/change/brightkite.pdf}} %\hspace{1em} 
+  \subcaptionbox{Brightkite\label{fig:change:brightkite}}{\includegraphics[width=0.3\textwidth]{figures/change/brightkite.pdf}} %\hspace{1em}
   \subcaptionbox{Epinion\label{fig:change:epinion}}{\includegraphics[width=0.3\textwidth]{figures/change/epinion.pdf}}\\ %\hspace{1em}\\
   \subcaptionbox{webGoogle\label{fig:change:webgoogle}}{\includegraphics[width=0.3\textwidth]{figures/change/webgoogle.pdf}} \hspace{1em}
   \subcaptionbox{Twitter\label{fig:change:twitter}}{\includegraphics[width=0.3\textwidth]{figures/change/twitter.pdf}} \hspace{1em}
@@ -283,17 +292,17 @@ Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that 
 % \begin{itemize}
 %  \item a Table showing for each graph what is the generating rate
 %  \item talking about exponentially disappearing the extra costs.
-%  
-%  
-% 
-% 
-% 
+%
+%
+%
+%
+%
 % \end{itemize}
 
 % Finally, we demonstrate how our solution adapts to changing conditions in the network.
 % Let $\sched_1, \sched_2, \sched_3$ be 3 different parameters settings for generating and propagating the items in the network, and let $\F_1, \F_2, \F_3$, be three samples obtained while the system operated with each of the 3 parameters settings, respectively. Also define $\sched^i$ to be the output schedule of {\optimizer} (with ?? round of iterations) with respect to sample $\F_i$. We assume that the system starts in setting $\sched_1$, and it changes its settings to $\sched_2, \sched_3$ at times ?? and ??.
 % After each change, our scheduler ({\optimizer}) receives starts to gather the next sample with a delay ??.
-% 
+%
 % To illustrate the robustness of the system to changes, each parameter setting is obtained by randomly permuting the labels of the nodes in the network.
 % The optimal cost is the same in all the parameter settings and we measure the time it takes for the system to return
 % to its steady state.
@@ -306,15 +315,15 @@ Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that 
 
 
 % \subsection{Influence Maximization}
-% As we mentioned in Section~\ref{sec:introduction} the Influence-Maximization problem can be asked in 
+% As we mentioned in Section~\ref{sec:introduction} the Influence-Maximization problem can be asked in
 % PHSP, where the sample $\F$ is the set of random hyper-edges: each random hyper-edge is generated by choosing a node, uniformly at random, and implementing a BFS in reverse direction of edges, where an edge $e$ is traversed with probability $p_e$; the final set of visited nodes is a random hyper-edge.
-% 
+%
 % Suppose we want to output a set of $k$ nodes, i.e. \emph{seeds}, that have large influences. Given a sample of random hyper-edges, $\F$, we run {\optimizer} with a very small decaying factor, $\theta = 0.0001$ and 15 rounds of iterations. If $\sched$ is the output schedule, we output the $k$ nodes with the larges weights in $\sched$. Motivated by the Chernoff's bound argument in Section~\ref{sec:method} we generated a sample of size $\frac{3(\ell\log(n)+\log(2))}{(1-\theta)\epsilon^2}$, where $n$ is the number of nodes and $\ell = 15$ (since we use 15 rounds of iterations). This can be seen as a generating system that outputs one informed-set at any time step.
-% 
+%
 % We compared this algorithm with \texttt{TIM+}~\cite{tim+} and results are provided in Figure~\ref{fig:inf}. \texttt{TIM+} is an approximate algorithm whose output's influence is at least $(1-1/e-\epsilon)$ fraction of the optimal (maximum) influence. For both of the algorithms we used $\epsilon=0.1$. \ahmad{Note that the interpretations of $\epsilon$ in these algorithms are not exactly the same: in \texttt{TIM+} it tunes the guarantee of the accuracy, but for {\optimizer} it tunes the accuracy for estimating the cost values.} For each graph, (i) we compared the influence of the algorithms outputs, (ii) the running time of each algorithm (micro-sec), and (iii) computed the Jaccard similarity between the algorithms' outputs. As illustrated in Figure~\ref{fig:inf}, the influence of the seeds obtained via {\optimizer} is very close to the influence of \texttt{TIM+} output seeds, in much smaller running time. Note that, since after sampling $\F$, computing the schedule via {\optimizer}, and sorting the nodes based on their weights in $\sched$ we just output the top $k$ nodes, the running time for our approach is constant.
 % Also, as shown in Figure~\ref{fig:inf}, for smaller number of seeds (i.e., smaller $k$'s) the outputs of both algorithms are usually very similar, but for larger number of seeds they can be very different.
-% 
-% 
+%
+%
 % \begin{figure*}
 % %  \centering
 %   \subcaptionbox{Enron-Email\label{fig:inf:enronEmail}}{\includegraphics[width=0.48\textwidth]{figures/inf/enronEmail.pdf}} \hspace{1em}%
@@ -333,49 +342,10 @@ We finish our experiments by an example for which we know the optimal schedule, 
 
 Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$ for  $\family = \{S \in 2^{[n]} \mid 1 \leq|S| \leq 2\}$, and $\pi(S)=\frac{1}{|\family|}$. It is easy to see that $\cost_\theta(\sched)$ is a symmetric function, and thus, the uniform schedule is optimal. Moreover, by Corollary~\ref{corol:convexity} the uniform schedule is the only optimal schedule, since $\{v\} \in \family$ for every $v\in V$.
 
-In our experiments we run the \algonameapx algorithm, using (i) different \emph{random} initial schedules, and (ii) samples $\Sample$ obtained from time intervals of different lengths. For each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \textbf{exact} cost of each schedule, and its variation distance to the uniform schedule. Our results are plotted in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using wider time intervals of sampling) the output schedules will be very close to the uniform schedule (the variance gets smaller and smaller).
-
-\begin{figure*}
+\begin{figure*}[htbp]
 	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/cost.pdf}}
 	\subcaptionbox*{}{\includegraphics[width=0.35\textwidth]{figures/D100s/vardist.pdf}}
 	\caption{The cost of \algonameapx outputs and their variation distance to the optimal schedule.} \label{fig:unique}
 \end{figure*}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+In our experiments we run the \algonameapx algorithm, using (i) different \emph{random} initial schedules, and (ii) samples $\Sample$ obtained from time intervals of different lengths. For each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \textbf{exact} cost of each schedule, and its variation distance to the uniform schedule. Our results are plotted in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using wider time intervals of sampling) the output schedules will be very close to the uniform schedule (the variance gets smaller and smaller).
