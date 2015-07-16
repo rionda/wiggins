@@ -9,26 +9,27 @@ sites~\citep{Delaney2009,latar2015robot,wallstreet2015,McKinney2011}. Similarly,
 intelligence, business and politics analysts are scanning online sources for new
 information or rumors. While new items are often reblogged, retweeted, and
 posted on a number of sites, it is sufficient to find an item once, as fast as
-possible, before it loses its relevance. There is no benefit in seeing more
-copies of the same news item, or rumor. A similar situation also arises in the
-need to detecting intrusions, infections, or defects in, respectively, a
-computer network, a public water system, or a large electronic circuit.
+possible, before it loses its relevance. There is no benefit in seeing multiple
+copies of the same news item or rumor. This is also the case when monitoring for
+intrusions, infections, or defects in, respectively, a computer network, a
+public water system, or a large electronic circuit.
 
-Indeed this is a fundamental search and detection problem in a distributed data
-setting, not limited to social networks or graph analysis. In this setting, the
-data is distributed among a large number of nodes, and new items appear in
-individual nodes (for example, as the products of processing the data available
-locally at the node), and may propagate (being copied) to neighboring nodes on a
-physical or a virtual network. The goal is to detect at least one copy of each
-new item as soon as possible. The search application can access any node
-in the system, but it can only \emph{probe} (i.e., check for new items on) a few
-nodes at a time. To minimize the time to find new items, the search application
-needs to optimize the schedule of probing nodes, taking into account (i) the
-distribution of copies of items among the nodes (to see where to probe), and
-(ii) the decay of items' \emph{\ahmad{novelty}} (or relevance) over time (to
-focus the search on most relevant items). The  main challenge is in devising a
-good probing schedule in absence of prior knowledge on the generation and
-distribution of items in the network.
+Monitoring for new events or information is a fundamental search and detection
+problem in a distributed data setting, not limited to social networks or graph
+analysis. In this setting, the data is distributed among a large number of
+nodes, and new items appear in individual nodes (for example, as the products of
+processing the data available locally at the node), and may propagate (being
+copied) to neighboring nodes on a physical or a virtual network. The goal is to
+detect at least one copy of each new item as soon as possible. The search
+application can access any node in the system, but it can only \emph{probe}
+(i.e., check for new items on) a few nodes at a time. To minimize the time to
+find new items, the search application needs to optimize the schedule of probing
+nodes, taking into account (i) the distribution of copies of items among the
+nodes (to choose which nodes to probe), and (ii) the decay of the items'
+\emph{\ahmad{novelty}} (or relevance) over time (to focus the search on most
+relevant items). The main challenge is how to devise a good probing schedule in
+the absence of prior knowledge about the generation and distribution of items in
+the network.
 
 % Commented by Matteo on 06/29
 %Another application that faces a similar search problem is processing security
@@ -51,25 +52,25 @@ this problem are the following:
 		schedule. The process and task are parametrized by the resource
 		limitations of the observer and the decay rate of the \ahmad{novelty} of
 		items. We introduce a \emph{cost} measure to compare different
-		schedules. The cost of a schedule is the limit of the average expected
-		\ahmad{novelty} of uncaught items at each time step. We formally define
-		the Optimal Probing Schedule Problem, which requires to find the
-		schedule with minimum cost.
+		schedules: the cost of a schedule is the limit of the average expected
+		\ahmad{novelty} of uncaught items at each time step. On the basis of
+		these concepts,  we formally define the \emph{Optimal Probing Schedule
+		Problem}, which requires to find the schedule with minimum cost.
 	\item We conduct a theoretical study of the cost of a schedule, showing that
-		it can be computed explicitly and that is a convex function over the
-		space of schedules. We then introduce \algoname,\footnote{In the Sherlock
-		Holmes novel \emph{A study in scarlet} by A.~Conan Doyle, Wiggins is the
-	leader of the ``Baker Street Irregulars'', a band of street urchins employed
-by Holmes as intelligence agents.} an algorithm to compute the optimal schedule
-by solving a constrained convex optimization problem through the use of an
-iterative method based on Lagrange multipliers.
+		it can \emph{be computed explicitly} and that is a \emph{convex
+		function} over the space of schedules. We then introduce
+		\algoname,\footnote{In the Sherlock Holmes novel \emph{A study in
+		scarlet} by A.~Conan Doyle, Wiggins is the leader of the ``Baker Street
+		Irregulars'', a band of street urchins employed by Holmes as
+		intelligence agents.} an algorithm to compute the optimal schedule by
+		solving a constrained convex optimization problem through the use of an
+		iterative method based on Lagrange multipliers.
 	\item We discuss variants of \algoname for the realistic situation where
 		the parameters of the process needs to be learned or can change over
-		time. We show how it to compute a schedule which is (probabilistically)
+		time. We show how to compute a schedule which is (probabilistically)
 		guaranteed to have a cost very close to the optimal by only observing
-		the process for a limited amount of time. We also present an adaptation
-		for the MapReduce framework of computation, which allow us to handle
-		very large networks.
+		the generating process for a limited amount of time. We also present an
+		MapReduce adaptation of \algoname to handle very large networks.
 	\item Finally, we conduct an extensive experimental evaluation of \algoname
 		and its variants, comparing the performances of the schedules it
 		computes with natural baselines, and showing how it performs extremely
@@ -80,9 +81,9 @@ iterative method based on Lagrange multipliers.
 
 To the best of our knowledge, the problem we study is novel and we are the first
 to devise an algorithm to compute an optimal schedule, both when the generating
-process parameters are known and when they need to be learned. Many variants
-of the problem we introduce can be devised but, due to lack of space, we defer
-their study to the extended version of this work.
+process parameters are known and when they need to be learned. A number of variants
+of the problem we introduce can be studied. We defer their analysis to the
+extended version of this work.
 
 \para{Paper Organization} In Sect.~\ref{sec:prelims} we give introductory
 definitions and formally introduce the settings and the problem. We discuss

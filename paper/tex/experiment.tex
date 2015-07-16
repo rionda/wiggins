@@ -123,7 +123,7 @@ set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
 
 \todo[Ahmad]{Please use the ctable package for tables, they look much better.}
 
-\subsection{The Efficiency and Accuracy of \algonameapx}
+\subsection{Efficiency and Accuracy}
 In Sect.~\ref{sec:optimize} we showed that when a run of \algonameapx converges
 (according to a sample $\Sample$) the computed $c$-schedule is optimal with
 respect to the sample $\Sample$ (Lemma~\ref{lem:optimal_sample}). In our first
@@ -240,7 +240,7 @@ sample.
 
 
 
-Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}; numbers are obtained by averaging the 10 runs over 10 different sample $\Sample'$s. 
+Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}; numbers are obtained by averaging the 10 runs over 10 different sample $\Sample'$s.
 
 \begin{table}[]
 \centering

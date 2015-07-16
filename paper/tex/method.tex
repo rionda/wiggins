@@ -3,15 +3,14 @@ In this section, we study the $(\theta,c)$-OPSP for a generating process
 $\sys=(\family,\pi)$ on a graph $G=(V,E)$ and present the algorithm \algoname
 (and its variants) to solve it.
 
-We start we start by assuming that we have complete knowledge of $\sys$, i.e.,
-we know $\family$ and $\pi$. This strong assumption allows us to study the
-theoretical properties of the cost of a function and motivates the design of
-our algorithm \algoname to compute an optimal schedule. We then remove the
-assumption and show how we can extend \algoname to only use a collection of
-observations from $\sys$. Then we discuss how to recalibrate our algorithms when
-the parameters of the process (e.g., $\pi$ or $\family$) change over time.
-Finally, we show an algorithm for the MapReduce framework that allows us to
-scale to large networks.
+We start by assuming that we have complete knowledge of $\sys$, i.e., we know
+$\family$ and $\pi$. This strong assumption allows us to study the theoretical
+properties of the cost of a function and motivates the design of our algorithm
+\algoname to compute an optimal schedule. We then remove the assumption and show
+how we can extend \algoname to only use a collection of observations from
+$\sys$. Then we discuss how to recalibrate our algorithms when the parameters of
+the process (e.g., $\pi$ or $\family$) change over time.  Finally, we show an
+algorithm for the MapReduce framework that allows us to scale to large networks.
 
 \subsection{Computing the Optimal Schedule}\label{sec:optimize}
 We now first conduct a theoretical analysis of the cost function $\cost_\theta$,
@@ -19,9 +18,9 @@ and then use the results to develop \algoname, our algorithm to compute the
 optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
 
 \paragraph{Analysis of the cost function}
-Assume for now that we know $\sys$, i.e., we have complete knowledge $\family$,
-and $\pi$. With this assumption, we can exactly compute the $\theta$-cost of a
-$c$-schedule.
+Assume for now that we know $\sys$, i.e., we have complete knowledge of
+$\family$ and $\pi$. Under this assumption, we can exactly compute the
+$\theta$-cost of a $c$-schedule.
 
 \begin{lemma}\label{lem:explicit}
 Let $\sched$ be a $c$-schedule. Then
@@ -71,9 +70,9 @@ where $\sched(S) = \sum_{v\in S} \sched_v$.
 	\[
 		\Pr(E_2)=(1-\sched(S))^{c(t-t')}\enspace.
 	\]
-	The events $E_1$ and $E_2$ are independent, as the event of process of
-	probing the nodes is independent from the process of generating items,
-	therefore, we have
+	The events $E_1$ and $E_2$ are independent, as the process of probing the
+	nodes is independent from the process of generating items, therefore, we
+	have
 	\[
 		\Pr(X_{S,t,t'}=\theta^{t-t'})=\Pr(E_1)\Pr(E_2)=\pi(S)(1-\sched(S))^{c(t-t')}\enspace.
 	\]
@@ -121,7 +120,8 @@ to show how to compute an optimal schedule.
 	$S\in\family$, $f_S(\sched)$ is convex.
 
 	We start by showing that $g_S(\sched) = \theta(1-\sched(S))^c$ is convex.
-	This is because its Hessian matrix is positive semidefinite (see~\cite{boyd2004convex}). Indeed we have:
+	This is due to the fact that its Hessian matrix is positive
+	semidefinite~\citep{BoydV04}:
 	\[
 		\frac{\partial}{\partial \sched_i \partial \sched_j} g_S(\sched)=\left\{
 		\begin{array}{lr}
@@ -173,7 +173,7 @@ practice though, available convex optimization problem solvers can not scale
 well with the number $n$ of variables, especially when $n$ is in the millions
 as is the case for modern graphs like online social networks or the Web. Hence
 we developed \algoname, an iterative method based on \emph{Lagrange
-multipliers}\citep[Sect.~5.1]{BoydV04}, which can scale efficiently and can be
+multipliers}~\citep[Sect.~5.1]{BoydV04}, which can scale efficiently and can be
 adapted to the MapReduce framework of computation~\citep{dean2008mapreduce}, as
 we show in Sect.~\ref{sec:mapreduce}. While we can not prove that this iterative
 method always converges, we can prove (Thm.~\ref{thm:optimal}) that (i) if at
@@ -254,10 +254,7 @@ the algorithm in case of convergence.
 	\]
 	because $\sched^{(j)}$ is optimal and hence all identities in the form
 	of~\eqref{eq:lagrange_i} must be true. For the same reason,
-	\eqref{eq:lagrange_l} must also hold for $\sched^{(j)}$, so we have
-	\[
-		\sum_{z=1}^n \sched^{(j)}_z = 1\enspace.
-	\]
+	\eqref{eq:lagrange_l} must also hold for $\sched^{(j)}$.
 	Hence, for any $1\le i\le n$, we can write the value $\sched^{(j+1)}_i$
 	computed at the end of iteration $j+1$ as
 	\[
@@ -266,8 +263,7 @@ the algorithm in case of convergence.
 		\frac{\sched^{(j)}_i\lambda}{1\lambda}=\sched^{(j)}_i,
 	\]
 	which means that we reached convergence and \algoname will return
-	$\sched^{(j+1)}$ in output, which is optimal because
-	$\sched^{(j+1)}=\sched^{(j)}$.
+	$\sched^{(j+1)}$, which is optimal because $\sched^{(j+1)}=\sched^{(j)}$.
 
 	Consider now point 2 in the statement of the theorem, and let $j$ be the
 	first iteration for which $\sched^{(j)}=\sched^{(j-1)}$. Then we have, for
@@ -341,11 +337,11 @@ the algorithm in case of convergence.
 \subsection{Approximation through sampling}\label{sec:sampcomp}
 We now remove the assumption, not realistic in practice, of knowing the
 generating process $\sys$ exactly through $\family$ and $\pi$. Instead, we
-observe the process using, for a certain time, a schedule that iterates over
-all nodes (or a schedule that selects each node with uniform probability), until
-we have observed, for each time step $t$ in a limited time interval $[a,b]$, the
-set $\Sample_t$ generated by $\sys$, and therefore we have access to a
-collection
+observe the process using, for a limited time interval, a schedule that iterates
+over all nodes (or a schedule that selects each node with uniform probability),
+until we have observed, for each time step $t$ in a limited time interval
+$[a,b]$, the set $\Sample_t$ generated by $\sys$, and therefore we have access
+to a collection
 \begin{equation}\label{eq:sample}
 	\Sample=\{\Sample_a,\Sample_{a+1},\dotsc,\Sample_b\}
 \end{equation}
@@ -406,7 +402,7 @@ We now show that, if $\ell(\Sample)$ is large enough, then, with high
 probability (i.e., with probability at least $1-1/n^r$ for some constant $r$),
 the schedule $\sched$ returned by \algonameapx in case of convergence has a cost
 $\cost_\theta(\sched)$ that is close to the cost $\cost_\theta(\sched^*)$ of an optimal
-schedule $\sched^*$.  Specifically, we show the following.
+schedule $\sched^*$.
 
 \begin{theorem}\label{thm:approx_sample}
 	Let $r$ be a positive integer, and let $\Sample$ be a sample gathered during a
@@ -422,8 +418,7 @@ schedule $\sched^*$.  Specifically, we show the following.
 	\]
 \end{theorem}
 
-Before we can prove Thm.~\ref{thm:approx_sample}, we need to show the following
-technical lemma.
+To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemm.
 
 \begin{lemma}\label{lem:chernoffcost}
 	Let $\sched$ be a $c$-schedule and $\Sample$ be a sample gathered during a
@@ -519,11 +514,11 @@ We can now prove Thm.~\ref{thm:approx_sample}.
 \subsection{Dynamic settings}\label{sec:dynamic}
 In this section we discuss how to handle changes in the parameters $\family$ and
 $\pi$ of the (unknown) process $\sys$ that may realistically appear over time.
-The idea is to keep track, for each set $S$ from $\family$ that we detect by
+The idea is to keep track, for each set $S$ from $\family$ that we catch by
 probing nodes, of an estimation $\tilde{\pi}(S)$ of $\pi(S)$ and of the last
 time $t$ such that an item $(t,S)$ has been generated (and caught at a time
 $t'>t$). If we have not caught an item in the form $(t'',S)$ in an interval
-significantly longer than $1/\tilde{\pi}(S)$, then we make the hypothesis that
+significantly longer than $1/\tilde{\pi}(S)$, then we assume that
 the parameters of $\sys$ changed. Hence, we trigger the collection of a new
 sample and compute a new schedule as described in Sect.~\ref{sec:sampcomp}.
 
@@ -686,19 +681,18 @@ the changes of parameters.
 %
 %
 \subsection{Scaling up with MapReduce}\label{sec:mapreduce}
-In this section, we discuss how to adapt \algoname and \algonameapx to the
-MapReduce framework~\citep{dean2008mapreduce}. The discussion will focus on
-adapting \algonameapx, as the extension to \algoname is immediate. We denote the
-resulting algorithm as \algonamemr.
+In this section, we discuss how to adapt \algonameapx to the
+MapReduce framework~\citep{dean2008mapreduce}. We denote the resulting algorithm
+as \algonamemr.
 
-In the MapReduce framework, algorithms work in \emph{rounds}. At each round,
-first a function $\mathsf{map}$ is executed independently (and therefore
-potentially massively in parallel) on each element of the input, and a number
-(or zero) key-value pairs of the form $(k,v)$ are emitted.  Then, in the second
-part of the round, the emitted pairs are partitioned by keys and elements with
-the same key are sent to the same machine (called the \emph{reducer} for that
-key), where a function $\mathsf{reduce}$ is applied to the whole set of received
-pairs, to emit the final output.
+In MapReduce, algorithms work in \emph{rounds}. At each round, first a function
+$\mathsf{map}$ is executed independently (and therefore potentially massively in
+parallel) on each element of the input, and a number (or zero) key-value pairs
+of the form $(k,v)$ are emitted. Then, in the second part of the round, the
+emitted pairs are partitioned by key and elements with the same key are sent to
+the same machine (called the \emph{reducer} for that key), where a function
+$\mathsf{reduce}$ is applied to the whole set of received pairs, to emit the
+final output.
 
 Each iteration of \algonameapx is spread over two rounds of \algonamemr. At
 each round, we assume that the current schedule $\sched$ is available to all
