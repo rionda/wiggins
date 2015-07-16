@@ -27,15 +27,15 @@ the probing sequence is over a much larger domain, and the goal is to identify
 the outbreaks (items) regardless of their size and solely by considering their
 interest value.
 
-An interesting related research direction aims at \emph{controlling} or
-\emph{stopping} contagions in the networks by changing the topology of the
-network (e.g, by protecting or blocking the edges and/or
-nodes)~\cite{Aspnes2006,Kimura2008Minimizing,Kimura2008,Kimura2009,Li2011,He2011,Kuhlman2013}. %
+%An interesting related research direction aims at \emph{controlling} or
+%\emph{stopping} contagions in the networks by changing the topology of the
+%network (e.g, by protecting or blocking the edges and/or
+%nodes)~\cite{Aspnes2006,Kimura2008Minimizing,Kimura2008,Kimura2009,Li2011,He2011,Kuhlman2013}. %
 %In our model, though, probing the nodes is the only action we can take.}
 %%%%%%%%%%%%%%
-\emph{Anomaly Detection} instead requires to find the events (usually
-structural) that deviate from \emph{normal}
-patterns~\cite{Noble2003,Sun2007,Eberle2007,Papadimitriou2010,Akoglu2010,Bogdanov2013}.
+%\emph{Anomaly Detection} instead requires to find the events (usually
+%structural) that deviate from \emph{normal}
+%patterns~\cite{Noble2003,Sun2007,Eberle2007,Papadimitriou2010,Akoglu2010,Bogdanov2013}.
 %%%%%%%%%%%%%%%%
 
 Our methods complement the work on \emph{Emerging Topic Detection} where the
@@ -45,12 +45,17 @@ immediate access to all tweets or postings as they are submitted to their
 server~\cite{Cataldi2010,Mathioudakis2010}. Outside observers need an efficient
 mechanism to monitor changes, such as the methods developed in this work.
 
-Finally, web-crawling is another research area that study how to obtain the
+\emph{Web-crawling} is another research area that study how to obtain the
 most recent snapshots of the web. However, it differs from our model in two key
 points: our model allows items to propagate their copies, and they will be
 caught if any of their copies is discovered (where snapshots of a webpage belong
 to that page only), and all the generated items should be discovered (and not
 just the recent ones)~\cite{dasgupta2007discoverability,wolf2002optimal}.
+
+\ahmad{The \emph{News and Feed Aggregation} problem is a very well-studied topic, whose goal is to capture the updates of news websites (e.g. by RSS feeds)~\cite{survey-oita2011deriving,onlineRef-horincar2014online,adaptive-bright2006adaptive}. Beside having different objectives, our model differs mainly in the assumption that items may get copied/propagated in the network and we do not need to catch all the copies, where in Feed Aggregation news (items) from different}
+%\ahmad{
+%The \emph{News and Feed Aggregation} problem is a very well-studied topic, in which the general goal is to obtain the updates of news websites (e.g. by RSS feeds). Among many introduced objectives~\cite{survey-oita2011deriving,onlineRef-horincar2014online,adaptive-bright2006adaptive} in studying this problem, the most similar one to our cost function is the \emph{delay} function presented by~\cite{fast-sia2007efficient}.  In~\cite{fast-sia2007efficient} it is assumed that the rates of the news publication does not change, where in our setting these rates may change and our algorithm ({\ada}) can adapt itself to the new setting. Also, we assume at any given time the number of probes is fixed (or bounded) regarding the limited computational power for simultaneous probes, but \cite{fast-sia2007efficient} uses a relaxed  assumption by fixing the number of probes over a \emph{time window} of a fixed length which may result in high number of probes at a single time step. Finally, \cite{fast-sia2007efficient} introduces a deterministic algorithm in which the number of probes to each feed is obtained by applying the Lagrange multipliers method (very similar result to Theorem~\ref{thm:randomized_schedule}), but they loose the guarantee on optimality of their solution, by rounding the estimated number of probes to integers. In contrast, our solution provides  theoretical guarantee on optimality of our output schedule. }
+
 
 % Finally, there are many work on Influence Maximization  and the social network Centrality, but as explained in previous section, they are ``orthogonal'' to  1-PHSP. To see the work on Influence Maximization and Betweenness centrality you can refer to \cite{Kempe2007,Borgs} and \cite{Yoshida}, and their related work.
 

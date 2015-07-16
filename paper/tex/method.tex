@@ -423,9 +423,9 @@ To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemm.
 \begin{lemma}\label{lem:chernoffcost}
 	Let $\sched$ be a $c$-schedule and $\Sample$ be a sample gathered during a
 	time interval of length
-	\[
+	\begin{align}\label{eq:samp_cond}
 		\ell(\Sample) \geq \frac{3(r\ln(n)+\ln(2))}{\varepsilon^2(1-\theta)},
-	\]
+	\end{align}
 	where $r$ is any natural number. Then, for every schedule $\sched$ we have
 	\[
 		\Pr(|\cost_\theta(\sched,\Sample) - \cost_\theta(\sched)|\geq
@@ -538,8 +538,8 @@ Note that when we adapt our schedule to the new environment (using the most
 recent sample) the system converges to its stable setting exponentially (in
 $\theta$) fast: Suppose $L$ items have been generated since we detected the
 change in the parameters until we adapt the new schedule. These items, if not
-caught, loose their freshness exponentially fast: after $t$ steps their
-freshness is at most $L\theta^t$ and decreases exponentially. In our experiments
+caught, loose their \ahmad{novelty} exponentially fast: after $t$ steps their
+novelty is at most $L\theta^t$ and decreases exponentially. In our experiments
 (Sect.~\ref{sec:exp}) we provide different examples that illustrate how the load
 of the generating process becomes stable after the algorithm adapts itself to
 the changes of parameters.

@@ -46,7 +46,7 @@ without replacement according to $\sched$}, independently from $P_{t'}$ from
 $t'< t$. We postpone the study of adaptive or sequential schedules to future
 work.
 
-\para{Caught items, uncaught items, and freshness}
+\para{Caught items, uncaught items, and novelty}
 We say that an item $(t',S)$ is \emph{caught at time $t\ge t'$} iff
 \begin{enumerate*}
 	\item a node $v\in S$ is probed at time $t$; and
@@ -57,7 +57,7 @@ Let $C_t$ be the set of items caught by the observer at any time $t'\le t$. We
 have $C_t\subseteq U_t$. Let $N_t= U_t\setminus C_t$ be the \emph{set of
 uncaught items at time $t$}, i.e., items that were generated at any time
 $t'\le t$ and have not been caught yet at time $t$. For any item $(t',S)\in
-N_t$, we define the \emph{$\theta$-freshness of $(t',S)$ at time $t$} as
+N_t$, we define the \emph{$\theta$-novelty of $(t',S)$ at time $t$} as
 \[
 	\fresh_\theta(t,t',S)\defeq\theta^{t-t'},
 \]
@@ -70,7 +70,7 @@ limit.
 
 \para{Load of the system and cost of a schedule} The set $N_t$ of uncaught items
 at time $t$ imposes a \emph{$\theta$-load $L_\theta(t)$ on the graph at time
-$t$}, defined as the sum of the $\theta$-freshness at time $t$ of the items in
+$t$}, defined as the sum of the $\theta$-novelty at time $t$ of the items in
 $N_t$:
 \[
 	L_\theta(t)\defeq\sum_{(t',S)\in N_t} \fresh_\theta(t,t',S)\enspace.
@@ -86,7 +86,7 @@ $t\rightarrow\infty$, of the average expected load of the system:
 	&=\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'\le
 	t}\expect\left[\sum_{(t'',S)\in N_{t'}}\fresh_\theta(t',t'',S)\right]\enspace.
 \end{align*}
-Intuitively, the load at each time indicates the amount of freshness we did not
+Intuitively, the load at each time indicates the amount of novelty we did not
 catch at that time, and the cost function measures the average of such loss over
 time. The limit above always exists (Lemma~\ref{lem:explicit}).
 
@@ -103,17 +103,17 @@ of $c$-schedules:
 	\sched^*=\argmin\{\cost_\theta(\sched), \sched\in\mathsf{S}_c\}\enspace.
 \]
 In other words, the goal is to design a $c$-schedule that allows to catch items
-with high freshness (which correspond to those generated most recently).
-The parameter $\theta$ controls how fast the freshness of an item decays, i.e.,
+with high novelty (which correspond to those generated most recently).
+The parameter $\theta$ controls how fast the novelty of an item decays, i.e.,
 how fast they loose value for the agent. A value of $\theta$ very close to $0$
 requires to catch the item  as soon as they are generated (or at most shortly
 thereafter). At the other extreme ($\theta\approx 1$), an ideal schedule should
-try to maximize the number of caught items, as their freshness decays very
+try to maximize the number of caught items, as their novelty decays very
 slowly. In other words, the optimal schedule is such that elements of $U$ more
-likely to receive ``fresh'' items have higher probability of being probed.
+likely to receive ``novel'' items have higher probability of being probed.
 Intuitively, if we see the items as the ``information'' flowing in the network,
 then an ideal schedule should assign higher probability of being probed to nodes
-that act as \emph{fresh information hubs}, i.e., receive a large number of
+that act as \emph{novel information hubs}, i.e., receive a large number of
 items. Hence by examining the optimal schedule $\sched^*$, we can identify
 information hubs among the nodes. This task (finding information hubs) can be
 seen as the complement of the \emph{influence maximization
@@ -124,7 +124,7 @@ In the information hubs problem we are interested in a set of nodes that
 observer.
 
 In the following sections, we often drop the specification of the parameters
-from $\theta$-freshness, $\theta$-cost, $\theta$-load, and $c$-schedule, and
+from $\theta$-novelty, $\theta$-cost, $\theta$-load, and $c$-schedule, and
 from their respective notation, as the parameters will be clear from the
 context.
 
