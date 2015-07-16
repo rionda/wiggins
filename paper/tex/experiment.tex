@@ -38,16 +38,16 @@ Enron-Email	& 36692	& 367662&9	&23	&517& 7.22\\
 \hline
 Brightkite	&58228	&428156	&2	&7	&399& 4.54\\
 \hline
-Epinion		&75879	&508837	&8	&45	&917& 12.22\\
+%Epinion		&75879	&508837	&8	&45	&917& 12.22\\
 \hline
 % wiki-Vote	&7115	&103689	&0	&7	&224& 2.59\\
 % \hline
-% web-Notredame	&325729	&1497134&43	&80	&1619& 24.49\\
-% \hline
+ web-Notredame	&325729	&1497134&43	&80	&1619& 24.49\\
+ \hline
 web-Google	&875713	&5105039&134	&180	&3546& 57.86\\
 \hline
-Twitter 	&81306	&1768149&43	&108	&2674& 36.44\\
-\hline
+%Twitter 	&81306	&1768149&43	&108	&2674& 36.44\\
+%\hline
 \end{tabular}
 }
 \caption{The datasets and corresponding statistics.}\label{table:datasets}
@@ -160,15 +160,15 @@ $\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges after few iterations.
 % We see that for all networks and sample size the process converges in less than 12 iterations.
 
 \begin{table*}[htb]
-\begin{tabular}{|l|c|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|}
 \hline
-{\bf Datasets}& Enron-Email & Brightkite & Epinion  & webGoogle & Twitter\\
+{\bf Datasets}& Enron-Email & Brightkite & webNotredame & webGoogle\\
 \hline \hline
-{\bf Sample size}& 14726 & 8985 & 24507 & 115917 & 72842 \\
+{\bf Samp. Size}& 97,309 & 63,652 & 393,348 & 998,038 \\
 \hline
-{\bf Average size of informed-sets}& 12956.59 & 17502.81 & 15890.41 & 700.96  & 15519.71 \\
+{\bf Items avg. size}& 12941.33 & 17491.08 & 183.75 & 704.74\\
 \hline
-{\bf Average time of each iteration(sec)}& 31.9256 & 26.7181&  66.4317&  18.9658&  194.9281\\
+{\bf Avg. iter. time (s) (for $c=1$)}& 204.59 &  144.35&  10.24& 121.88\\
 \hline
 \end{tabular}
 \caption{Sample Sizes \& Running time of each iteration in \algonameapx.}\label{table:time}
@@ -182,14 +182,15 @@ function of both sample size and sizes of the sets (informed-sets) inside the
 sample.
 
 %As shown in Figure\ref{fig:optimizer}, {\optimizer} quickly converges to (an almost) optimal schedule.
+\mynote[Ahmad]{I'm removing the results for twitter and epinion: there was a problem for these two + 4 data sets seems enough (2 directed and 2 undirected)}
 
 \begin{figure*}[htbp]
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/brightkite.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/enron-email.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/epinion.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/twitter.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/web-google.pdf}}
-\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/web-notredame.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.24\textwidth]{figures/conv/brightkite.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.24\textwidth]{figures/conv/enron-email.pdf}}
+%\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/epinion.pdf}}
+%\subcaptionbox*{}{\includegraphics[width=0.25\textwidth]{figures/conv/twitter.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.24\textwidth]{figures/conv/web-google.pdf}}
+\subcaptionbox*{}{\includegraphics[width=0.24\textwidth]{figures/conv/web-notredame.pdf}}
 \caption{The cost of intermediate $c$-schedules at iterations of \algonameapx  according to $\Sample$.}\label{fig:conv}
 \end{figure*}
 
@@ -239,9 +240,21 @@ sample.
 
 
 
-Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}.
-\todo[ahmad]{I'll add the table. Since yesterday filesystem is not working..}
-\mynote[matteo]{Do we need 10 times of running for this specific table?}
+Next, we extracted the $1$-schedules  outputted by \algonameapx, and compared its cost to three other \ahmad{trivial/natural} schedules: (i) \texttt{uniform} schedule, (ii) \texttt{outdegree} schedule that probes each node proportional to its out-degree, and (iii) \texttt{indegree} schedule that probes each node proportional to its in-degree (note that for undirected graphs \texttt{outdegree} and \texttt{indegree} are the same). We compared the cost of these schedules according to another sample $\Sample'$ that satisfies the condition in Lemma~\ref{lem:chernoffcost}, and the results are shown in Table~\ref{table:compare}; numbers are obtained by averaging the 10 runs over 10 different sample $\Sample'$s. 
+
+\begin{table}[]
+\centering
+\caption{Comparing the costs of 5 different 1-schedules.}
+\label{table:compare}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+Dataset       & \algonameapx & \texttt{uniform} & \texttt{outdeg} & \texttt{indeg} & \texttt{totdeg} \\ \hline
+Enron-Email   &       7.55 & 14.16 & 9.21 & 9.21 & 9.21                  \\ \hline
+Brightkite    &       4.85 & 9.64 & 6.14 & 6.14 & 6.14                  \\ \hline
+web-Notredame &       96.10 & 97.78 & 97.37 & 97.43 & 97.40             \\ \hline
+web-Google    &       213.15 & 230.88 & 230.48 & 230.47 & 230.47       \\ \hline
+\end{tabular}
+\end{table}
 
 
 
