@@ -39,6 +39,7 @@ public:
 	double theta;
 	vint_t indeg;
 	vint_t outdeg;
+	vint_t totaldeg;
 
 	Graph(const string input_file, const double theta);
 	// Graph(const string input_file);

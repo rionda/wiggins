@@ -1,0 +1,6 @@
+./s_phsp -TASK simulator -DIR data/twitter/
+./s_phsp -TASK simulator -DIR data/enronEmail/ 
+./s_phsp -TASK simulator -DIR data/epinion/ 
+./s_phsp -TASK simulator -DIR data/brightkite/
+./s_phsp -TASK simulator -DIR data/webgoogle/ 
+./s_phsp -TASK simulator -DIR data/notredame/

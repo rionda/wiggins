@@ -1,0 +1,6 @@
+./c_phsp -TASK auto_compare -DIR data/twitter/
+./c_phsp -TASK auto_compare -DIR data/enronEmail/
+./c_phsp -TASK auto_compare -DIR data/epinion/ 
+./c_phsp -TASK auto_compare -DIR data/brightkite/
+./c_phsp -TASK auto_compare -DIR data/webgoogle/ 
+./c_phsp -TASK auto_compare -DIR data/notredame/

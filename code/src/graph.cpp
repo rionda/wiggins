@@ -65,6 +65,7 @@ Graph::Graph(const string input_file, const double theta_input) {
 	bern = vector<vector<bernoulli_distribution>>(number_of_nodes);
 	indeg = vint_t(number_of_nodes, 0);
 	outdeg = vint_t(number_of_nodes, 0);
+	totaldeg = vint_t(number_of_nodes, 0);
 
 	// loading the edges:
 	number_of_edges = 0;
@@ -74,6 +75,9 @@ Graph::Graph(const string input_file, const double theta_input) {
 		nodes[u].push_back(v);
 		++outdeg[u];
 		++indeg[v];
+		++totaldeg[u];
+		++totaldeg[v];
+		
 		bern[u].push_back(bernoulli_distribution(p));
 	}	
 	fin.close();
@@ -156,10 +160,11 @@ void Graph::gen_sample_with_time(const int time_interval, const string output_fi
 vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
 	int u;
 	vdoub_t p0, p1, p2;
-	
+	cout << eps << " " << number_of_nodes << " " << theta << endl;
 	int R = ceil(3*(log(number_of_nodes)+log(2))/ ((1-theta)*pow(eps,2)));
-	int a = 10*R;
+	int a = 3*R;
 	int b = 2*R;
+
 
 	cout << "R: " << R << ", a: " << a << ", b: " << b << endl;
 	

@@ -51,7 +51,7 @@ void indexed_sampler(Graph g, const string dir, const uint64_t len_samp, const i
 	/*
 		len_samp: the lenght of the time interval of samples
 	*/
-	string samp_file = dir+"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
+	string samp_file = dir+"samples/S-"+to_string(len_samp)+"-"+to_string(ind);
 	g.gen_sample(len_samp, samp_file);
 	
 	ofstream fout(samp_file + ".stat");	
@@ -301,7 +301,6 @@ void simulator(const string filename, const int num_simuls, const int num_iter, 
 	/*
 		In PKDD submission, we let epsilon = 1, theta=0.75, and num_iter = 15;
 	*/
-
 	for (int idx=0; idx < num_simuls; ++idx) {
 		Graph g(filename, theta);
 		vdoub_t cost = g.simul_process(epsilon, num_iter,""+to_string(idx));
@@ -382,16 +381,24 @@ void compare(const string filename, const string samp_file, const string test_fi
 	}
 
 
-	vdoub_t cost_val(4,0);	
+	// getting total_degree:
+	vdoub_t tot_degree(number_of_nodes);
+	for (int u = 0; u<number_of_nodes; ++u) {
+		tot_degree[u] = (double) g.totaldeg[u]/(2*g.number_of_edges);
+	}
+
+
+	vdoub_t cost_val(5,0);	
 	int k, u;
-	double pS_p, pS_unif, pS_out, pS_in;	
-	double cost_p = 0, cost_unif = 0, cost_out = 0, cost_in = 0;
+	double pS_p, pS_unif, pS_out, pS_in, pS_tot;	
+	double cost_p = 0, cost_unif = 0, cost_out = 0, cost_in = 0, cost_tot = 0;
 	while (fin >> k) {
 		// vector<double> pS(pp.size(), 0);
 		pS_p = 0;
 		pS_unif = 0;
 		pS_out = 0;
 		pS_in = 0;
+		pS_tot = 0;
 
 		for (int i=0; i<k; ++i) {			
 			fin >> u;
@@ -399,6 +406,7 @@ void compare(const string filename, const string samp_file, const string test_fi
 			pS_unif += unif[u];
 			pS_out += out_degree[u];
 			pS_in  += in_degree[u];
+			pS_tot += tot_degree[u];
 			
 		}
 
@@ -406,6 +414,7 @@ void compare(const string filename, const string samp_file, const string test_fi
 		cost_unif += 1.0/(1 - theta*pow(1-pS_unif,probes));
 		cost_out += 1.0/(1 - theta*pow(1-pS_out,probes));
 		cost_in += 1.0/(1 - theta*pow(1-pS_in,probes));
+		cost_tot += 1.0/(1 - theta*pow(1-pS_tot,probes));
 
 	}
 	fin.close();
@@ -414,12 +423,20 @@ void compare(const string filename, const string samp_file, const string test_fi
 	cost_unif /= len_samp;
 	cost_out /= len_samp;
 	cost_in /= len_samp;
+	cost_tot /= len_samp;
 	
-	ofstream fout_comp(samp_file + "_probes-" + to_string(probes) + ".compare");
-	fout_comp << "p\t" << cost_p << endl;
-	fout_comp << "unif\t" << cost_unif << endl;
-	fout_comp << "out_degree\t" << cost_out << endl;
-	fout_comp << "in_degree\t" << cost_in << endl;
+	ofstream fout_comp(test_file + "-compare");
+	// fout_comp << "p\t" << cost_p << endl;
+	// fout_comp << "unif\t" << cost_unif << endl;
+	// fout_comp << "out_degree\t" << cost_out << endl;
+	// fout_comp << "in_degree\t" << cost_in << endl;
+	// fout_comp << "tot_degree\t" << cost_tot << endl;
+
+	fout_comp <<  cost_p << endl;
+	fout_comp <<  cost_unif << endl;
+	fout_comp <<  cost_out << endl;
+	fout_comp <<  cost_in << endl;
+	fout_comp <<  cost_tot << endl;
 
 	fout_comp.close();
 }
@@ -637,6 +654,11 @@ int main(int argc, char *argv[]) {
 		Graph g(filename, theta);
 		indexed_sampler(g, my_get_dir_name(filename), len_samp, ind);
 
+	} else if (TASK == "auto_indexed_sampler") {
+		Graph g(filename, theta);
+		len_samp = getAutoLenSamp(g.number_of_nodes, epsilon, theta); // computing the sample size
+		indexed_sampler(g, my_get_dir_name(filename), len_samp, ind);		
+
 	} else if (TASK == "solver") {
 		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
 		solver(samp_file, theta, num_iter, probes);	
@@ -677,10 +699,17 @@ int main(int argc, char *argv[]) {
 		string test_file = TFILE;
 		compare_with_file(samp_file, test_file, num_iter, probes, theta);	
 	
-	} else if (TASK == "indexed_compare") {
-		string samp_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_samp)+"-"+to_string(ind);
-		string test_file = my_get_dir_name(filename)  +"indexed/S-"+to_string(len_test)+"-"+to_string(ind);
+	//  -------------------------------
+	} else if (TASK == "auto_compare") {
+		Graph g(filename, theta);
+		len_samp = getAutoLenSamp(g.number_of_nodes, epsilon, theta);
+		probes = 1;
+
+		string samp_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp);
+		string test_file = my_get_dir_name(filename)  +"samples/S-"+to_string(len_samp)+"-"+to_string(ind);
 		compare(filename, samp_file, test_file, num_iter, probes, theta);
+	
+//  ---------------------------------------
 	} else if (TASK == "solver_uniform") {
 		vector<int> lens = {5,10,20,50,100,200,500,1000,2000,5000,10000,20000};
 		// vector<int> lens = {10};
