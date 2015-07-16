@@ -1,27 +1,35 @@
 \section{Experimental Results}\label{sec:exp}
 In this section we present the results of our experimental evaluation of
-\algonameapx. We do not evaluate \algoname, as in realistic scenarios we only
-have access to samples from $\sys$.
+\algonameapx.
+%We do not evaluate \algoname, as in realistic scenarios we only
+%have access to samples from $\sys$.
 
-\para{Goals} First, we show that for a given sample $\Sample$, \algonameapx
-converges quickly to a schedule $\sched^*$ that minimizes $\cost_\theta(\sched,
-\Sample)$ (see Thm.~\ref{thm:optimal}). In particular, our experiments
-illustrate that the sequence $\cost_\theta(\sched^1,\Sample), \cost_\theta(\sched^2, \Sample),
-\ldots$ is descending and converges after few iterations. Next, we compare the
-output schedule of \algonameapx to three other schedules: (i) uniform schedules,
-(ii) proportional to out-degrees, and (iii) proportional to in-degrees.
-Specifically, we compute the costs of these schedules according to a sample
-$\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and
-compare them.
+\para{Summary} We evaluate different aspects of \algonameapx. Specifically
+\begin{enumerate*}
+	\item we show that for a given sample $\Sample$, \algonameapx converges
+		quickly to a schedule $\sched^*$ that minimizes
+		$\cost_\theta(\sched,\Sample)$ (Thm.~\ref{thm:optimal}): the sequence
+		$\cost_\theta(\sched^1,\Sample), \cost_\theta(\sched^2, \Sample),
+		\ldots$ is fast decreasing and converges after few iterations;
+	\item we consider a specific example of $\sys$ for which we know the
+		\emph{unique} optimal schedule, and show that for larger samples
+		\algonameapx outputs a schedule closer to the optimal
+		\todo{with cost better than what the theory guarantees?};
+	\item we compare the output schedule of \algonameapx to three other
+		schedules: (i) uniform, (ii) proportional to out-degree, and (iii)
+		proportional to in-degree, showing that it outperforms all these
+		intuitive schedules;
+	\item we show how \algonameapx is able to respond quickly to changes in the
+		generating process parameters.
+\end{enumerate*}
+		%Specifically, we compute the costs of these schedules according to a sample
+%$\Sample$ that satisfies the condition in Lemma~\ref{lem:chernoffcost} and
+%compare them.
 %Next, for further investigation, for each generated sequence of
 %$\sched^1,\sched^2,\ldots$ according to a sample $\Sample$, we compute the cost
 %of $\sched^i$'s according to another test sample $\Sample'$, and see that the
 %sequence $\cost_\theta(\sched^1,\Sample'), \cost_\theta(\sched^2,\Sample'),\ldots$ is still
 %descending and converges after few steps.
-Then, we demonstrate how our method can adapt itself to the changes in the
-network parameters. Finally, we consider a specific example for which we know
-the \emph{unique} optimal schedule, and show that for larger samples
-\algonameapx outputs a schedule closer to the optimal optimal.
 
 % Finally,  we show how one can use {\optimizer} to extract a set of nodes as a solution the the Influence-Maximization problem, and we compare it to \texttt{TIM+}\cite{??}. \texttt{TIM+} is an algorithm for Influence-Maximization problem that is based on sampling \emph{hyper-edges} (see \cite{borgs,??}) and running a greedy algorithm for submodular optimization. We see that by {\optimizer} we can obtain seeds whose influence are close to \texttt{TIM+}'s output seeds with much smaller running time.
 
@@ -53,10 +61,11 @@ web-Google	&875713	&5105039&134	&180	&3546& 57.86\\
 \caption{The datasets and corresponding statistics.}\label{table:datasets}
 \end{table*}
 
-\para{Environment and Datasets.} We implemented \algonameapx in C++
+\para{Environment and Datasets.} We implemented \algonameapx in
+C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}
 \inote{true?}. The implementation of \algonameapx never loads the entire sample
 to the main memory, which makes it very practical for running large samples on
-conventional machines. The experiments were run on a Opteron 6282 SE CPU (2.6
+conventional machines. We run the experiments on a Opteron 6282 SE CPU (2.6
 GHz) using 12G memory. We tested our method on a number of datasets from the
 SNAP repository\footnote{\url{http://snap.stanford.edu}} (see
 Table~\ref{table:datasets} for details).
@@ -73,7 +82,7 @@ Table~\ref{table:datasets} for details).
 %\reply[Ahmad]{No, you can remove this list, we don't even need to have the
 %references, the link to snap.stanford.edu is enough. Matteo}
 
-\para{Parameters and model of propagation}
+\para{Model of generation and propagation}
 %Throughout our experiments, for sake of simplicity we focus on $(\theta,c)$-OPSP for $c=1,3,5$ and $\theta = 0.75$.
 We always assume the graphs are directed by replacing undirected edges with two directed ones.
 \todo[Ahmad]{Please explain why. The following is also not clear, as it is not
@@ -123,12 +132,28 @@ set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$.
 
 \todo[Ahmad]{Please use the ctable package for tables, they look much better.}
 
+
+\begin{table*}[htb]
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+{\bf Datasets}& Enron-Email & Brightkite & webNotredame & webGoogle\\
+\hline \hline
+{\bf Samp. Size}& 97,309 & 63,652 & 393,348 & 998,038 \\
+\hline
+{\bf Items avg. size}& 12941.33 & 17491.08 & 183.75 & 704.74\\
+\hline
+{\bf Avg. iter. time (s) (for $c=1$)}& 204.59 &  144.35&  10.24& 121.88\\
+\hline
+\end{tabular}
+\caption{Sample Sizes \& Running time of each iteration in \algonameapx.}\label{table:time}
+\end{table*}
+
 \subsection{Efficiency and Accuracy}
 In Sect.~\ref{sec:optimize} we showed that when a run of \algonameapx converges
 (according to a sample $\Sample$) the computed $c$-schedule is optimal with
 respect to the sample $\Sample$ (Lemma~\ref{lem:optimal_sample}). In our first
 experiment, we measure the rate of convergence and the execution time of
-\algonameapx. We fixed $\epsilon=0.1$, $\theta=0.75$, and consider
+\algonameapx. We fixed $\varepsilon=0.1$, $\theta=0.75$, and consider
 $c\in\{1,3,5\}$. For each dataset, we used a sample $\Sample$ of a size that
 satisfies the condition in Lemma~\ref{lem:chernoffcost}, and ran \algonameapx
 for 30 iterations. Denote the schedule computed at round $i$ by $\sched^i$.
@@ -158,21 +183,6 @@ $\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges after few iterations.
 
 %  Figure~\ref{fig:conv} reports the convergence rate of runs of {XXX}  for the networks.
 % We see that for all networks and sample size the process converges in less than 12 iterations.
-
-\begin{table*}[htb]
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-{\bf Datasets}& Enron-Email & Brightkite & webNotredame & webGoogle\\
-\hline \hline
-{\bf Samp. Size}& 97,309 & 63,652 & 393,348 & 998,038 \\
-\hline
-{\bf Items avg. size}& 12941.33 & 17491.08 & 183.75 & 704.74\\
-\hline
-{\bf Avg. iter. time (s) (for $c=1$)}& 204.59 &  144.35&  10.24& 121.88\\
-\hline
-\end{tabular}
-\caption{Sample Sizes \& Running time of each iteration in \algonameapx.}\label{table:time}
-\end{table*}
 
 
 For each graph, the size of the sample $\Sample$, the average size of sets in
