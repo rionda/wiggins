@@ -55,9 +55,10 @@ web-Google	&875713	&5105039&(134,180,3546)	& 57.86\\
 \para{Environment and Datasets.} We implemented \algonameapx in C++. The implementation of \algonameapx never loads the entire sample
 to the main memory, which makes it very practical for running large samples on
 conventional machines. The experiments were run on a Opteron 6282 SE CPU (2.6
-GHz) using 12G memory. We tested our method on a number of datasets from the
+GHz) using 12G memory. We tested our method on a number of graphs from the
 SNAP repository\footnote{\url{http://snap.stanford.edu}} (see
-Table~\ref{table:datasets} for details).
+Table~\ref{table:datasets} for details). We always consider the graphs to be
+directed, replacing undirected edges with two directed ones. 
 %\begin{itemize*}
 % \item Enron-Email~\cite{klimt2004introducing}: The email communication of Enron Corporation.
 % \item Brightkite~\cite{ChoML11}: A location-based online social network, where each edge represents a friendship tie.
@@ -71,44 +72,64 @@ Table~\ref{table:datasets} for details).
 %\reply[Ahmad]{No, you can remove this list, we don't even need to have the
 %references, the link to snap.stanford.edu is enough. Matteo}
 
-\para{Parameters and model of propagation}
-We always let the graphs be directed by replacing undirected edges with two
-directed ones. Through our experiments (except Sect.~\ref{sec:example}), we
-consider the Independent-Cascade (IC)~\cite{Kempe2003} as the propagation model,
-assume the activity of a node (its rate of generating new items) is a function
-of its out-degree (i.e., the number of neighbors influenced by that node).
-Therefore, we group the nodes based on their degrees as follows:
-\begin{itemize*}
- \item $V_{1K} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
- \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
- \item $V_{100}  = \{i\in V ~:~ 100\leq \degree^+(i) < 500\}$, and
- \item $V_{0}    = \{i\in V ~:~ \degree^+(i) < 100\}$,
-\end{itemize*}
-where $\degree^+(i)$ is the out-degree of node $i$ (see Table~\ref{table:datasets}).
-We assume each node may generate a new item, that will be propagated, at each
-time based on the group the node is assigned to. In particular, we assume that
-the probability of  node $i$ generating a new item, $\pi_i$, is as follows,
-based on the intuition that active individuals are  likely to have more
-followers/friends:
-%  $\pi=(\pi_1, \ldots, \pi_n)$, where
-$$
-   \pi_i = \left\{
-     \begin{array}{ll}
-       0.1 &: i \in V_{1K}\\
-       0.05 &: i \in V_{500} \\
-       0.01 &: i \in V_{50} \\
-       0 & : \text{otherwise} \\
-     \end{array}
-   \right.
-$$
- In Table~\ref{table:datasets} the expected number of new items at each time
- step is given, for each dataset, in the leftmost column (\emph{rate of new
- items}). Also, for each directed edge $e=v\rightarrow w$ we associate  a probability
-$p_e$ that a new item at node $v$ is propagated through this edge to node $w$ (as in IC model),
-and events for different items are independent. Following the parameters
-reported in the
+\para{Generating process}
+The generating process $\sys=(\family,\pi)$ we use in our experiments (except
+those in Sect.~\ref{sec:example}) simulate an Independent-Cascade (IC)
+model~\citep{Kempe03}. At each time $t$, items are generated in two phases:
+a ``creation'' phase and a ``diffusion'' phase. In the creation phase to
+simulate the creation of ``rumors'' at the nodes: we flip a biased coin for each
+node in the graph, where the bias depends on the out-degree of the node. We
+assume to partition the nodes into classes based on their degrees and to each
+class we assign a head probability for a biased coin of the nodes in the class,
+as shown in Table~\ref{tab:bias}. In Table~\ref{table:datasets}, for each
+dataset we report the size of the classes and the expected number of flipped
+coins with outcome head at each time (leftmost column).
+\begin{table}[ht]
+	\begin{tabular}{lcl}
+		\toprule
+		Class & Nodes in class & Bias\\
+		\midrule
+		$V_{1K}$ & $\{i\in V ~:~ \degree^+(i) \geq 1000\}$ & 0.1\\
+		$V_{500}$ &  $\{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$ & 0.05 \\
+		$V_{100}$ & $\{i\in V ~:~ 100\leq \degree^+(i) < 500\}$  & 0.01 \\
+		$V_{0}$   & $\{i\in V ~:~ \degree^+(i) < 100\}$ & 0.0\\
+		\bottomrule
+	\end{tabular}
+	\caption{\scriptsize Classes and bias for the generating process.}
+	\label{tab:bias}
+\end{table}
+Let now $v$ be a node whose coin had outcome head in the most recent flip. In
+the ``diffusion'' phase we simulate the spreading of the ``rumor'' originating
+at $v$ through network according to the IC model, as follows. For each directed
+edge $e=u\rightarrow w$ there a probability $p_e$ that a rumor that reached $u$
+is propagated through this edge to node $w$ (as in IC model), and events for
+different rumors and different edges are independent. Following the
 literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we
-set $p_{v\rightarrow w} = \frac{1}{\degree^-(w)}$. Finally, note that for each set of nodes, $S$, this model implicitly imposes a probability $\pi(S)$, that is unknown to \algonameapx.
+use $p_{u\rightarrow w} = \frac{1}{\degree^-(w)}$. If we denote with $S$ the
+final set of nodes that the rumor created at $v$ reached during the (simulated)
+diffusion process (which always terminates), we have that through this process
+we generated an item $(t,S)$.
+%where $\degree^+(i)$ is the out-degree of node $i$ (see
+%Table~\ref{table:datasets}). We group the nodes based on their degrees as
+%follows:
+%\begin{itemize*}
+% \item $V_{1K} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
+% \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
+% \item $V_{100}  = \{i\in V ~:~ 100\leq \degree^+(i) < 500\}$, and
+% \item $V_{0}    = \{i\in V ~:~ \degree^+(i) < 100\}$,
+%\end{itemize*}
+%where $\degree^+(i)$ is the out-degree of node $i$ (see Table~\ref{table:datasets}).
+%$$
+%   \pi_i = \left\{
+%     \begin{array}{ll}
+%       0.1 &: i \in V_{1K}\\
+%       0.05 &: i \in V_{500} \\
+%       0.01 &: i \in V_{50} \\
+%       0 & : \text{otherwise} \\
+%     \end{array}
+%   \right.
+%$$
+%Also, f Finally, note that for each set of nodes, $S$, this model implicitly imposes a probability $\pi(S)$, that is unknown to \algonameapx.
 
 
 %As the model of propagation, we consider the Independent-Cascade
