@@ -1,5 +1,5 @@
 \section{Related Work}\label{sec:related_work}
-The problem we focus on is novel and generalizes and complements other problems
+The novel problem we focus on in this work generalizes and complements a number of problems
 studied in the literature.
 
 The  ``Battle of Water Sensor Network'' challenge~\citep{BWSN2008} motivated a
@@ -52,7 +52,9 @@ caught if any of their copies is discovered (where snapshots of a webpage belong
 to that page only), and all the generated items should be discovered (and not
 just the recent ones)~\cite{dasgupta2007discoverability,wolf2002optimal}.
 
-\ahmad{The \emph{News and Feed Aggregation} problem is a very well-studied topic, whose goal is to capture the updates of news websites (e.g. by RSS feeds)~\cite{survey-oita2011deriving,onlineRef-horincar2014online,adaptive-bright2006adaptive,fast-sia2007efficient}. Beside having different objectives, our model differs mainly in the assumption that items may get copied/propagated in the network and we do not need to catch all the copies, where in Feed Aggregation news (items) from different}
+The goal of {News and Feed Aggregation} problem is to capture updates in news websites (e.g. by RSS feeds)~\cite{survey-oita2011deriving,onlineRef-horincar2014online,adaptive-bright2006adaptive,fast-sia2007efficient}. Our model differs from that setting in that we consider copies of the same news in different web sites as equivalent and therefore are only interested in discovering one of the copies.
+
+
 %\ahmad{
 %The \emph{News and Feed Aggregation} problem is a very well-studied topic, in which the general goal is to obtain the updates of news websites (e.g. by RSS feeds). Among many introduced objectives~\cite{survey-oita2011deriving,onlineRef-horincar2014online,adaptive-bright2006adaptive} in studying this problem, the most similar one to our cost function is the \emph{delay} function presented by~\cite{fast-sia2007efficient}.  In~\cite{fast-sia2007efficient} it is assumed that the rates of the news publication does not change, where in our setting these rates may change and our algorithm ({\ada}) can adapt itself to the new setting. Also, we assume at any given time the number of probes is fixed (or bounded) regarding the limited computational power for simultaneous probes, but \cite{fast-sia2007efficient} uses a relaxed  assumption by fixing the number of probes over a \emph{time window} of a fixed length which may result in high number of probes at a single time step. Finally, \cite{fast-sia2007efficient} introduces a deterministic algorithm in which the number of probes to each feed is obtained by applying the Lagrange multipliers method (very similar result to Theorem~\ref{thm:randomized_schedule}), but they loose the guarantee on optimality of their solution, by rounding the estimated number of probes to integers. In contrast, our solution provides  theoretical guarantee on optimality of our output schedule. }
 

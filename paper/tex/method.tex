@@ -1,7 +1,8 @@
 \section{The \algonamebasecaps{} Algorithm}\label{sec:method}
-In this section, we study the $(\theta,c)$-OPSP for a generating process
-$\sys=(\family,\pi)$ on a graph $G=(V,E)$ and present the algorithm \algoname
-(and its variants) to solve it.
+In this section we present the algorithm \algoname
+(and its variants) for solving 
+the Optimal Probing Schedule Problem $(\theta,c)$-OPSP for generating process
+$\sys=(\family,\pi)$ on a graph $G=(V,E)$. 
 
 We start by assuming that we have complete knowledge of $\sys$, i.e., we know
 $\family$ and $\pi$. This strong assumption allows us to study the theoretical
@@ -13,9 +14,9 @@ the process (e.g., $\pi$ or $\family$) change over time.  Finally, we show an
 algorithm for the MapReduce framework that allows us to scale to large networks.
 
 \subsection{Computing the Optimal Schedule}\label{sec:optimize}
-We now first conduct a theoretical analysis of the cost function $\cost_\theta$,
-and then use the results to develop \algoname, our algorithm to compute the
-optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
+We first conduct a theoretical analysis of the cost function $\cost_\theta$.
+%and then use the results to develop \algoname, our algorithm to compute the
+%optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
 
 \paragraph{Analysis of the cost function}
 Assume for now that we know $\sys$, i.e., we have complete knowledge of
@@ -245,7 +246,7 @@ the algorithm in case of convergence.
 		\sum_{z=1}^n \sched_z = 1\enspace.
 	\end{equation}
 
-	Consider now the point 1 in the statement of the theorem, and assume that we
+	Consider now the first claim of the theorem, and assume that we
 	are at iteration $j$ such that $j$ is the minimum iteration index for which
 	the schedule $\sched^{(j)}$ computed at the end of iteration $j$ is optimal.
 	Then, for any $i$, $1\le i\le n$, we have
@@ -265,7 +266,7 @@ the algorithm in case of convergence.
 	which means that we reached convergence and \algoname will return
 	$\sched^{(j+1)}$, which is optimal because $\sched^{(j+1)}=\sched^{(j)}$.
 
-	Consider now point 2 in the statement of the theorem, and let $j$ be the
+	Consider the second claim of the theorem, and let $j$ be the
 	first iteration for which $\sched^{(j)}=\sched^{(j-1)}$. Then we have, for
 	any $1\le i\le n$,
 	\[
@@ -345,16 +346,20 @@ to a collection
 \begin{equation}\label{eq:sample}
 	\Sample=\{\Sample_a,\Sample_{a+1},\dotsc,\Sample_b\}
 \end{equation}
-We usually refer to $\Sample$ as a \emph{sample gathered in the time interval
-$[a,b]$}. Here we show that the cost of a schedule can be approximated within a
-multiplicative factor $\varepsilon\in[0,1]$ if $b-a=O(\varepsilon^2\log n)$, and
-that it is possible to adapt \algoname to this case.
+We refer to $\Sample$ as a \emph{sample gathered in the time interval
+$[a,b]$}. We show that a schedule computed with respect to a sample $\Sample$ taken during an interval of
+$ \ell (\Sample) = b-a=O(\varepsilon^{-2}\log n)$ steps has cost which is within  a
+multiplicative factor $\varepsilon\in[0,1]$ of the optimal schedule. We then adapt \algoname to optimize with respect to such sample.
+
+%the cost of a schedule can be approximated within a
+%multiplicative factor $\varepsilon\in[0,1]$ if $b-a=O(\varepsilon^2\log n)$, and
+%that it is possible to adapt \algoname to this case.
 
 We start by defining the cost of a schedule w.r.t.~to a sample $\Sample$.
 
 \begin{definition}\label{def:costsample}
-	Suppose $\sched$ is a $c$-schedule and $\Sample$ is as in~\eqref{eq:sample},
-	with $b-a=\ell$. The $\theta$-cost of $\sched$ w.r.t.~to $\Sample$
+	Suppose $\sched$ is a $c$-schedule and $\Sample$ is as in Equation~\eqref{eq:sample},
+	with $\ell (\Sample) = b-a$. The $\theta$-cost of $\sched$ w.r.t.~to $\Sample$
 	denoted by $\cost_\theta(\sched,\Sample)$ is defined as
 	\[
 		\cost_\theta(\sched,\Sample)\defeq\frac{1}{\ell}\sum_{S\in \Sample}
@@ -373,7 +378,7 @@ differences from \algoname are:
 \begin{enumerate*}
 	\item the loop on line~\ref{algline:sum} in Alg.~\ref{alg:iterative} is only
 		over the sets that appear in at least one $\Sample_j\in\Sample$.
-	\item \algonameapx uses the values $W_i(\sched,\Sample)$ instead of
+	\item \algonameapx uses the values $W_i(\sched,\Sample)$ (defined above) instead of
 		$W_i(\sched)$ (line~\ref{algline:w} in Alg.~\ref{alg:iterative});
 \end{enumerate*}
 
@@ -418,7 +423,7 @@ schedule $\sched^*$.
 	\]
 \end{theorem}
 
-To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemm.
+To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemma.
 
 \begin{lemma}\label{lem:chernoffcost}
 	Let $\sched$ be a $c$-schedule and $\Sample$ be a sample gathered during a
@@ -513,9 +518,9 @@ We can now prove Thm.~\ref{thm:approx_sample}.
 
 \subsection{Dynamic settings}\label{sec:dynamic}
 In this section we discuss how to handle changes in the parameters $\family$ and
-$\pi$ of the (unknown) process $\sys$ that may realistically appear over time.
-The idea is to keep track, for each set $S$ from $\family$ that we catch by
-probing nodes, of an estimation $\tilde{\pi}(S)$ of $\pi(S)$ and of the last
+$\pi$ as the (unknown) generating process $\sys$  evolves over time.
+The idea is to maintain an estimation $\tilde{\pi}(S)$ of $\pi(S)$ for each set $S\in \family$ that we discover in the probing process,
+together with the last
 time $t$ such that an item $(t,S)$ has been generated (and caught at a time
 $t'>t$). If we have not caught an item in the form $(t'',S)$ in an interval
 significantly longer than $1/\tilde{\pi}(S)$, then we assume that
