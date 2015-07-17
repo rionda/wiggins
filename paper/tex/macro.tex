@@ -6,8 +6,11 @@
 \usepackage{hyperref} % Must be loaded before cleveref
 \usepackage{mdwlist} % compressed itemize, enumerate
 \usepackage[numbers,sort&compress,square]{natbib}
+\ifacmstyle
 \renewcommand{\refname}{REFERENCES}
 \renewcommand{\bibsection}{\section{REFERENCES}}
+\renewcommand*{\bibfont}{\raggedright}
+\fi
 \usepackage[ruled,linesnumbered]{algorithm2e} % must be loaded after natbib
 \usepackage{amssymb}
 \usepackage{graphicx}
