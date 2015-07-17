@@ -56,6 +56,8 @@ public:
 	vector<double> simul_with_file(const int time_interval, const string sample_file, const int num_iter, const int time_idx);
 	vector<double> solver(const string sample_file, const int time_length, const int num_iter);
 	vdoub_t simul_process(double eps, int num_iter, string idxstr);
+	vdoub_t simul_process_2(double eps, int num_iter, string idxstr);
+
 	void go_online(vvint_t & schedule, vector<double>& cost, const int time_idx, const int time_interval);
 	void go_offline(vvint_t & schedule, vector<double>& cost, const string sample_file);
 	void inf_gen_sample(const int num_samples, const string output_file);

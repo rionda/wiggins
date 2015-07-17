@@ -157,12 +157,86 @@ void Graph::gen_sample_with_time(const int time_interval, const string output_fi
 }
 
 
-vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
+// vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
+// 	int u;
+// 	vdoub_t p0, p1, p2;
+// 	cout << eps << " " << number_of_nodes << " " << theta << endl;
+// 	// int R = ceil(3*(log(number_of_nodes)+log(2))/ ((1-theta)*pow(eps,2)));
+// 	int R = 100;
+// 	int a = 2*R;
+// 	int b = 2*R;
+
+
+// 	cout << "R: " << R << ", a: " << a << ", b: " << b << endl;
+	
+// 	p0 = simul_with_file(R, graph_name+".tmp0"+idxstr, num_iter, 0);
+// 	p1 = simul_with_file(R, graph_name+".tmp1"+idxstr, num_iter, a+b-R);
+// 	p2 = simul_with_file(R, graph_name+".tmp2"+idxstr, num_iter, 2*(a+b)-R);
+
+// 	discrete_distribution<int> disc0(p0.begin(), p0.end());
+// 	discrete_distribution<int> disc1(p1.begin(), p1.end());
+// 	discrete_distribution<int> disc2(p2.begin(), p2.end());
+
+// 	vvint_t schedule(number_of_nodes);
+// 	//
+// 	cout << "1" << endl; cout.flush();
+// 	cout << "schedule size: " << schedule.size() << endl; cout.flush();
+// 	cout << "p0 size: " << p0.size() << endl; cout.flush();
+// 	for (int t=0; t< a; ++t) {
+// 		u = disc0(eng);
+// 		schedule[u].push_back(t);
+// 	}
+// 	cout << "1 (shuffle)" << endl; cout.flush();
+// 	shuffle(p0.begin(), p0.end(), eng);
+// 	disc0 = discrete_distribution<int>(p0.begin(), p0.end());
+// 	for (int t=a; t< (a+b); ++t) {
+// 		u = disc0(eng);
+// 		schedule[u].push_back(t);
+// 	}
+// 	//
+// 	cout << "2" << endl; cout.flush();
+// 	for (int t=(a+b); t< 2*a+b; ++t) {
+// 		u = disc1(eng);
+// 		schedule[u].push_back(t);
+// 	}
+// 	cout << "2(shuffle)" << endl; cout.flush();
+// 	shuffle(p1.begin(), p1.end(), eng);
+// 	disc1 = discrete_distribution<int>(p1.begin(), p1.end());
+// 	for (int t=2*a+b; t< 2*(a+b); ++t) {
+// 		u = disc1(eng);
+// 		schedule[u].push_back(t);
+// 	}
+// 	//
+// 	cout << "3" << endl; cout.flush();
+// 	for (int t=2*(a+b); t< 3*a+2*b; ++t) {
+// 		u = disc2(eng);
+// 		schedule[u].push_back(t);
+// 	}
+
+
+// 	// go for cost:
+// 	vdoub_t cost(3*a+2*b, 0);
+// 	cout << "online(1)" << endl; cout.flush();
+// 	go_online(schedule, cost, 0, a+b-R);
+// 	cout << "offline (1)" << endl; cout.flush();
+// 	go_offline(schedule, cost, graph_name+".tmp1"+idxstr);
+// 	cout << "online(2)" << endl;cout.flush();
+// 	go_online(schedule, cost, a+b, a+b-R);
+// 	cout << "offline (2)" << endl;cout.flush();
+// 	go_offline(schedule, cost, graph_name+".tmp2"+idxstr);
+// 	cout << "online(3)" << endl;cout.flush();
+// 	go_online(schedule, cost, 2*(a+b), a);
+
+// 	return cost;
+// }
+
+vdoub_t Graph::simul_process_2(double eps, int num_iter, string idxstr) {
 	int u;
-	vdoub_t p0, p1, p2;
+	vdoub_t p0, p1;
 	cout << eps << " " << number_of_nodes << " " << theta << endl;
 	int R = ceil(3*(log(number_of_nodes)+log(2))/ ((1-theta)*pow(eps,2)));
-	int a = 3*R;
+	// int R = 100;
+	int a = 2*R;
 	int b = 2*R;
 
 
@@ -170,11 +244,11 @@ vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
 	
 	p0 = simul_with_file(R, graph_name+".tmp0"+idxstr, num_iter, 0);
 	p1 = simul_with_file(R, graph_name+".tmp1"+idxstr, num_iter, a+b-R);
-	p2 = simul_with_file(R, graph_name+".tmp2"+idxstr, num_iter, 2*(a+b)-R);
+	// p2 = simul_with_file(R, graph_name+".tmp2"+idxstr, num_iter, 2*(a+b)-R);
 
 	discrete_distribution<int> disc0(p0.begin(), p0.end());
 	discrete_distribution<int> disc1(p1.begin(), p1.end());
-	discrete_distribution<int> disc2(p2.begin(), p2.end());
+	// discrete_distribution<int> disc2(p2.begin(), p2.end());
 
 	vvint_t schedule(number_of_nodes);
 	//
@@ -198,33 +272,41 @@ vdoub_t Graph::simul_process(double eps, int num_iter, string idxstr) {
 		u = disc1(eng);
 		schedule[u].push_back(t);
 	}
-	cout << "2(shuffle)" << endl; cout.flush();
-	shuffle(p1.begin(), p1.end(), eng);
-	disc1 = discrete_distribution<int>(p1.begin(), p1.end());
-	for (int t=2*a+b; t< 2*(a+b); ++t) {
-		u = disc1(eng);
-		schedule[u].push_back(t);
-	}
-	//
-	cout << "3" << endl; cout.flush();
-	for (int t=2*(a+b); t< 3*a+2*b; ++t) {
-		u = disc2(eng);
-		schedule[u].push_back(t);
-	}
-
+	// ---------------------------------------------- >
+	// cout << "2(shuffle)" << endl; cout.flush();
+	// shuffle(p1.begin(), p1.end(), eng);
+	// disc1 = discrete_distribution<int>(p1.begin(), p1.end());
+	// for (int t=2*a+b; t< 2*(a+b); ++t) {
+	// 	u = disc1(eng);
+	// 	schedule[u].push_back(t);
+	// }
+	// //
+	// cout << "3" << endl; cout.flush();
+	// for (int t=2*(a+b); t< 3*a+2*b; ++t) {
+	// 	u = disc2(eng);
+	// 	schedule[u].push_back(t);
+	// }
+	// < ---------------------------------------------- 
 
 	// go for cost:
-	vdoub_t cost(3*a+2*b, 0);
+	// vdoub_t cost(3*a+2*b, 0);
+	vdoub_t cost(2*a + b, 0);
+
+
 	cout << "online(1)" << endl; cout.flush();
 	go_online(schedule, cost, 0, a+b-R);
 	cout << "offline (1)" << endl; cout.flush();
 	go_offline(schedule, cost, graph_name+".tmp1"+idxstr);
 	cout << "online(2)" << endl;cout.flush();
-	go_online(schedule, cost, a+b, a+b-R);
-	cout << "offline (2)" << endl;cout.flush();
-	go_offline(schedule, cost, graph_name+".tmp2"+idxstr);
-	cout << "online(3)" << endl;cout.flush();
-	go_online(schedule, cost, 2*(a+b), a);
+	// go_online(schedule, cost, a+b, a+b-R);
+	go_online(schedule, cost, a+b, a);
+
+	// ---------------------------------------------- >
+	// cout << "offline (2)" << endl;cout.flush();
+	// go_offline(schedule, cost, graph_name+".tmp2"+idxstr);
+	// cout << "online(3)" << endl;cout.flush();
+	// go_online(schedule, cost, 2*(a+b), a);
+	// < ---------------------------------------------- 
 
 	return cost;
 }

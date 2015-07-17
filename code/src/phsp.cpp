@@ -1,4 +1,5 @@
 #include <cmath>
+// #include <ctime>
 #include "graph.h"
 
 
@@ -303,7 +304,7 @@ void simulator(const string filename, const int num_simuls, const int num_iter, 
 	*/
 	for (int idx=0; idx < num_simuls; ++idx) {
 		Graph g(filename, theta);
-		vdoub_t cost = g.simul_process(epsilon, num_iter,""+to_string(idx));
+		vdoub_t cost = g.simul_process_2(epsilon, num_iter,""+to_string(idx));
 		ofstream fout;
 		fout.open(my_get_dir_name(filename) + "simul-"+to_string(idx));
 		for (double c : cost)
@@ -597,6 +598,7 @@ double vardist_f(const string samp_file, const string test_file,
 }
 
 int main(int argc, char *argv[]) {
+	clock_t start = clock();
 	/*
 		Parsing the arguments
 	*/
@@ -688,6 +690,7 @@ int main(int argc, char *argv[]) {
 		tester(samp_file, test_file, num_iter, probes, theta);
 		
 	} else if (TASK == "simulator") {
+		epsilon = 0.1;
 		simulator(filename, num_simuls, num_iter, theta, epsilon);
 	
 	} else if (TASK == "compare") {
@@ -780,7 +783,8 @@ int main(int argc, char *argv[]) {
 
 	}
 
-
+	clock_t stop = clock();
+	cout << "total_time: " << double(stop-start) / CLOCKS_PER_SEC << endl;
 	
 	return 0;
 }
