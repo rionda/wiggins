@@ -75,15 +75,13 @@ directed, replacing undirected edges with two directed ones.
 \para{Generating process}
 The generating process $\sys=(\family,\pi)$ we use in our experiments (except
 those in Sect.~\ref{sec:example}) simulate an Independent-Cascade (IC)
-model~\citep{Kempe03}. At each time $t$, items are generated in two phases:
+model~\citep{Kempe2003}. At each time $t$, items are generated in two phases:
 a ``creation'' phase and a ``diffusion'' phase. In the creation phase to
-simulate the creation of ``rumors'' at the nodes: we flip a biased coin for each
+simulate the creation of \ahmad{``rumors''} at the nodes: we flip a biased coin for each
 node in the graph, where the bias depends on the out-degree of the node. We
-assume to partition the nodes into classes based on their degrees and to each
-class we assign a head probability for a biased coin of the nodes in the class,
-as shown in Table~\ref{tab:bias}. In Table~\ref{table:datasets}, for each
+assume a partition of the nodes into classes based on their out-degrees, \ahmad{where for the nodes in the same class, we assign the same head probability for their biased coins, as show in in Table~\ref{tab:bias}.} In Table~\ref{table:datasets}, for each
 dataset we report the size of the classes and the expected number of flipped
-coins with outcome head at each time (leftmost column).
+coins with outcome head at each time (\ahmad{rightmost} column).
 \begin{table}[ht]
 	\begin{tabular}{lcl}
 		\toprule
@@ -99,7 +97,7 @@ coins with outcome head at each time (leftmost column).
 	\label{tab:bias}
 \end{table}
 Let now $v$ be a node whose coin had outcome head in the most recent flip. In
-the ``diffusion'' phase we simulate the spreading of the ``rumor'' originating
+the ``diffusion'' phase we simulate the spreading of the \ahmad{``rumor''} originating
 at $v$ through network according to the IC model, as follows. For each directed
 edge $e=u\rightarrow w$ there a probability $p_e$ that a rumor that reached $u$
 is propagated through this edge to node $w$ (as in IC model), and events for
@@ -108,7 +106,7 @@ literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we
 use $p_{u\rightarrow w} = \frac{1}{\degree^-(w)}$. If we denote with $S$ the
 final set of nodes that the rumor created at $v$ reached during the (simulated)
 diffusion process (which always terminates), we have that through this process
-we generated an item $(t,S)$.
+we generated an \ahmad{item/rumor} $(t,S)$.
 %where $\degree^+(i)$ is the out-degree of node $i$ (see
 %Table~\ref{table:datasets}). We group the nodes based on their degrees as
 %follows:
@@ -280,11 +278,14 @@ interval is $R = \frac{3(\log(n)+\log(2))}{\epsilon^2(1-\theta)}$, $\epsilon=0.5
 Theorem~\ref{thm:approx_sample}.
 
 %\todo[ahmad]{for $\epsilon=0.1$ and without making nodes generate up to 10: running}
-
 %and other intervals (three time intervals before, between, and after the colored time intervals) have length $10R$. Also, for sake of illustration, we assumed at each time step each node $i$ may generated up to 10 items (each having a chance of $\pi_i$ to be generated). Thus, the number of generated items at each node is a binomial random variable with parameters 10 and $\pi$.
 %Note that we start the generating process at time 0. Hence, during the first few time steps the load of the generating process increases.
+%<<<<<<< Updated upstream
 
 Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the time (blue), and the \emph{average} load in the normal and perturbed time intervals (red). Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv}), the cost of the initial schedule for web-Notredame is very close the optimal cost (obtained after 30 iteration).
+%=======
+%Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the \ahmad{time (blue), and the \emph{average} load in the normal and perturbed time intervals (red)}. Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. \ahmad{Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv}), the cost of the initial schedule for web-Notredame is very close the optimal cost (obtained after 30 iteration).}
+%>>>>>>> Stashed changes
 
 %Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that (i) a sample gathered during a very short time interval suffices to minimize the load (and therefore the cost) of the generating process, and (ii) after adapting to the new schedule, the effect of the perturbation disappears immediately (see the Section~\ref{sec:dynamic} for theoretical upper bound). Finally, note that for each time $t$, we plot the loads $L_\theta(t)$, and not the cost function. This is because the load is what we can observe (which is a draw of random variables $L_\theta(t)$), as the cost function is the expected value of these random variables averaged over the time, and it explains  the asymptotic behavior of the system.
 
