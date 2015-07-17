@@ -72,7 +72,12 @@ Table~\ref{table:datasets} for details).
 %references, the link to snap.stanford.edu is enough. Matteo}
 
 \para{Parameters and model of propagation}
-We always \ahmad{let the graphs be directed} by replacing undirected edges with two directed ones. Through our experiments (except Sect.~\ref{sec:example}), we consider the Independent-Cascade (IC)~\cite{Kempe2003} as the propagation model, assume the activity of a node (its rate of generating new items) is a function of its out-degree (i.e., the number of neighbors influenced by that node). Therefore, we group the nodes based on their degrees as follows:
+We always let the graphs be directed by replacing undirected edges with two
+directed ones. Through our experiments (except Sect.~\ref{sec:example}), we
+consider the Independent-Cascade (IC)~\cite{Kempe2003} as the propagation model,
+assume the activity of a node (its rate of generating new items) is a function
+of its out-degree (i.e., the number of neighbors influenced by that node).
+Therefore, we group the nodes based on their degrees as follows:
 \begin{itemize*}
  \item $V_{1K} = \{i\in V ~:~ \degree^+(i) \geq 1000\}$,
  \item $V_{500}  = \{i\in V ~:~ 500\leq \degree^+(i) < 1000\}$,
@@ -127,7 +132,7 @@ experiment, we measure the rate of convergence and the execution time of
 $c\in\{1,3,5\}$. For each dataset, we use a sample $\Sample$ that satisfies~\eqref{eq:samp_cond}, and run \algonameapx
 for 30 iterations. Denote the schedule computed at round $i$ by $\sched^i$.
 As shown in Figure~\ref{fig:conv}, the sequence of cost values of the schedules
-$\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, \ahmad{converges extremely fast, after just few iterations}.
+$\sched^i$'s, $\cost_\theta(\sched^i,\Sample)$, converges extremely fast after few iterations.
 
 %the sequences of cost values according to both sample $\Sample$ and the test sample $\Sample'$ are descending and converge after few steps. Also note that the cost values according to $\Sample$ and $\Sample'$ are close (in some cases almost identical), which agrees with the theoretical analysis in Section~\ref{sec:sampcomp}.
 
@@ -246,10 +251,11 @@ In this section, we present experimental results that show
  how our algorithm can adapt itself to the new situation.
 Simulations are provided in Figure~\ref{figure:changes}: for each graph, we
 start by following an 1-optimal schedule in the graph. At the beginning of each
-``gray'' time interval, the labels of the nodes are permuted randomly, \ahmad{to impose great disruptions in the system.} Following that, at
+``gray'' time interval, the labels of the nodes are permuted randomly, to impose
+great disruptions in the system. Following that, at
 the beginning of each ``green'' time interval our algorithm starts gathering
 samples of $\sys$. Then, \algonameapx computes the schedule for the new sample, using 50 rounds of iterations, and starts probing. The length of each colored time
-interval is $R = \frac{3(\log(n)+\log(2))}{\epsilon^2(1-\theta)}$, \ahmad{$\epsilon=0.5$}, motivated by
+interval is $R = \frac{3(\log(n)+\log(2))}{\epsilon^2(1-\theta)}$, $\epsilon=0.5$, motivated by
 Theorem~\ref{thm:approx_sample}.
 
 %\todo[ahmad]{for $\epsilon=0.1$ and without making nodes generate up to 10: running}
@@ -257,7 +263,7 @@ Theorem~\ref{thm:approx_sample}.
 %and other intervals (three time intervals before, between, and after the colored time intervals) have length $10R$. Also, for sake of illustration, we assumed at each time step each node $i$ may generated up to 10 items (each having a chance of $\pi_i$ to be generated). Thus, the number of generated items at each node is a binomial random variable with parameters 10 and $\pi$.
 %Note that we start the generating process at time 0. Hence, during the first few time steps the load of the generating process increases.
 
-Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the \ahmad{time (blue), and the \emph{average} load in the normal and perturbed time intervals (red)}. Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. \ahmad{Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv}), the cost of the initial schedule for web-Notredame is very close the optimal cost (obtained after 30 iteration).}
+Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the time (blue), and the \emph{average} load in the normal and perturbed time intervals (red). Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv}), the cost of the initial schedule for web-Notredame is very close the optimal cost (obtained after 30 iteration).
 
 %Based on our experiments, shown in Figure~\ref{figure:changes}, we observe that (i) a sample gathered during a very short time interval suffices to minimize the load (and therefore the cost) of the generating process, and (ii) after adapting to the new schedule, the effect of the perturbation disappears immediately (see the Section~\ref{sec:dynamic} for theoretical upper bound). Finally, note that for each time $t$, we plot the loads $L_\theta(t)$, and not the cost function. This is because the load is what we can observe (which is a draw of random variables $L_\theta(t)$), as the cost function is the expected value of these random variables averaged over the time, and it explains  the asymptotic behavior of the system.
 
