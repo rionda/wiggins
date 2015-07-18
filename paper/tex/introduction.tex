@@ -1,7 +1,7 @@
 \section{Introduction}\label{sec:introduction}
 Many applications require the detection of events in a network as soon as they
 happen or shortly thereafter, as the value of the information obtained by
-detecting the events decays rapidly as times passes. For example, an emerging
+detecting the events decays rapidly as time passes. For example, an emerging
 trend in algorithmic stock trading is the use of automatic search through the
 Web and social networks for pieces of information that can be used in trading
 decisions before they appear in the more popular news
@@ -46,7 +46,7 @@ when only a few nodes can be probed at a time. Our contributions to the study of
 this problem are the following:
 
 \begin{itemize*}
-	\item We formalize a generic process that describe the creation and
+	\item We formalize a generic process that describes the creation and
 		distribution of information in a network, and define the computational task of
 		learning this process by probing the nodes in the network according to a
 		schedule. The process and task are parametrized by the resource
@@ -69,7 +69,7 @@ this problem are the following:
 		the parameters of the process needs to be learned or can change over
 		time. We show how to compute a schedule which is (probabilistically)
 		guaranteed to have a cost very close to the optimal by only observing
-		the generating process for a limited amount of time. We also present an
+		the generating process for a limited amount of time. We also present a
 		MapReduce adaptation of \algoname to handle very large networks.
 	\item Finally, we conduct an extensive experimental evaluation of \algoname
 		and its variants, comparing the performances of the schedules it
@@ -87,7 +87,7 @@ process parameters are known and when they need to be learned.
 %extended version of this work.
 
 \para{Paper Organization} In Sect.~\ref{sec:prelims} we give introductory
-definitions and formally introduce the settings and the problem. We discuss
+definitions, and formally introduce the settings and the problem. We discuss
 related works in Sect.~\ref{sec:related_work}. In Sect.~\ref{sec:method} we
 describe our algorithm \algoname and its variants. The results of our
 experimental evaluation are presented in Sect.~\ref{sec:exp}. We conclude by
