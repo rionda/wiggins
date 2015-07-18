@@ -74,14 +74,17 @@ directed, replacing undirected edges with two directed ones.
 
 \para{Generating process}
 The generating process $\sys=(\family,\pi)$ we use in our experiments (except
-those in Sect.~\ref{sec:example}) simulate an Independent-Cascade (IC)
-model~\citep{Kempe2003}. At each time $t$, items are generated in two phases:
+those in Sect.~\ref{sec:example}) simulates an \emph{Independent-Cascade (IC)
+model}~\citep{Kempe2003}. At each time $t$, items are generated in two phases:
 a ``creation'' phase and a ``diffusion'' phase. In the creation phase to
-simulate the creation of \ahmad{``rumors''} at the nodes: we flip a biased coin for each
-node in the graph, where the bias depends on the out-degree of the node. We
-assume a partition of the nodes into classes based on their out-degrees, \ahmad{where for the nodes in the same class, we assign the same head probability for their biased coins, as show in in Table~\ref{tab:bias}.} In Table~\ref{table:datasets}, for each
-dataset we report the size of the classes and the expected number of flipped
-coins with outcome head at each time (\ahmad{rightmost} column).
+simulate the creation of ``rumors'' at the nodes: we flip a biased coin
+for each node in the graph, where the bias depends on the out-degree of the
+node. We assume a partition of the nodes into classes based on their
+out-degrees, and, we assign the same head probability for the biased coins of
+nodes in the same class, as show in in Table~\ref{tab:bias}. In
+Table~\ref{table:datasets}, for each dataset we report the size of the classes
+and the expected number of flipped coins with outcome head at each time
+(rightmost column).
 \begin{table}[ht]
 	\begin{tabular}{lcl}
 		\toprule
@@ -97,7 +100,7 @@ coins with outcome head at each time (\ahmad{rightmost} column).
 	\label{tab:bias}
 \end{table}
 Let now $v$ be a node whose coin had outcome head in the most recent flip. In
-the ``diffusion'' phase we simulate the spreading of the \ahmad{``rumor''} originating
+the ``diffusion'' phase we simulate the spreading of the ``rumor'' originating
 at $v$ through network according to the IC model, as follows. For each directed
 edge $e=u\rightarrow w$ there a probability $p_e$ that a rumor that reached $u$
 is propagated through this edge to node $w$ (as in IC model), and events for
@@ -106,7 +109,7 @@ literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we
 use $p_{u\rightarrow w} = \frac{1}{\degree^-(w)}$. If we denote with $S$ the
 final set of nodes that the rumor created at $v$ reached during the (simulated)
 diffusion process (which always terminates), we have that through this process
-we generated an \ahmad{item/rumor} $(t,S)$.
+we generated an item $(t,S)$, without having explicitly defined $\pi(S)$.
 %where $\degree^+(i)$ is the out-degree of node $i$ (see
 %Table~\ref{table:datasets}). We group the nodes based on their degrees as
 %follows:
