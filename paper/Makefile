@@ -18,7 +18,7 @@ $(MAINFILE).pdf: $(MAINFILE).aux $(MAINFILE).bbl
 	$(LATEX) $(MAINFILE).tex
 
 $(MAINFILE).tar.bz2: $(MAINFILE).pdf
-	env COPYFILE_DISABLE=1 tar cjvfh $(MAINFILE).tar.bz2 *.tex tex/*.tex *.bib *.pdf $(wildcard figures/*) $(wildcard *.bst) $(wildcard *.cls) $(wildcard *.clo) $(wildcard *.eps) $(wildcard *.svg) Makefile
+	env COPYFILE_DISABLE=1 tar cjvfh $(MAINFILE).tar.bz2 *.tex $(wildcard tex/*.tex) *.bib *.pdf $(wildcard *.sty) $(wildcard figures/*) $(wildcard *.bst) $(wildcard *.cls) $(wildcard *.clo) $(wildcard *.eps) $(wildcard *.svg) Makefile
 
 archive: $(MAINFILE).tar.bz2
 
