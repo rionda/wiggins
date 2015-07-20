@@ -69,7 +69,7 @@ where $\theta\in(0,1)$ is a user-specified parameter modeling how fast the
 value of an item decreases with time if uncaught. Intuitively, pieces of
 information (e.g., rumors) have high value if caught almost as soon as they have
 appeared in the network, but their value decreases fast (i.e., exponentially) as
-more time passes before being uncaught, to the point of having no value in the
+more time passes before being caught, to the point of having no value in the
 limit.
 
 \para{Load of the system and cost of a schedule} The set $N_t$ of uncaught items
@@ -119,7 +119,7 @@ slowly.
 %In other words, the optimal schedule is such that elements of $U$ more
 %likely to receive ``novel'' items have higher probability of being probed.
 
-Viewing the items as ``information'' dissemination in the network,
+Viewing the items as ``information'' disseminated in the network,
 an ideal schedule assigns higher probing probability  to nodes
 that act as \emph{ information hubs}, i.e., nodes that receive a large number of
 items. Thus, an optimal schedule $\sched^*$, identifies
@@ -127,7 +127,7 @@ information hubs among the nodes. This task (finding information hubs) can be
 seen as the complement of the \emph{influence maximization
 problem}~\citep{Kempe2003,Kempe2005}. In the influence maximization problem we
 look for a set of nodes that \emph{generate} information that reach most nodes.
-In the information hubs problem we are interested in a set of nodes that
+In the information hubs problem, we are interested in a set of nodes that
 \emph{receive} the most of information, thus the most informative nodes for an
 observer.
 

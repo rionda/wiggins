@@ -1,8 +1,8 @@
 \section{The \algonamebasecaps{} Algorithm}\label{sec:method}
 In this section we present the algorithm \algoname
-(and its variants) for solving 
+(and its variants) for solving
 the Optimal Probing Schedule Problem $(\theta,c)$-OPSP for generating process
-$\sys=(\family,\pi)$ on a graph $G=(V,E)$. 
+$\sys=(\family,\pi)$ on a graph $G=(V,E)$.
 
 We start by assuming that we have complete knowledge of $\sys$, i.e., we know
 $\family$ and $\pi$. This strong assumption allows us to study the theoretical
@@ -304,7 +304,8 @@ the algorithm in case of convergence.
 	\SetKwComment{tcp}{//}{}
 	\SetKw{KwBreak}{break}
 	\Input{$\family$, $\pi$, $c$, $\theta$, and maximum number $T$ of iterations}
-	\Output{An optimal $c$-schedule $\sched$ with minimum $\theta$-cost}
+	\Output{A $c$-schedule $\sched$ (with globally minimum $\theta$-cost, in
+	case of convergence)}
 	\For{$i\leftarrow 1$ \KwTo $n$}{
 		$\sched_i \leftarrow 1/n$\;
 	}
@@ -335,7 +336,7 @@ the algorithm in case of convergence.
 %``However, this iterative method is convergent if the Jacobian norm of $F$ is
 %less than 1, i.e., $\|DF\| < 1$.''
 
-\subsection{Approximation Through Sampling}\label{sec:sampcomp}
+\subsection{Approximation through Sampling}\label{sec:sampcomp}
 We now remove the assumption, not realistic in practice, of knowing the
 generating process $\sys$ exactly through $\family$ and $\pi$. Instead, we
 observe the process using, for a limited time interval, a schedule that iterates
@@ -541,7 +542,7 @@ sample and compute a new schedule as described in Sect.~\ref{sec:sampcomp}.
 
 Note that when we adapt our schedule to the new environment (using the most
 recent sample) the system converges to its stable setting exponentially (in
-$\theta$) fast: Suppose $L$ items have been generated since we detected the
+$\theta$) fast. Suppose $L$ items have been generated since we detected the
 change in the parameters until we adapt the new schedule. These items, if not
 caught, loose their novelty exponentially fast, since after $t$ steps their
 novelty is at most $L\theta^t$ and decreases exponentially. In our experiments

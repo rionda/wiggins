@@ -1,11 +1,12 @@
 \section{Experimental Results}\label{sec:exp}
 In this section we present the results of our experimental evaluation of
-\algonameapx. 
+\algonameapx.
 
 \para{Goals} First, we show that for a given sample $\Sample$, \algonameapx
 converges quickly to a schedule $\sched^*$ that minimizes $\cost_\theta(\sched,
 \Sample)$ (see Thm.~\ref{thm:optimal}). In particular, our experiments
-illustrate that the sequence $\cost_\theta(\sched^1,\Sample), \cost_\theta(\sched^2, \Sample),
+illustrate that the sequence $\cost_\theta(\sched^{(1)},\Sample),
+\cost_\theta(\sched^{(2)}, \Sample),
 \ldots$ is descending and converges after few iterations. Next, we compare the
 output schedule of \algonameapx to four other schedules: (i) uniform schedules,
 (ii) proportional to out-degrees, (iii) proportional to in-degrees, and (iv) proportional to \emph{undirected} degrees, i.e., the number of incident edges.
@@ -21,7 +22,7 @@ Then, we consider a specific example for which we know
 the \emph{unique} optimal schedule, and show that for larger samples
 \algonameapx outputs a schedule closer to the optimal.
  Finally, we demonstrate how our method can adapt itself to the changes in the
-network parameters. 
+network parameters.
 % Finally,  we show how one can use {\optimizer} to extract a set of nodes as a solution the the Influence-Maximization problem, and we compare it to \texttt{TIM+}\cite{??}. \texttt{TIM+} is an algorithm for Influence-Maximization problem that is based on sampling \emph{hyper-edges} (see \cite{borgs,??}) and running a greedy algorithm for submodular optimization. We see that by {\optimizer} we can obtain seeds whose influence are close to \texttt{TIM+}'s output seeds with much smaller running time.
 
 % Next, for different samples and different number of iterations, we test the quality of the output schedule, according to a test sample $\Sample'$, i.e., we evaluate the cost of each of the schedules in the iterative method with respect to $\Sample'$, $\cost{\sched,\Sample'}$ . \ahmad{\st{Finally, we illustrate the behavior of {\optimizer} when the network parameters change.}}
@@ -52,13 +53,13 @@ web-Google	&875713	&5105039&(134,180,3546)	& 57.86\\
 \caption{\scriptsize The datasets, corresponding statistics, and the rate of generating new items at each step.}\label{table:datasets}
 \end{table}
 
-\para{Environment and Datasets.} We implemented \algonameapx in C++. The implementation of \algonameapx never loads the entire sample
-to the main memory, which makes it very practical for running large samples on
-conventional machines. The experiments were run on a Opteron 6282 SE CPU (2.6
-GHz) using 12G memory. We tested our method on a number of graphs from the
-SNAP repository\footnote{\url{http://snap.stanford.edu}} (see
+\para{Environment and Datasets} We implemented \algonameapx in C++. The implementation of \algonameapx never loads the entire sample
+to the main memory, which makes it very practical when using large samples. The
+experiments were run on a Opteron 6282 SE CPU (2.6 GHz) with 12GB of RAM. We
+tested our method on graphs from the SNAP
+repository\footnote{\url{http://snap.stanford.edu}} (see
 Table~\ref{table:datasets} for details). We always consider the graphs to be
-directed, replacing undirected edges with two directed ones. 
+directed, replacing undirected edges with two directed ones.
 %\begin{itemize*}
 % \item Enron-Email~\cite{klimt2004introducing}: The email communication of Enron Corporation.
 % \item Brightkite~\cite{ChoML11}: A location-based online social network, where each edge represents a friendship tie.
@@ -75,8 +76,10 @@ directed, replacing undirected edges with two directed ones.
 \para{Generating process}
 The generating process $\sys=(\family,\pi)$ we use in our experiments (except
 those in Sect.~\ref{sec:example}) simulates an \emph{Independent-Cascade (IC)
-model}~\citep{Kempe2003}. At each time $t$, items are generated in two phases:
-a ``creation'' phase and a ``diffusion'' phase. In the creation phase to
+model}~\citep{Kempe2003}. Since explicitly computing $\pi(S)$ in this case does
+not seem possible, we simulate the creation of items according to this model as
+follows. At each time $t$, items are generated in two phases: a ``creation''
+phase and a ``diffusion'' phase. In the creation phase, we
 simulate the creation of ``rumors'' at the nodes: we flip a biased coin
 for each node in the graph, where the bias depends on the out-degree of the
 node. We assume a partition of the nodes into classes based on their
@@ -102,14 +105,14 @@ and the expected number of flipped coins with outcome head at each time
 Let now $v$ be a node whose coin had outcome head in the most recent flip. In
 the ``diffusion'' phase we simulate the spreading of the ``rumor'' originating
 at $v$ through network according to the IC model, as follows. For each directed
-edge $e=u\rightarrow w$ there a probability $p_e$ that a rumor that reached $u$
+edge $e=u\rightarrow w$ we fix a probability $p_e$ that a rumor that reached $u$
 is propagated through this edge to node $w$ (as in IC model), and events for
 different rumors and different edges are independent. Following the
 literature~\cite{Kempe2003,Chen2009,Chen2010,jung2011irie,tang2014influence}, we
 use $p_{u\rightarrow w} = \frac{1}{\degree^-(w)}$. If we denote with $S$ the
 final set of nodes that the rumor created at $v$ reached during the (simulated)
 diffusion process (which always terminates), we have that through this process
-we generated an item $(t,S)$, without having explicitly defined $\pi(S)$.
+we generated an item $(t,S)$, without the need to explicitly define $\pi(S)$.
 %where $\degree^+(i)$ is the out-degree of node $i$ (see
 %Table~\ref{table:datasets}). We group the nodes based on their degrees as
 %follows:
@@ -222,7 +225,7 @@ sample.
 
 
 
-Next, we extract the $1$-schedules  output by \algonameapx, and compare its cost to four other natural schedules: \texttt{unif}, \texttt{outdeg}, \texttt{indeg}, and \texttt{totdeg} that probe each node, respectively, uniformly, proportional to its out-degree, proportional to its in-degree, and proportional to the number of incident edges. Note that for undirected graphs \texttt{outdeg}, \texttt{indeg}, and \texttt{totdeg} are essentially the same schedule. 
+Next, we extract the $1$-schedules  output by \algonameapx, and compare its cost to four other natural schedules: \texttt{unif}, \texttt{outdeg}, \texttt{indeg}, and \texttt{totdeg} that probe each node, respectively, uniformly, proportional to its out-degree, proportional to its in-degree, and proportional to the number of incident edges. Note that for undirected graphs \texttt{outdeg}, \texttt{indeg}, and \texttt{totdeg} are essentially the same schedule.
 
 To have a fair comparison among the costs of these schedules and \algonameapx, we calculate their costs according to 10  independent samples, $\Sample_1,\ldots,\Sample_{10}$ that satisfy \eqref{eq:samp_cond}, and compute the average. The results are shown in Table~\ref{table:compare}, and show that \algonameapx outperforms the other four schedules.
 
@@ -236,11 +239,11 @@ To have a fair comparison among the costs of these schedules and \algonameapx, w
 \label{table:compare}
 \begin{tabular}{lrrrrr}
 \toprule
-Dataset       & \algonameapx & \texttt{uniform} & \texttt{outdeg} & \texttt{indeg} & \texttt{totdeg} \\ 
+Dataset       & \algonameapx & \texttt{uniform} & \texttt{outdeg} & \texttt{indeg} & \texttt{totdeg} \\
 \midrule
-Enron-Email   &       7.55 & 14.16 & 9.21 & 9.21 & 9.21                  \\ 
-Brightkite    &       4.85 & 9.64 & 6.14 & 6.14 & 6.14                  \\ 
-web-Notredame &       96.10 & 97.78 & 97.37 & 97.43 & 97.40             \\ 
+Enron-Email   &       7.55 & 14.16 & 9.21 & 9.21 & 9.21                  \\
+Brightkite    &       4.85 & 9.64 & 6.14 & 6.14 & 6.14                  \\
+web-Notredame &       96.10 & 97.78 & 97.37 & 97.43 & 97.40             \\
 web-Google    &       213.15 & 230.88 & 230.48 & 230.47 & 230.47       \\
 \bottomrule
 \end{tabular}
@@ -253,7 +256,11 @@ web-Google    &       213.15 & 230.88 & 230.48 & 230.47 & 230.47       \\
 % --------------------------------------------------
 % --------------------------------------------------
 \subsubsection{A Test on Convergence to  Optimal Schedule}\label{sec:example}
-Here, we present an example for which we know the optimal schedule, and moreover, the optimal schedule is unique. Therefore, we use this example to investigate further the convergence of \algonameapx. In particular, we would like to see how close the \algonameapx output is to the optimal schedule, regarding (i) different initial schedules, $\sched^0$ (which we let to be uniform), and (ii) samples $\Sample$'s  obtained during time intervals of different lengths.
+Here, we further invetigate the convergence of \algonameapx, using an example
+graph and process for which we know the \emph{unique} optimal schedule. We study
+how close the \algonameapx output is to the optimal schedule when (i) we start
+from different initial schedules, $\sched^0$, or (ii) we use samples $\Sample$'s
+obtained during time intervals of different lengths.
 
 Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$ for  $\family = \{S \in 2^{[n]} \mid 1 \leq|S| \leq 2\}$, and $\pi(S)=\frac{1}{|\family|}$. It is easy to see that $\cost_\theta(\sched)$ is a symmetric function, and thus, the uniform schedule is optimal. Moreover, by Corollary~\ref{corol:convexity} the uniform schedule is the only optimal schedule, since $\{v\} \in \family$ for every $v\in V$. Furthermore, we let $\theta=0.99$ to increase the sample complexity (as in Lemma~\ref{lem:chernoffcost}) and make it harder to learn the uniform/optimal schedule.
 
@@ -269,12 +276,12 @@ In our experiments we run the \algonameapx algorithm, using (i) different \emph{
 %-----------------------------------------------------------
 
 \subsection{Dynamic Settings}\label{sec:dynset}
-In this section, we present experimental results that show
- how our algorithm can adapt itself to the new situation.
-Simulations are provided in Figure~\ref{figure:changes}: for each graph, we
-start by following an optimal 1-schedule in the graph. At the beginning of each
-``gray'' time interval, the labels of the nodes are permuted randomly, to impose
-great disruptions in the system. Following that, at
+In this section, we present experimental results that show how our algorithm can
+adapt itself to the new situation. The experiment is illustrated in
+Fig.~\ref{figure:changes}. For each graph, we start by following an optimal
+1-schedule in the graph. At the beginning of each ``gray'' time interval, the
+labels of the nodes are permuted randomly, to impose great disruptions in the
+system. Following that, at
 the beginning of each ``green'' time interval our algorithm starts gathering
 samples of $\sys$. Then, \algonameapx computes the schedule for the new sample, using 50 rounds of iterations, and starts probing. The length of each colored time
 interval is $R = \frac{3(\log(n)+\log(2))}{\epsilon^2(1-\theta)}$, $\epsilon=0.5$, motivated by
@@ -285,7 +292,18 @@ Theorem~\ref{thm:approx_sample}.
 %Note that we start the generating process at time 0. Hence, during the first few time steps the load of the generating process increases.
 %<<<<<<< Updated upstream
 
-Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the time (blue), and the \emph{average} load in the normal and perturbed time intervals (red). Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv} and Table~\ref{table:compare}, the cost of the initial schedule for web-Notredame is very close the optimal cost, obtained after 30 iteration).
+Since the cost function is defined asymptotically (and explains the asymptotic
+behavior of the system in response to a schedule), in
+Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over
+the time (blue), and the \emph{average} load in the normal and perturbed time
+intervals (red). Based on this experiment, and as shown in
+Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of
+the disruption caused by the perturbation disappears immediately. Note that when
+the difference between the optimal cost and any other schedule is small (like
+web-Notredame), the jump in the load will be small (e.g., as shown in
+Figure~\ref{fig:conv} and Table~\ref{table:compare}, the cost of the initial
+schedule for web-Notredame is very close the optimal cost, obtained after 30
+iteration).
 %=======
 %Since the cost function is defined asymptotically (and explains the asymptotic behavior of the system in response to a schedule), in  Figure~\ref{figure:changes} we plot the load of the system $L_\theta(t)$ over the \ahmad{time (blue), and the \emph{average} load in the normal and perturbed time intervals (red)}. Based on this experiment, and as shown in Figure~\ref{figure:changes}, after adapting to the new schedule, the effect of the disruption caused by the perturbation disappears immediately. \ahmad{Note that when the difference between the optimal cost and any other schedule is small (like web-Notredame), the jump in the load will be small (e.g. as shown in Figure~\ref{fig:conv}), the cost of the initial schedule for web-Notredame is very close the optimal cost (obtained after 30 iteration).}
 %>>>>>>> Stashed changes
