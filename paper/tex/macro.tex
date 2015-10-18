@@ -1,9 +1,16 @@
+\ifacmstyle
+\setlength{\paperheight}{11in} % Shut up hyperref warning in ACM style
+\fi
 \usepackage{lmodern} % More complete than the default CM font
 \usepackage[T1]{fontenc} % needed for lmodern
 \usepackage[utf8]{inputenc}
 %\usepackage{newtxtext} % use (similar to) Times font in text.
 %\usepackage{newtxmath} % use (similar to) Times font in math.
+\ifacmstyle
+\usepackage[pdfpagelabels=false]{hyperref} % Must be loaded before cleveref. Option is to shut up hyperref warning in ACM style
+\else
 \usepackage{hyperref} % Must be loaded before cleveref
+\fi
 \usepackage{mdwlist} % compressed itemize, enumerate
 \usepackage[numbers,sort&compress,square]{natbib}
 \ifacmstyle
