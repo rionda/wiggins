@@ -1,0 +1,39 @@
+\section{Theorems}
+\begin{theorem}
+ For any graph, there is a unique optimal schedule.
+\end{theorem}
+\begin{proof}
+ The cost of a schedule $p$ can be written as 
+ $$\sum_{S}\pr{S}\frac{1}{\sum_{i\in S} p_i},$$
+ which is a convex function. Now since the simplex $\Delta_{n-1}$, the set of all schedules, is convex, there is a unique optimal schedule $p^*$.
+\end{proof}
+
+
+
+
+For a schedule $p$ define $c(p) = (c_1(p), \ldots, c_n(p))$, where 
+$$c_i(p) = \sum_{S:i\in S} \pr{S} \cdot \left(\frac{p_i}{\sum_{j\in S} p_j}\right)^2 = 
+p_i^2 \sum_{S:i\in S} \pr{S} \cdot \frac{1}{\paran{\sum_{j\in S} p_j}^2}.
+$$
+Also, define a mapping $\tau$ from schedules to schedules as follows:
+$$\frac{1}{Z}\paran{\sqrt{c_p^*(1)}, \ldots, \sqrt{c_p^*(n)}},$$
+where $Z$ is the normalizing factor.
+
+\begin{theorem}
+ A schedule $p$ is optimal if and only if $\tau(p) = p$.
+\end{theorem}
+\begin{proof}
+ Using Lagrange multipliers and uniqueness of the optimal schedule, $p$ is an optimal solution if and only if it is the only solution the the following system of equations, for variables $p_1, \ldots, p_n, \lambda$
+ \begin{align}\label{eq:lagsystem}
+ \sum_{S:i\in S} \pr{S}\frac{1}{\paran{\sum_{j\in S}p_j}^2} = \lambda, \ \forall i: 1\leq i \leq n.
+ \end{align}
+ 
+ 
+ On the other hand, $\tau(p) = p$ if and only if for every $i$, $1\leq i \leq n$:
+ \begin{align}
+  p_i &= \sqrt{c_i(p)/Z} = \frac{p_i}{\sqrt{Z}} \paran{\sum_{S:i\in S} \pr{S} \cdot \frac{1}{\paran{\sum_{j\in S} p_j}^2}}^{1/2} \\
+  & \Leftrightarrow \sum_{S:i\in S} \pr{S}\frac{1}{\paran{\sum_{j\in S}p_j}^2} = Z,
+ \end{align}
+ which is a solution for the system of equations in (\ref{eq:lagsystem}), by letting $\lambda = Z$.
+\end{proof}
+

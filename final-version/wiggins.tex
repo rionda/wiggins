@@ -1,0 +1,99 @@
+\documentclass{sig-alternate}
+\newif\ifacmstyle
+\acmstyletrue
+
+\input{./tex/macro.tex}
+
+\begin{document}
+\ifacmstyle
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
+
+\global\boilerplate={Permission to make digital or hard copies of all or part of
+	this work for personal or classroom use is granted without fee provided that
+	copies are not made or distributed for profit or commercial advantage and
+	that copies bear this notice and the full citation on the first page.
+	Copyrights for components of this work owned by others than the author(s)
+	must be honored. Abstracting with credit is permitted. To copy otherwise, or
+	republish, to post on servers or to redistribute to lists, requires prior
+	specific permission and/or a fee. Request permissions from
+Permissions@acm.org.}
+\CopyrightYear{2016}
+\conferenceinfo{WSDM 2016,}{February 22--25, 2016, San Francisco, CA, USA}
+\copyrightetc{Copyright is held by the owner/author(s). Publication rights
+licensed to ACM.\\ ISBN \the\acmcopyr}
+\crdata{978-1-4503-3716-8/16/02\dots\$15.00\\
+DOI: http://dx.doi.org/10.1145/2835776.2835830
+}
+
+
+%WSDM 2016, February 22 - 25, 2016, San Francisco, CA, USA
+%Copyright is held by the owner/author(s). Publication rights licensed to ACM.
+
+\clubpenalty=10000
+\widowpenalty = 10000
+\fi
+
+%\title{The \probname: a General Framework for Search and Detection in Dynamic
+%Social Networks}
+\title{\algonamebasecap: Detecting Valuable Information\\in Dynamic Networks Using Limited Resources}
+
+\numberofauthors{3}
+\author{
+\alignauthor
+Ahmad Mahmoody\\
+\affaddr{Dept.~of Computer Science}\\
+\affaddr{Brown University}\\
+\affaddr{Providence, RI, USA}\\
+\email{ahmad@cs.brown.edu}
+\alignauthor
+Matteo Riondato\\
+\affaddr{Two Sigma Investments}\\
+\affaddr{New York City, NY, USA}\\
+\email{matteo@twosigma.com}
+\alignauthor
+Eli Upfal\\
+\affaddr{Dept.~of Computer Science}\\
+\affaddr{Brown University}\\
+\affaddr{Providence, RI, USA}\\
+\email{eli@cs.brown.edu}
+}
+
+\date{\today}
+
+\maketitle
+
+\textit{``Have you found it, Wiggins?''}
+\begin{flushright}
+	\vspace{-6pt}
+	[Sherlock Holmes in \emph{A Study in Scarlet}]
+\end{flushright}
+\vspace{-16pt}
+
+\input{./tex/abstract.tex}
+
+\category{G.2.2}{Discrete Mathematics}{Graph Theory}[Graph algorithms]
+\category{H.2.8}{Database Management}{Database Applications}[Data mining]
+
+\keywords{Information diffusion; Rumor catching; Social networks}
+
+\input{./tex/introduction.tex}
+\input{./tex/model.tex}
+\input{./tex/relatedwork.tex}
+\input{./tex/method.tex}
+\input{./tex/experiment.tex}
+\input{./tex/conclusion.tex}
+
+\section{Acknowledgements}
+This work was supported by NSF grant IIS-1247581 and NIH grant R01-CA180776.
+
+%\bibliographystyle{abbrvnat}
+%\bibliography{catchRef}
+\input{./tex/biblio.tex}
+
+
+% \appendix
+% \input{./tex/appendix.tex}
+\end{document}
