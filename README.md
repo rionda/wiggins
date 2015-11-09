@@ -1,6 +1,6 @@
-# Wiggins
+# Wiggins: Detecting Valuable Information in Dynamic Networks Using Limited Resources
 
-LaTex source for a paper to be submitted at some point
+LaTex Source and code for the ACM WSDM'16 paper of the same name.
 
 The paper was written by Ahmad Mahmoody <ahmad@cs.brown.edu>, Matteo Riondato
 <matteo@cs.brown.edu>, and Eli Upfal <eli@cs.brown.edu>. The sources for the
