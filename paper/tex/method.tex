@@ -26,7 +26,7 @@ $\theta$-cost of a $c$-schedule.
 \begin{lemma}\label{lem:explicit}
 Let $\sched=(\sched_1,\ldots,\sched_n)$ be a $c$-schedule. Then
 \begin{equation}\label{eq:explicit}
-	\cost(\sched) \defeq
+	\cost_\theta(\sched) \defeq
 	\lim_{t\rightarrow\infty}\frac{1}{t}\sum_{t'=0}^t\expect[L_\theta(t')] =
 	\sum_{S\in \family} \frac{\pi(S)}{1- \theta(1-\sched(S))^c},
 \end{equation}
@@ -261,7 +261,7 @@ the algorithm in case of convergence.
 	\[
 		\sched^{(j+1)}_i = \frac{\sched^{(j)}_i W_i(\sched^{(j)})}{\sum_{z=1}^n
 		\sched^{(j)}_z W_z(\sched^{(j)})}=
-		\frac{\sched^{(j)}_i\lambda}{1\lambda}=\sched^{(j)}_i,
+		\frac{\sched^{(j)}_i\lambda}{1\cdot\lambda}=\sched^{(j)}_i,
 	\]
 	which means that we reached convergence and \algoname will return
 	$\sched^{(j+1)}$, which is optimal. %because $\sched^{(j+1)}=\sched^{(j)}$.
@@ -318,11 +318,11 @@ the algorithm in case of convergence.
 				$W_i \leftarrow W_i + \frac{\theta c \pi(S) (1-\sched(S))^{c-1}}{(1-\theta(1-\sched(S))^c)^2}$\label{algline:w}\;
 			}
 		}
-		$\sched_{\mathrm{old}}\leftarrow \sched$\;
+		$\sched^{\mathrm{old}}\leftarrow \sched$\;
 		\For{$i\leftarrow 1$ \KwTo $n$}{
-			$\sched_i\leftarrow \frac{\sched_iW_i}{\sum_{i} \sched_iW_i}$\;
+			$\sched_i\leftarrow \frac{\sched^{\mathrm{old}}_i\cdot W_i}{\sum_{i} \sched^{\mathrm{old}}_i\cdot W_i}$\;
 		}
-		\If(// test for convergence){$\sched_{\mathrm{old}} = \sched$} {
+		\If(// test for convergence){$\sched^{\mathrm{old}} = \sched$} {
 			%\tcp{Reached convergence}
 			\KwBreak\;
 		}
@@ -463,7 +463,7 @@ To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemma.
 	\]
 	Let now
 	\[
-		\mu=\frac{\ell(\Sample)(1-\theta)}{|Z|}\cost_\theta(\sched)\enspace.
+		\mu=\frac{\ell(\Sample)(1-\theta)}{Z}\cost_\theta(\sched)\enspace.
 	\]
 	By using the Chernoff bound for Binomial random
 	variables~\citep[Corol.~4.6]{MitzenmacherU05}, we have
@@ -472,10 +472,10 @@ To prove Thm.~\ref{thm:approx_sample}, we need the following technical lemma.
 		\cost_\theta(\sched)\right)\\
 		&=\Pr\left(\left|\sum_i X^i - \ell(\Sample)\cost_\theta(\sched)\right| \geq \varepsilon
 		\ell(\Sample) \cost_\theta(\sched)\right) \\
-		&= \Pr\left(\left|\frac{1-\theta}{|Z|}\sum_i X^i - \mu\right| \geq \varepsilon
+		&= \Pr\left(\left|\frac{1-\theta}{Z}\sum_i X^i - \mu\right| \geq \varepsilon
 		\mu\right) \leq 2\exp\left(-\frac{\varepsilon^2\mu}{3}\right)\\
 		&\le 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)
-			\cost_\theta(\sched)}{3|Z|}\right) \leq 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)}{3}\right),
+			\cost_\theta(\sched)}{3Z}\right) \leq 2\exp\left(-\frac{\varepsilon^2 \ell(\Sample) (1-\theta)}{3}\right),
 	\end{align*}
 	where the last inequality follows from the rightmost inequality
 	in~\eqref{eq:boundcost}. The thesis follows from our choice of
@@ -693,7 +693,7 @@ as \algonamemr.
 
 In MapReduce, algorithms work in \emph{rounds}. At each round, first a function
 $\mathsf{map}$ is executed independently (and therefore potentially massively in
-parallel) on each element of the input, and a number (or zero) key-value pairs
+parallel) on each element of the input, and a number of (or zero) key-value pairs
 of the form $(k,v)$ are emitted. Then, in the second part of the round, the
 emitted pairs are partitioned by key and elements with the same key are sent to
 the same machine (called the \emph{reducer} for that key), where a function

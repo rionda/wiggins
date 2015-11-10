@@ -9,7 +9,7 @@ of  information in the network by defining a \emph{generating
 process} $\sys=(\family,\pi)$.  $\sys$ is a infinite discrete-time process
 which, at each time step $t$, generates a collection of sets $\Sample_t\subseteq\family$ such
 that each set $S\in\family$ is included in $\Sample_t$ with probability $\pi(S)$,
-independently of $t$ and of other sets generated at time $t$ and at time $t'<t$.
+independent of $t$ and of other sets generated at time $t'\leq t$.
 For any $t$ and any $S\in\Sample_t$, the ordered pair $(t,S)$ represents an
 \emph{item} - a piece of information that was generated at time
 $t$ and reached \emph{instantaneously} the nodes in $S$. We choose to model the
