@@ -14,11 +14,11 @@ the process (e.g., $\pi$ or $\family$) change over time.  Finally, we show an
 algorithm for the MapReduce framework that allows us to scale to large networks.
 
 \subsection{Computing the Optimal Schedule}\label{sec:optimize}
-We first conduct a theoretical analysis of the cost function $\cost_\theta$.
-%and then use the results to develop \algoname, our algorithm to compute the
-%optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
+We first conduct a theoretical analysis of the cost function $\cost_\theta$,
+and then use the results to develop \algoname, our algorithm to compute the
+optimal $c$-schedule (i.e., solve the $(\theta,c)$-OPSP).
 
-\paragraph{Analysis of the cost function}
+\subsubsection{Analysis of the cost function}
 Assume for now that we know $\sys$, i.e., we have complete knowledge of
 $\family$ and $\pi$. Under this assumption, we can exactly compute the
 $\theta$-cost of a $c$-schedule.
@@ -154,7 +154,7 @@ We then have the following corollary of Thm.~\ref{thm:convexity}.
 	$\{v\}$ belongs to $\family$, the optimal schedule is \emph{unique}.
 \end{corollary}
 
-\paragraph{The algorithm}
+\subsubsection{The Algorithm}
 Corollary~\ref{corol:convexity} implies that one can compute an optimal
 $c-$schedule $p^*$ (i.e., solve the $(\theta,c)$-OPSP) by solving the
 unconstrained minimization of $\cost_\theta$ over the set $\mathsf{S}_c$ of all
