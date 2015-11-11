@@ -267,7 +267,9 @@ Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$
 \begin{figure}[htbp]
 	\subcaptionbox*{}{\includegraphics[width=0.49\textwidth]{figures/D100s/cost.pdf}}
 	\subcaptionbox*{}{\includegraphics[width=0.49\textwidth]{figures/D100s/vardist.pdf}}
-	\caption{\scriptsize The cost of \algonameapx outputs and their variation distance to the optimal schedule.} \label{fig:unique}
+	\caption{\scriptsize The cost of \algonameapx outputs and their variation distance to the optimal schedule: 
+	The edges of each box are the 25$^{th}$ and 75$^{th}$ percentiles, and excluding the outliers, the whiskers extend to the most extreme data points. The median and the outliers are marked by red line and $+$'s, respectively.
+	} \label{fig:unique}
 \end{figure}
 In our experiments we run the \algonameapx algorithm, using (i) different \emph{random} initial schedules, and (ii) samples $\Sample$ obtained from time intervals of different lengths. For each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \textbf{exact} cost of each schedule, and its variation distance to the uniform schedule. Our results are plotted in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using longer time intervals of sampling) the output schedules gets very close to the uniform schedule (the variance gets smaller and smaller).
 
