@@ -267,8 +267,16 @@ Suppose $G=(V,E)$ is the complete graph where $V=[n]$. Let $\sys=(\family, \pi)$
 \begin{figure}[htbp]
 	\subcaptionbox*{}{\includegraphics[width=0.49\textwidth]{figures/D100s/cost.pdf}}
 	\subcaptionbox*{}{\includegraphics[width=0.49\textwidth]{figures/D100s/vardist.pdf}}
-	\caption{\scriptsize The cost of \algonameapx outputs and their variation distance to the optimal schedule: 
-	The edges of each box are the 25$^{th}$ and 75$^{th}$ percentiles, and the median is shown by a red line segment.  The points that are larger than $q_3 + 1.5(q_3 - q_1)$ or smaller than $q_1 - 1.5(q_3 -s q_1)$ are considered as outliers (denoted by \textcolor{red}{$+$}), where $q_1$ and $q_3$ are the  25$^{th}$ and 75$^{th}$ percentiles, respectively. The whiskers extend to the most extreme data points that are not outliers.
+	\caption{\scriptsize The cost of \algonameapx outputs and their variation
+	distance to the optimal schedule: The top and bottom edge of each box are
+	the 25\textsuperscript{th}
+	and 75\textsuperscript{th} percentiles respectively , and the median
+	(50\textsuperscript{th} percentile) is shown by a red line segment.
+	The \textcolor{red}{$+$} symbols denote outliers, i.e., points larger than
+	$q_3 + 1.5(q_3 - q_1)$ or smaller than $q_1 - 1.5(q_3 - q_1)$, where $q_1$
+	and $q_3$ are the 25\textsuperscript{th} and 75\textsuperscript{th}
+	percentiles, respectively. The whiskers extend to the most extreme data
+	points that are not outliers.
 	} \label{fig:unique}
 \end{figure}
 In our experiments we run the \algonameapx algorithm, using (i) different \emph{random} initial schedules, and (ii) samples $\Sample$ obtained from time intervals of different lengths. For each sample, we run \algonameapx 10 times with 10 different random initial schedules, and compute the \textbf{exact} cost of each schedule, and its variation distance to the uniform schedule. Our results are plotted in Figure~\ref{fig:unique}, and as shown, by increasing the sample size (using longer time intervals of sampling) the output schedules gets very close to the uniform schedule (the variance gets smaller and smaller).
