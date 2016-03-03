@@ -84,7 +84,7 @@ where $\sched(S) = \sum_{v\in S} \sched_v$.
 	\begin{align}
 		\lim_{t\rightarrow\infty}\expect[L_\theta(t)]
 		&=\lim_{t\rightarrow\infty}\sum_{S\in\family}\sum_{t'=0}^t\theta^{t-t'}\pi(S)(1-\sched(S))^{c(t-t')}\nonumber\\
-		&=\lim_{t\rightarrow\infty}\sum_{S\in\family}\pi(S)\sum_{t'=0}^t(\theta(1-\sched(S))^c)^{t}\nonumber\\
+		&=\lim_{t\rightarrow\infty}\sum_{S\in\family}\pi(S)\sum_{t'=0}^t(\theta(1-\sched(S))^c)^{t'}\nonumber\\
 		&=\sum_{S\in\family}\frac{\pi(S)}{1-\theta(1-\sched(S))^c},
 	\end{align}
 	where we used the fact that $\theta(1-\sched(S))^c< 1$. We just showed that
